@@ -2,6 +2,8 @@
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Lexplorer.Models;
+using Newtonsoft.Json;
+using RestSharp;
 using System.Diagnostics;
 
 namespace Lexplorer.Services
@@ -10,19 +12,17 @@ namespace Lexplorer.Services
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/loopring/loopring";
 
-        readonly GraphQLHttpClient _client;
+        readonly RestClient _client;
 
         public GraphQLService()
         {
-            _client = new GraphQLHttpClient(_baseUrl, new NewtonsoftJsonSerializer());
+            _client = new RestClient(_baseUrl);
         }
 
-        public async Task<GraphQLResponse<BlockData>> GetBlocks()
+        public async Task<BlockData> GetBlocks()
         {
-            GraphQLRequest fetchBlocksGraphlQLQuery = new GraphQLHttpRequest
-            {
-                Query = @"
-             query blocks(
+            var blockQuery = @"
+            query blocks(
                 $skip: Int
                 $first: Int
                 $orderBy: Block_orderBy
@@ -30,6 +30,7 @@ namespace Lexplorer.Services
               ) {
                 proxy(id: 0) {
                   blockCount
+                  userCount
                 }
                 blocks(
                   skip: $skip
@@ -59,17 +60,27 @@ namespace Lexplorer.Services
                 id
                 address
             }
-            ",
-                Variables = new
+            ";
+
+            var request = new RestRequest()
+            {
+                Method = Method.Post
+            };
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = blockQuery,
+                variables = new
                 {
-                    skip = 0,
+                    skip = 10,
                     first = 10,
                     orderBy = "internalID",
                     orderDirection = "desc"
                 }
-            };
-            var response = await _client.SendQueryAsync<BlockData>(fetchBlocksGraphlQLQuery);
-            return response;
+            });
+            var response = await _client.PostAsync(request);
+            var data = JsonConvert.DeserializeObject<BlockData>(response.Content);
+            return data;
         }
     }
 }
