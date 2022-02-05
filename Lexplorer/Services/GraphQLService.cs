@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
+using Lexplorer.Helpers;
 using Lexplorer.Models;
 using Newtonsoft.Json;
 using RestSharp;
@@ -19,9 +20,9 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<BlockData> GetBlocks()
+        public async Task<Blocks> GetBlocks()
         {
-            var blockQuery = @"
+            var blocksQuery = @"
             query blocks(
                 $skip: Int
                 $first: Int
@@ -42,31 +43,15 @@ namespace Lexplorer.Services
                   transactionCount
                 }
               }
-            fragment BlockFragment on Block {
-                id
-                timestamp
-                txHash
-                gasLimit
-                gasPrice
-                height
-                blockHash
-                blockSize
-                gasPrice
-                operatorAccount {
-                  ...AccountFragment
-                }
-              }
-            fragment AccountFragment on Account {
-                id
-                address
-            }
-            ";
+            " 
+            + GraphQLFragments.BlockFragment 
+            + GraphQLFragments.AccountFragment ;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
             {
-                query = blockQuery,
+                query = blocksQuery,
                 variables = new
                 {
                     skip = 0,
@@ -76,7 +61,127 @@ namespace Lexplorer.Services
                 }
             });
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<BlockData>(response.Content);
+            var data = JsonConvert.DeserializeObject<Blocks>(response.Content);
+            return data;
+        }
+
+        public async Task<Transactions> GetTransactions()
+        {
+            var transactionsQuery = @"
+              query transactions(
+                $skip: Int
+                $first: Int
+                $orderBy: Transaction_orderBy
+                $orderDirection: OrderDirection
+                $block: Block_height
+                $where: Transaction_filter
+              ) {
+                proxy(id: 0) {
+                  transactionCount
+                  depositCount
+                  withdrawalCount
+                  transferCount
+                  addCount
+                  removeCount
+                  orderbookTradeCount
+                  swapCount
+                  accountUpdateCount
+                  ammUpdateCount
+                  signatureVerificationCount
+                  tradeNFTCount
+                  swapNFTCount
+                  withdrawalNFTCount
+                  transferNFTCount
+                  nftMintCount
+                  nftDataCount
+                }
+                transactions(
+                  skip: $skip
+                  first: $first
+                  orderBy: $orderBy
+                  orderDirection: $orderDirection
+                  block: $block
+                  where: $where
+                ) {
+                  id
+                  internalID
+                  block {
+                    id
+                    blockHash
+                    timestamp
+                    transactionCount
+                    depositCount
+                    withdrawalCount
+                    transferCount
+                    addCount
+                    removeCount
+                    orderbookTradeCount
+                    swapCount
+                    accountUpdateCount
+                    ammUpdateCount
+                    signatureVerificationCount
+                    tradeNFTCount
+                    swapNFTCount
+                    withdrawalNFTCount
+                    transferNFTCount
+                    nftMintCount
+                    nftDataCount
+                  }
+                  data
+                  ...AddFragment
+                  ...RemoveFragment
+                  ...SwapFragment
+                  ...OrderbookTradeFragment
+                  ...DepositFragment
+                  ...WithdrawalFragment
+                  ...TransferFragment
+                  ...AccountUpdateFragment
+                  ...AmmUpdateFragment
+                  ...SignatureVerificationFragment
+                  ...TradeNFTFragment
+                  ...SwapNFTFragment
+                  ...WithdrawalNFTFragment
+                  ...TransferNFTFragment
+                  ...MintNFTFragment
+                  ...DataNFTFragment
+                }
+              }"
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment
+              + GraphQLFragments.PoolFragment
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.AddFragment
+              + GraphQLFragments.RemoveFragment
+              + GraphQLFragments.SwapFragment
+              + GraphQLFragments.OrderBookTradeFragment
+              + GraphQLFragments.DepositFragment
+              + GraphQLFragments.WithdrawalFragment
+              + GraphQLFragments.TransferFragment
+              + GraphQLFragments.AccountUpdateFragment
+              + GraphQLFragments.AmmUpdateFragment
+              + GraphQLFragments.SignatureVerificationFragment
+              + GraphQLFragments.TradeNFTFragment
+              + GraphQLFragments.SwapNFTFragment
+              + GraphQLFragments.WithdrawalNFTFragment
+              + GraphQLFragments.TransferNFTFragment
+              + GraphQLFragments.MintNFTFragment
+              + GraphQLFragments.DataNFTFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = transactionsQuery,
+                variables = new
+                {
+                    skip = 0,
+                    first = 10,
+                    orderBy = "internalID",
+                    orderDirection = "desc"
+                }
+            });
+            var response = await _client.PostAsync(request);
+            var data = JsonConvert.DeserializeObject<Transactions>(response.Content);
             return data;
         }
     }
