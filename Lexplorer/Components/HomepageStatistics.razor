@@ -1,10 +1,21 @@
-﻿@inject Lexplorer.Services.GraphQLService GraphQLService;
+﻿@using GraphQL
+@using Lexplorer.Models
+@inject Lexplorer.Services.GraphQLService GraphQLService;
 <h3>HomepageStatistics</h3>
+
+@if(blockData.Data != null)
+{
+    @foreach(var block in blockData.Data.data.blocks)
+    {
+        <p>@block.blockHash</p>
+    }
+}
 
 @code 
 {
+    private GraphQLResponse<BlockData> blockData = new GraphQLResponse<BlockData>();
     protected override async Task OnInitializedAsync()
     {
-        await GraphQLService.GetBlocks();
+       blockData = await GraphQLService.GetBlocks();
     }
 }

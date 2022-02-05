@@ -1,4 +1,5 @@
-﻿using GraphQL.Client.Http;
+﻿using GraphQL;
+using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Lexplorer.Models;
 using System.Diagnostics;
@@ -16,9 +17,10 @@ namespace Lexplorer.Services
             _client = new GraphQLHttpClient(_baseUrl, new NewtonsoftJsonSerializer());
         }
 
-        public async Task GetBlocks()
+        public async Task<GraphQLResponse<BlockData>> GetBlocks()
         {
             var response = await _client.SendQueryAsync<BlockData>(GraphQLConstants.FetchBlocksGraphlQLQuery);
+            return response;
         }
     }
 }

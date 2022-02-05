@@ -8,7 +8,7 @@ namespace Lexplorer.Models
         public static GraphQL.GraphQLRequest FetchBlocksGraphlQLQuery = new GraphQLHttpRequest
         {
             Query = @"
-                            query blocks(
+             query blocks(
                 $skip: Int
                 $first: Int
                 $orderBy: Block_orderBy
@@ -27,19 +27,7 @@ namespace Lexplorer.Models
                   transactionCount
                 }
               }
-            "
-            + BlockFragment,
-            Variables = new
-            {
-                skip = 0,
-                first = 10,
-                orderBy = "internalID",
-                orderDirection = "desc"
-            }
-        };
-
-        public static string BlockFragment = 
-            @"fragment BlockFragment on Block {
+            fragment BlockFragment on Block {
                 id
                 timestamp
                 txHash
@@ -52,14 +40,20 @@ namespace Lexplorer.Models
                 operatorAccount {
                   ...AccountFragment
                 }
-              }"
-            + AccountFragment;
-
-        public static string AccountFragment =
-            @"  fragment AccountFragment on Account {
-            id
-            address
-            }";
+              }
+            fragment AccountFragment on Account {
+                id
+                address
+            }
+            ",
+            Variables = new
+            {
+                skip = 0,
+                first = 10,
+                orderBy = "internalID",
+                orderDirection = "desc"
+            }
+        };
     }
 }
 
