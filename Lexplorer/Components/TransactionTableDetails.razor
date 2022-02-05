@@ -1,0 +1,18 @@
+﻿@using Lexplorer.Models
+
+@switch(TransactionData.__typename)
+{
+    case "Transfer":
+    <MudTd DataLabel="From Address">@TransactionData.fromAccount.address.Substring(0,5)...@TransactionData.fromAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 5)</MudTd>
+    <MudTd DataLabel="To Address">@TransactionData.toAccount.address.Substring(0,5)...@TransactionData.toAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 5)</MudTd>
+    break;
+    case "Swap":
+    <MudTd DataLabel="From Address">@TransactionData.account.address.Substring(0,5)...@TransactionData.account.address.Substring(TransactionData.account.address.Length - 6, 5)</MudTd>
+    <MudTd DataLabel="To Address">@TransactionData.pool.address.Substring(0,5)...@TransactionData.pool.address.Substring(TransactionData.pool.address.Length - 6, 5)</MudTd>
+    break;
+}
+
+@code {
+    [Parameter]
+    public Transaction TransactionData { get; set; }
+}

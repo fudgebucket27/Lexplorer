@@ -89,7 +89,9 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id">@context.id</MudTd>
-                </RowTemplate>
+                    <MudTd DataLabel="Type">@context.__typename</MudTd>
+                    <TransactionTableDetails TransactionData=@context/>
+            </RowTemplate>
             </MudTable>
         </MudItem>
     </MudGrid>
