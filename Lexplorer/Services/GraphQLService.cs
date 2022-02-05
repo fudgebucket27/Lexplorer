@@ -20,7 +20,7 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<Blocks> GetBlocks()
+        public async Task<Blocks> GetBlocks(int skip, int first)
         {
             var blocksQuery = @"
             query blocks(
@@ -54,8 +54,8 @@ namespace Lexplorer.Services
                 query = blocksQuery,
                 variables = new
                 {
-                    skip = 0,
-                    first = 10,
+                    skip = skip,
+                    first = first,
                     orderBy = "internalID",
                     orderDirection = "desc"
                 }
@@ -65,7 +65,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransactions()
+        public async Task<Transactions> GetTransactions(int skip, int first)
         {
             var transactionsQuery = @"
               query transactions(
@@ -174,8 +174,8 @@ namespace Lexplorer.Services
                 query = transactionsQuery,
                 variables = new
                 {
-                    skip = 0,
-                    first = 10,
+                    skip = skip,
+                    first = first,
                     orderBy = "internalID",
                     orderDirection = "desc"
                 }

@@ -114,8 +114,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        blockData = await GraphQLService.GetBlocks();
-        transactionData = await GraphQLService.GetTransactions();
+        blockData = await GraphQLService.GetBlocks(0,10);
+        transactionData = await GraphQLService.GetTransactions(0,10);
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
     }
