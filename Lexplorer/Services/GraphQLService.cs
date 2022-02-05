@@ -19,7 +19,56 @@ namespace Lexplorer.Services
 
         public async Task<GraphQLResponse<BlockData>> GetBlocks()
         {
-            var response = await _client.SendQueryAsync<BlockData>(GraphQLConstants.FetchBlocksGraphlQLQuery);
+            GraphQLRequest fetchBlocksGraphlQLQuery = new GraphQLHttpRequest
+            {
+                Query = @"
+             query blocks(
+                $skip: Int
+                $first: Int
+                $orderBy: Block_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                proxy(id: 0) {
+                  blockCount
+                }
+                blocks(
+                  skip: $skip
+                  first: $first
+                  orderBy: $orderBy
+                  orderDirection: $orderDirection
+                ) {
+                  ...BlockFragment
+                  transactionCount
+                }
+              }
+            fragment BlockFragment on Block {
+                id
+                timestamp
+                txHash
+                gasLimit
+                gasPrice
+                height
+                blockHash
+                blockSize
+                gasPrice
+                operatorAccount {
+                  ...AccountFragment
+                }
+              }
+            fragment AccountFragment on Account {
+                id
+                address
+            }
+            ",
+                Variables = new
+                {
+                    skip = 0,
+                    first = 10,
+                    orderBy = "internalID",
+                    orderDirection = "desc"
+                }
+            };
+            var response = await _client.SendQueryAsync<BlockData>(fetchBlocksGraphlQLQuery);
             return response;
         }
     }
