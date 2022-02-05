@@ -1,2 +1,2 @@
 # Lexplorer
-Loopring explorer alternative
+Loopring block explorer alternative
