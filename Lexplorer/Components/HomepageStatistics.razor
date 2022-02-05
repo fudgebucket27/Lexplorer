@@ -1,0 +1,10 @@
+﻿@inject Lexplorer.Services.GraphQLService GraphQLService;
+<h3>HomepageStatistics</h3>
+
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await GraphQLService.GetBlocks();
+    }
+}
