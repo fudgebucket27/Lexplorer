@@ -32,7 +32,7 @@
         public Proxy proxy { get; set; }
     }
 
-    public class BlockData
+    public class Blocks
     {
         public Data data { get; set; }
     }
