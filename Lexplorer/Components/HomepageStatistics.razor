@@ -1,17 +1,64 @@
 ﻿@using GraphQL
 @using Lexplorer.Models
 @inject Lexplorer.Services.GraphQLService GraphQLService;
-<h3>Layer 2 Statistics</h3>
 @if(blockData != null)
 {
-    @foreach(var block in blockData.data.blocks)
-    {
-        <p>@block.blockHash</p>
-    }
+    <MudGrid>
+        <MudItem xs="4">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">TO DO</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="4">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data.proxy.blockCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="4">
+            <MudCard>
+               <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data.proxy.userCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="4">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">TO DO</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="4">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">TO DO</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="4">
+            <MudCard>
+               <MudCardContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">TO DO</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 }
 else
 {
-    <p>Retrieving Layer 2 statistics</p>
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
 }
 
 @code 
