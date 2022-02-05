@@ -62,10 +62,7 @@ namespace Lexplorer.Services
             }
             ";
 
-            var request = new RestRequest()
-            {
-                Method = Method.Post
-            };
+            var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
             {

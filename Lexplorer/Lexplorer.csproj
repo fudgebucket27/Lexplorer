@@ -13,4 +13,8 @@
     <PackageReference Include="RestSharp" Version="107.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>
