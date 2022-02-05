@@ -1,19 +1,22 @@
 ﻿@using GraphQL
 @using Lexplorer.Models
 @inject Lexplorer.Services.GraphQLService GraphQLService;
-<h3>HomepageStatistics</h3>
-
-@if(blockData.Data != null)
+<h3>Layer 2 Statistics</h3>
+@if(blockData != null)
 {
-    @foreach(var block in blockData.Data.data.blocks)
+    @foreach(var block in blockData.data.blocks)
     {
         <p>@block.blockHash</p>
     }
 }
+else
+{
+    <p>Retrieving Layer 2 statistics</p>
+}
 
 @code 
 {
-    private GraphQLResponse<BlockData> blockData = new GraphQLResponse<BlockData>();
+    private BlockData blockData;
     protected override async Task OnInitializedAsync()
     {
        blockData = await GraphQLService.GetBlocks();
