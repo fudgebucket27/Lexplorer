@@ -55,6 +55,21 @@
             </MudCard>
         </MudItem>
     </MudGrid>
+    <MudText Typo="Typo.h6">Latest Blocks</MudText>
+    <MudTable Items="@blockData.data.blocks" Hover="true">
+        <HeaderContent>
+            <MudTh>Block ID</MudTh>
+            <MudTh>L1 Transaction Hash</MudTh>
+            <MudTh>Block Size</MudTh>
+            <MudTh>Time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Block Id">@context.id</MudTd>
+            <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash</a></MudTd>
+            <MudTd DataLabel="Block Id">@context.blockSize</MudTd>
+            <MudTd DataLabel="Block Id">@context.timestamp</MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 else
 {

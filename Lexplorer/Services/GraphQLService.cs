@@ -69,7 +69,7 @@ namespace Lexplorer.Services
                 query = blockQuery,
                 variables = new
                 {
-                    skip = 10,
+                    skip = 0,
                     first = 10,
                     orderBy = "internalID",
                     orderDirection = "desc"
