@@ -52,19 +52,16 @@ else
 
     public bool isLoading;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
+        if (String.IsNullOrEmpty(pageNumber))
         {
-            if (String.IsNullOrEmpty(pageNumber))
-            {
-                pageNumber = "0";
-            }
-            isLoading = true;
-            blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
-            isLoading = false;
-            StateHasChanged();
+            pageNumber = "0";
         }
+        isLoading = true;
+        blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
+        isLoading = false;
+        StateHasChanged();
     }
 
     private void GoToNextPage()
