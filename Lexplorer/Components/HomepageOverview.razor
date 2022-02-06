@@ -5,7 +5,7 @@
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
 
-@if(blockData == null && transactionData == null)
+@if (blockData == null && transactionData == null)
 {
     <br />
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -146,16 +146,13 @@ else if (blockData != null && transactionData != null)
     private long averageTransactions;
     private double lastBlockSubmittedTime;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            blockData = await GraphQLService.GetBlocks(0, 10);
-            transactionData = await GraphQLService.GetTransactions(0, 10);
-            CalculateAverageBlockTime();
-            CalculateLastBlockSubmitted();
-            StateHasChanged();
-        }
+        blockData = await GraphQLService.GetBlocks(0, 10);
+        transactionData = await GraphQLService.GetTransactions(0, 10);
+        CalculateAverageBlockTime();
+        CalculateLastBlockSubmitted();
+        StateHasChanged();
     }
 
     private void CalculateAverageBlockTime()
