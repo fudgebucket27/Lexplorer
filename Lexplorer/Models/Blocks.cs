@@ -26,7 +26,7 @@
         public string userCount { get; set; }
     }
 
-    public class BlockData
+    public class BlocksData
     {
         public List<BlocksDetail> blocks { get; set; }
         public BlocksProxy proxy { get; set; }
@@ -34,6 +34,6 @@
 
     public class Blocks
     {
-        public BlockData data { get; set; }
+        public BlocksData data { get; set; }
     }
 }

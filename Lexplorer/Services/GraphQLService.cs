@@ -65,7 +65,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Blocks> GetBlock(int blockId)
+        public async Task<Block> GetBlock(int blockId)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -108,7 +108,7 @@ namespace Lexplorer.Services
                 }
             });
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Blocks>(response.Content);
+            var data = JsonConvert.DeserializeObject<Block>(response.Content);
             return data;
         }
 
