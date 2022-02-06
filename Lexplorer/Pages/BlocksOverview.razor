@@ -1,5 +1,5 @@
 ﻿@page "/blocks"
-@page "/blocks/{pageNumber}"
+@page "/blocks/{blockNumber}"
 @using Lexplorer.Models
 @using Lexplorer.Helpers
 @inject Lexplorer.Services.GraphQLService GraphQLService;
@@ -50,6 +50,10 @@ else
     private Blocks blockData;
 
     [Parameter]
+    public string? blockNumber { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
     public string? pageNumber { get; set; }
 
     public bool isLoading;
@@ -69,19 +73,19 @@ else
     private void GoToNextPage()
     {
         int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"blocks/{nextPage.ToString()}";
+        string parameters = $"blocks?pageNumber={nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPreviousPage()
     {
         int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"blocks/{previousPage.ToString()}";
+        string parameters = $"blocks?pageNumber={previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
     private void GoToStartPage()
     {
-        string parameters = "blocks/0";
+        string parameters = "blocks/";
         NavigationManager.NavigateTo(parameters);
     }
 }
