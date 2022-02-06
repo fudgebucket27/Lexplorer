@@ -6,7 +6,7 @@
 @if (blockData != null)
 {
     <MudGrid>
-        <MudItem xs="12">
+        <MudItem sm="12">
             <MudText Typo="Typo.h6">Latest Blocks</MudText>
             <MudTable Items="@blockData.data.blocks" Hover="true">
                 <HeaderContent>
@@ -24,6 +24,15 @@
             </MudTable>
         </MudItem>
     </MudGrid>
+    if(page != "0")
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary">Previous Page</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary">Next Page</MudButton>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GetNextPage">Next Page</MudButton>
+    }
 }
 else
 {
@@ -38,7 +47,7 @@ else
 
     /*
     protected override async Task OnInitializedAsync()
-    {
+        {
         blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25 ,25)
     }
     */
@@ -50,5 +59,11 @@ else
             blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25, 25);
             StateHasChanged();
         }
+    }
+
+    private async Task GetNextPage()
+    {
+        blockData = null;
+
     }
 }

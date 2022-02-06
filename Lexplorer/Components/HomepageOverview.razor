@@ -3,10 +3,17 @@
 @using Lexplorer.Models
 @using System.Diagnostics
 @inject Lexplorer.Services.GraphQLService GraphQLService;
-@if (blockData != null && transactionData != null)
+
+@if(blockData == null && transactionData == null)
 {
+    <br />
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else if (blockData != null && transactionData != null)
+{
+
     <MudGrid>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
@@ -14,7 +21,7 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
@@ -22,7 +29,7 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
@@ -32,7 +39,7 @@
         </MudItem>
     </MudGrid>
     <MudGrid>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
@@ -40,7 +47,7 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
@@ -48,7 +55,7 @@
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="4">
+        <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
@@ -59,9 +66,11 @@
     </MudGrid>
 
     <MudGrid>
-        <MudItem xs="6">
-            <MudText Typo="Typo.h6">Latest Blocks</MudText>
-            <MudTable Items="@blockData.data.blocks" Hover="true">
+        <MudItem sm="6">
+            <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Latest Blocks</MudText>
+                </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Block ID</MudTh>
                     <MudTh>L1 Transaction Hash</MudTh>
@@ -76,9 +85,11 @@
                 </RowTemplate>
             </MudTable>
         </MudItem>
-        <MudItem xs="6">
-            <MudText Typo="Typo.h6">Latest Transactions</MudText>
-            <MudTable Items="@transactionData.data.transactions" Hover="true">
+        <MudItem sm="6">
+            <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Latest Transactions</MudText>
+                </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Tx Id</MudTh>
                     <MudTh>Type</MudTh>
@@ -96,11 +107,6 @@
             </MudTable>
         </MudItem>
     </MudGrid>
-
-}
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
 @code
