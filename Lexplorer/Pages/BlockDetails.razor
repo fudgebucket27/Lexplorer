@@ -2,15 +2,47 @@
 @using Lexplorer.Models;
 @using Lexplorer.Helpers;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject NavigationManager NavigationManager;
 
 @if(blockData != null)
 {
     <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
+    <MudSimpleTable Style="overflow-x: auto;">
+      <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Block Hash</td>
+                <td>@blockData.data.block.blockHash</td>
+            </tr>
+            <tr>
+                <td>Block Size</td>
+                <td>@blockData.data.block.blockSize</td>
+            </tr>
+            <tr>
+                <td>L1 Transaction Hash</td>
+                <td><a href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
+            </tr>
+            <tr>
+                <td>Verified At</td>
+                <td>@TimestampToUTCConverter.Convert(@blockData.data.block.timestamp)</td>
+            </tr>
+            <tr>
+                <td>Raw Data</td>
+                <td>@blockData.data.block.data</td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
 }
 else
 {
      <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
+<MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
 
 @code {
     private Block blockData;
@@ -34,6 +66,12 @@ else
         blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
         isLoading = false;
         StateHasChanged();
+    }
+
+    private void GoToBlocksOverviewPage()
+    {
+        string parameters = "blocks/";
+        NavigationManager.NavigateTo(parameters);
     }
 
 }
