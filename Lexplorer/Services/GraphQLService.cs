@@ -43,9 +43,9 @@ namespace Lexplorer.Services
                   transactionCount
                 }
               }
-            " 
-            + GraphQLFragments.BlockFragment 
-            + GraphQLFragments.AccountFragment ;
+            "
+            + GraphQLFragments.BlockFragment
+            + GraphQLFragments.AccountFragment;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -58,6 +58,53 @@ namespace Lexplorer.Services
                     first = first,
                     orderBy = "internalID",
                     orderDirection = "desc"
+                }
+            });
+            var response = await _client.PostAsync(request);
+            var data = JsonConvert.DeserializeObject<Blocks>(response.Content);
+            return data;
+        }
+
+        public async Task<Blocks> GetBlock(int blockId)
+        {
+            var blockQuery = @"
+            query block($id: ID!) {
+                proxy(id: 0) {
+                  blockCount
+                }
+                block(id: $id) {
+                  ...BlockFragment
+                  data
+                  transactionCount
+                  depositCount
+                  withdrawalCount
+                  transferCount
+                  addCount
+                  removeCount
+                  orderbookTradeCount
+                  swapCount
+                  accountUpdateCount
+                  ammUpdateCount
+                  signatureVerificationCount
+                  tradeNFTCount
+                  swapNFTCount
+                  withdrawalNFTCount
+                  transferNFTCount
+                  nftMintCount
+                  nftDataCount
+                }
+              }
+            "
+            + GraphQLFragments.AccountFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = blockQuery,
+                variables = new
+                {
+                    id = blockId
                 }
             });
             var response = await _client.PostAsync(request);

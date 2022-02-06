@@ -1,12 +1,12 @@
 ﻿namespace Lexplorer.Models
 {
-    public class OperatorAccount
+    public class BlocksOperatorAccount
     {
         public string address { get; set; }
         public string id { get; set; }
     }
 
-    public class Block
+    public class BlocksDetail
     {
         public string blockHash { get; set; }
         public int blockSize { get; set; }
@@ -14,26 +14,26 @@
         public string gasPrice { get; set; }
         public string height { get; set; }
         public string id { get; set; }
-        public OperatorAccount operatorAccount { get; set; }
+        public BlocksOperatorAccount operatorAccount { get; set; }
         public string timestamp { get; set; }
         public string transactionCount { get; set; }
         public string txHash { get; set; }
     }
 
-    public class Proxy
+    public class BlocksProxy
     {
         public string blockCount { get; set; }
         public string userCount { get; set; }
     }
 
-    public class Data
+    public class BlockData
     {
-        public List<Block> blocks { get; set; }
-        public Proxy proxy { get; set; }
+        public List<BlocksDetail> blocks { get; set; }
+        public BlocksProxy proxy { get; set; }
     }
 
     public class Blocks
     {
-        public Data data { get; set; }
+        public BlockData data { get; set; }
     }
 }
