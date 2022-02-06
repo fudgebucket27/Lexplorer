@@ -7,7 +7,7 @@
 @if(blockData != null)
 {
     <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
-    <MudSimpleTable Style="overflow-x: auto;">
+    <MudSimpleTable>
       <thead>
         <tr>
             <th></th>
@@ -28,12 +28,12 @@
                 <td><a href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
             </tr>
             <tr>
-                <td>Verified At</td>
+                <td>Verified At (UTC)</td>
                 <td>@TimestampToUTCConverter.Convert(@blockData.data.block.timestamp)</td>
             </tr>
             <tr>
                 <td>Raw Data</td>
-                <td>@blockData.data.block.data</td>
+                <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@blockData.data.block.data" Lines="5"/></td>
             </tr>
         </tbody>
     </MudSimpleTable>
