@@ -3,7 +3,7 @@
 @using Lexplorer.Models
 @using System.Diagnostics
 @inject Lexplorer.Services.GraphQLService GraphQLService;
-@if(blockData != null && transactionData != null)
+@if (blockData != null && transactionData != null)
 {
     <MudGrid>
         <MudItem xs="4">
@@ -24,7 +24,7 @@
         </MudItem>
         <MudItem xs="4">
             <MudCard>
-               <MudCardContent>
+                <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data.proxy.userCount</MudText>
                 </MudCardContent>
@@ -50,7 +50,7 @@
         </MudItem>
         <MudItem xs="4">
             <MudCard>
-               <MudCardContent>
+                <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">@lastBlockSubmittedTime mins ago</MudText>
                 </MudCardContent>
@@ -91,8 +91,8 @@
                 <RowTemplate>
                     <MudTd DataLabel="Block Id">@context.id</MudTd>
                     <MudTd DataLabel="Type">@context.__typename</MudTd>
-                    <TransactionTableDetails TransactionData=@context/>
-            </RowTemplate>
+                    <TransactionTableDetails TransactionData=@context />
+                </RowTemplate>
             </MudTable>
         </MudItem>
     </MudGrid>
@@ -100,10 +100,10 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
-@code 
+@code
 {
     private Blocks blockData;
     private Transactions transactionData;
@@ -112,12 +112,26 @@ else
     private long averageTransactions;
     private double lastBlockSubmittedTime;
 
+    /*
     protected override async Task OnInitializedAsync()
-    {
-        blockData = await GraphQLService.GetBlocks(0,10);
-        transactionData = await GraphQLService.GetTransactions(0,10);
+        {
+        blockData = await GraphQLService.GetBlocks(0, 10);
+        transactionData = await GraphQLService.GetTransactions(0, 10);
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
+    }
+    */
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            blockData = await GraphQLService.GetBlocks(0, 10);
+            transactionData = await GraphQLService.GetTransactions(0, 10);
+            CalculateAverageBlockTime();
+            CalculateLastBlockSubmitted();
+            StateHasChanged();
+        }
     }
 
 
@@ -127,7 +141,7 @@ else
         long transactionCount = 0;
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         List<long> timeBetweenBlocks = new List<long>();
-        foreach(var block in blockData.data.blocks)
+        foreach (var block in blockData.data.blocks)
         {
             transactionCount += Int64.Parse(block.transactionCount);
             timeBetweenBlocks.Add(currentTime - Int64.Parse(block.timestamp));
