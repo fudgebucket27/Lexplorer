@@ -1,5 +1,5 @@
 ﻿@page "/blocks"
-@page "/blocks/{page}"
+@page "/blocks/{pageNumber}"
 @using Lexplorer.Models
 @using Lexplorer.Helpers
 @inject Lexplorer.Services.GraphQLService GraphQLService;
@@ -10,7 +10,7 @@
     <MudGrid>
         <MudItem sm="12">
             <MudText Typo="Typo.h6">Latest Blocks</MudText>
-            <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true">
+            <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true" Loading="@isLoading">
                 <HeaderContent>
                     <MudTh>Block ID</MudTh>
                     <MudTh>L1 Transaction Hash</MudTh>
@@ -26,15 +26,17 @@
             </MudTable>
         </MudItem>
     </MudGrid>
-    if(page != "0")
+    if(pageNumber != "0")
     {    
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
     }
     else
     {
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
     }
 }
 else
@@ -46,28 +48,32 @@ else
     private Blocks blockData;
 
     [Parameter]
-    public string? page { get; set; }
+    public string? pageNumber { get; set; }
+
+    public bool isLoading;
 
     protected override async Task OnParametersSetAsync()
     {
-        if(String.IsNullOrEmpty(page))
+        if(String.IsNullOrEmpty(pageNumber))
         {
-            page = "0";
+            pageNumber = "0";
         }
-        blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25, 25);
+        isLoading = true;
+        blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
+        isLoading = false;
         StateHasChanged();
     }
 
     private void GoToNextPage()
     {
-        int nextPage = Int32.Parse(page) + 1;
+        int nextPage = Int32.Parse(pageNumber) + 1;
         string parameters = $"blocks/{nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
     
     private void GoToPreviousPage()
     {
-        int previousPage = Int32.Parse(page) - 1;
+        int previousPage = Int32.Parse(pageNumber) - 1;
         string parameters = $"blocks/{previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
