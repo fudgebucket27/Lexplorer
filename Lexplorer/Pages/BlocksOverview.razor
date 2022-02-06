@@ -61,7 +61,6 @@ else
                 pageNumber = "0";
             }
             isLoading = true;
-            StateHasChanged;
             blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
             isLoading = false;
             StateHasChanged();
