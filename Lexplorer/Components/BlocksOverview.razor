@@ -27,7 +27,7 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
 @code {
@@ -36,8 +36,19 @@ else
     [Parameter]
     public string page { get; set; }
 
+    /*
     protected override async Task OnInitializedAsync()
     {
-        blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25 ,25);
+        blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25 ,25)
+    }
+    */
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            blockData = await GraphQLService.GetBlocks(Int32.Parse(page) * 25, 25);
+            StateHasChanged();
+        }
     }
 }
