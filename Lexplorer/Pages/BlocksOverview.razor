@@ -26,8 +26,8 @@
             </MudTable>
         </MudItem>
     </MudGrid>
-    if(pageNumber != "0")
-    {    
+    if (pageNumber != "0")
+    {
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
@@ -52,16 +52,20 @@ else
 
     public bool isLoading;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(String.IsNullOrEmpty(pageNumber))
+        if (firstRender)
         {
-            pageNumber = "0";
+            if (String.IsNullOrEmpty(pageNumber))
+            {
+                pageNumber = "0";
+            }
+            isLoading = true;
+            StateHasChanged;
+            blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
+            isLoading = false;
+            StateHasChanged();
         }
-        isLoading = true;
-        blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
-        isLoading = false;
-        StateHasChanged();
     }
 
     private void GoToNextPage()
@@ -70,14 +74,14 @@ else
         string parameters = $"blocks/{nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
-    
+
     private void GoToPreviousPage()
     {
         int previousPage = Int32.Parse(pageNumber) - 1;
         string parameters = $"blocks/{previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
-        private void GoToStartPage()
+    private void GoToStartPage()
     {
         string parameters = "blocks/0";
         NavigationManager.NavigateTo(parameters);
