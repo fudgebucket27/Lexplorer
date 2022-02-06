@@ -1,0 +1,39 @@
+﻿@page "/blocks/{blockNumber}"
+@using Lexplorer.Models;
+@using Lexplorer.Helpers;
+@inject Lexplorer.Services.GraphQLService GraphQLService;
+
+@if(blockData != null)
+{
+    <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
+}
+else
+{
+     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+@code {
+    private Block blockData;
+
+    [Parameter]
+    public string blockNumber { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? pageNumber { get; set; }
+
+    public bool isLoading;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (String.IsNullOrEmpty(pageNumber))
+        {
+            pageNumber = "0";
+        }
+        isLoading = true;
+        blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+        isLoading = false;
+        StateHasChanged();
+    }
+
+}

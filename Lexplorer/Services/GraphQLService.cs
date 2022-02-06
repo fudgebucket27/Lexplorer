@@ -95,6 +95,7 @@ namespace Lexplorer.Services
                 }
               }
             "
+            + GraphQLFragments.BlockFragment
             + GraphQLFragments.AccountFragment;
 
             var request = new RestRequest();
