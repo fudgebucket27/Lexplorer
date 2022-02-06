@@ -118,16 +118,6 @@ else if (blockData != null && transactionData != null)
     private long averageTransactions;
     private double lastBlockSubmittedTime;
 
-    /*
-    protected override async Task OnInitializedAsync()
-        {
-        blockData = await GraphQLService.GetBlocks(0, 10);
-        transactionData = await GraphQLService.GetTransactions(0, 10);
-        CalculateAverageBlockTime();
-        CalculateLastBlockSubmitted();
-    }
-    */
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -139,8 +129,6 @@ else if (blockData != null && transactionData != null)
             StateHasChanged();
         }
     }
-
-
 
     private void CalculateAverageBlockTime()
     {
