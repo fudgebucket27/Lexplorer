@@ -102,7 +102,7 @@ else if (blockData != null && transactionData != null)
                     <MudTh>Block ID</MudTh>
                     <MudTh>L1 Transaction Hash</MudTh>
                     <MudTh>Block Size</MudTh>
-                    <MudTh>Time(UTC)</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
@@ -125,7 +125,7 @@ else if (blockData != null && transactionData != null)
                     <MudTh>To</MudTh>
                     <MudTh>Amount</MudTh>
                     <MudTh>Fee</MudTh>
-                    <MudTh>Time(UTC)</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
