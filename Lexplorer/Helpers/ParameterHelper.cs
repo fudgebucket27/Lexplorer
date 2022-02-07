@@ -9,7 +9,7 @@
                 case "Swap":
                     return $"transaction/Swap/{transactionId}";
                 default:
-                    return "";
+                    return "404";
             }
         }
     }

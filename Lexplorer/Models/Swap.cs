@@ -75,7 +75,8 @@ namespace Lexplorer.Models
 
     public class SwapTransaction
     {
-        public string __typename { get; set; }
+        [JsonProperty(PropertyName = "__typename")]
+        public string typeName { get; set; }
         public SwapAccount account { get; set; }
         public SwapBlock block { get; set; }
         public string data { get; set; }

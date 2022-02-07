@@ -31,7 +31,7 @@
                 </tr>
                 <tr>
                     <td>Raw Data</td>
-                    <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
+                    <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
                 </tr>
             </tbody>
         </MudSimpleTable>
@@ -57,7 +57,7 @@ else
                         <MudTh>Time(UTC)</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Block Id">@context.id</MudTd>
+                        <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
                         <MudTd DataLabel="Type">@context.typeName</MudTd>
                         <TransactionTableDetails TransactionData=@context />
                         <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
@@ -102,12 +102,12 @@ else
         }
         if(block == null)
         {
-            block = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}", () => GraphQLService.GetBlock(Int32.Parse(blockNumber)));
+            block = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}", () => GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)));
         }
         StateHasChanged();
         isLoading = true;
         StateHasChanged();
-        transactionData = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}-page{pageNumber}", () =>GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber));
+        transactionData = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}-page{pageNumber}", () =>GraphQLService.GetTransactionsForBlock(Int32.Parse(pageNumber) * 10, 10, blockNumber));
         isLoading = false;
         StateHasChanged();
     }
@@ -118,7 +118,7 @@ else
         NavigationManager.NavigateTo(parameters);
     }
 
-        private void GoToNextPage()
+    private void GoToNextPage()
     {
         int nextPage = Int32.Parse(pageNumber) + 1;
         string parameters = $"blocks/{blockNumber}?pageNumber={nextPage.ToString()}";

@@ -7,14 +7,7 @@
 
 <PageTitle>The Lexplorer - Transaction</PageTitle>
 
-if(swapData != null)
-{
-    <SwapTransactionDetail swapData=@swapData></SwapTransactionDetail>
-}
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
+<SwapTransactionDetail SwapDetails=@swapData />
 
 
 @code {
@@ -30,9 +23,9 @@ else
     {
         if (swapData == null && transactionType == "Swap")
         {
-            swapData = await GraphQLService.GetSwapTransaction(transactionId);
-            //swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetSwapTransaction(transactionId));
+            swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetSwapTransaction(transactionId));
+            StateHasChanged();
         }
-        StateHasChanged();
+        
     }
 }

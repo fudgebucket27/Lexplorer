@@ -65,7 +65,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Block> GetBlock(int blockId)
+        public async Task<Block> GetBlockDetails(int blockId)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -183,7 +183,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Transactions> GetTransactionsForBlock(int skip, int first, string? blockId = null, string? typeName = null)
         {
             var transactionsQuery = @"
               query transactions(
