@@ -2,7 +2,7 @@
 @using Lexplorer.Models
 @using System.Globalization
 
-@switch(TransactionData.__typename)
+@switch(TransactionData.typeName)
 {
     case "Transfer":
     <MudTd DataLabel="From Address">@TransactionData.fromAccount.address.Substring(0,5)...@TransactionData.fromAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 5)</MudTd>

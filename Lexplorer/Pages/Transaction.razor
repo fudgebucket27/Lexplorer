@@ -1,0 +1,25 @@
+﻿@page "/transaction/{transacationId}"
+@using Lexplorer.Components;
+@using Lexplorer.Helpers;
+@using Lexplorer.Models;
+@inject IAppCache AppCache;
+@inject Lexplorer.Services.GraphQLService GraphQLService;
+
+<PageTitle>The Lexplorer - Transaction</PageTitle>
+
+
+@code {
+    private Transactions transactionData;
+
+    [Parameter]
+    public string transactionId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (transactionData == null)
+        {
+            transactionData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionId}", () => GraphQLService.GetTransaction(Int32.Parse(transactionId)));
+        }
+        StateHasChanged();
+    }
+}

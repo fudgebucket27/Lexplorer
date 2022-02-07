@@ -1,0 +1,44 @@
+﻿@using Lexplorer.Models;
+@using Lexplorer.Helpers;
+
+
+              <MudText Typo="Typo.h6">Block #@TransactionData.id</MudText>
+                <MudSimpleTable Dense="true">
+                    <tbody>
+                        <tr>
+                            <td>Block #</td>
+                            <td>@TransactionData.block.id</td>
+                        </tr>
+                        <tr>
+                            <td>Verified at</td>
+                            <td>@TimestampToUTCConverter.Convert(@TransactionData.block.timestamp)</td>
+                        </tr>
+                        <tr>
+                            <td>User Account</td>
+                            <td>@TransactionData.account.address</td>
+                        </tr>
+                        <tr>
+                            <td>Swap</td>
+                            <td>@TokenAmountConverter.Convert(@TransactionData.fillSA, @TransactionData.tokenA.decimals) @TransactionData.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(@TransactionData.fillSB, @TransactionData.tokenB.decimals) @TransactionData.tokenB.symbol</td>
+                        </tr>
+                        <tr>
+                            <td>Fee</td>
+                            <td>@TokenAmountConverter.Convert(@TransactionData.feeA,  @TransactionData.tokenB.decimals)</td>
+                        </tr>
+                        <tr>
+                            <td>Pool</td>
+                            <td>@TransactionData.pool.address</td>
+                        </tr>
+                        <tr>
+                            <td>Raw Data</td>
+                            <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@TransactionData.data" Lines="5"/></td>
+                        </tr>
+                    </tbody>
+                </MudSimpleTable>
+
+@code {
+    [Parameter]
+    public Transaction TransactionData { get; set; }
+
+    public string swapSymbol = "<>";
+}

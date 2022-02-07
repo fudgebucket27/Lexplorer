@@ -1,4 +1,6 @@
-﻿namespace Lexplorer.Models
+﻿using Newtonsoft.Json;
+
+namespace Lexplorer.Models
 {
     public class TransactionProxy
     {
@@ -139,7 +141,8 @@
 
     public class Transaction
     {
-        public string __typename { get; set; }
+        [JsonProperty(PropertyName = "__typename")]
+        public string typeName { get; set; }
         public Account account { get; set; }
         public TransactionBlock block { get; set; }
         public string data { get; set; }

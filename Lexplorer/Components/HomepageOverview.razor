@@ -129,7 +129,7 @@ else if (blockData != null && transactionData != null)
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id">@context.id</MudTd>
-                    <MudTd DataLabel="Type">@context.__typename</MudTd>
+                    <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
                 </RowTemplate>
             </MudTable>

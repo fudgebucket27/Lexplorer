@@ -58,8 +58,9 @@ else
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Block Id">@context.id</MudTd>
-                        <MudTd DataLabel="Type">@context.__typename</MudTd>
+                        <MudTd DataLabel="Type">@context.typeName</MudTd>
                         <TransactionTableDetails TransactionData=@context />
+                        <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
                     </RowTemplate>
     </MudTable>
     @if(pageNumber == "0")
