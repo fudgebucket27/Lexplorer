@@ -7,7 +7,7 @@
 @if(blockData != null)
 {
     <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
-    <MudSimpleTable>
+    <MudSimpleTable Dense="true">
       <thead>
         <tr>
             <th></th>
@@ -25,7 +25,7 @@
             </tr>
             <tr>
                 <td>L1 Transaction Hash</td>
-                <td><a href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
+                <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
             </tr>
             <tr>
                 <td>Verified At (UTC)</td>
