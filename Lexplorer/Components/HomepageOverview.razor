@@ -128,7 +128,7 @@ else if (blockData != null && transactionData != null)
                     <MudTh>Time(UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Block Id">@context.id</MudTd>
+                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
                 </RowTemplate>

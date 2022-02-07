@@ -1,4 +1,4 @@
-﻿@page "/transaction/{transacationId}"
+﻿@page "/transaction/{transactionType}/{transactionId}"
 @using Lexplorer.Components;
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
@@ -7,18 +7,31 @@
 
 <PageTitle>The Lexplorer - Transaction</PageTitle>
 
+if(swapData != null)
+{
+    <SwapTransactionDetail swapData=@swapData></SwapTransactionDetail>
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
 
 @code {
-    private Transactions transactionData;
+    private Swap swapData;
+
+    [Parameter]
+    public string transactionType { get; set; }
 
     [Parameter]
     public string transactionId { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (transactionData == null)
+        if (swapData == null && transactionType == "Swap")
         {
-            transactionData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionId}", () => GraphQLService.GetTransaction(Int32.Parse(transactionId)));
+            swapData = await GraphQLService.GetSwapTransaction(transactionId);
+            //swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetSwapTransaction(transactionId));
         }
         StateHasChanged();
     }

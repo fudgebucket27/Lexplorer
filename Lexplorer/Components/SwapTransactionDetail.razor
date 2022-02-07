@@ -2,43 +2,43 @@
 @using Lexplorer.Helpers;
 
 
-              <MudText Typo="Typo.h6">Block #@TransactionData.id</MudText>
+              <MudText Typo="Typo.h6">Block #@swapData.data.transaction.id</MudText>
                 <MudSimpleTable Dense="true">
                     <tbody>
                         <tr>
                             <td>Block #</td>
-                            <td>@TransactionData.block.id</td>
+                            <td>@swapData.data.transaction.block.id</td>
                         </tr>
                         <tr>
                             <td>Verified at</td>
-                            <td>@TimestampToUTCConverter.Convert(@TransactionData.block.timestamp)</td>
+                            <td>@TimestampToUTCConverter.Convert(swapData.data.transaction.block.timestamp)</td>
                         </tr>
                         <tr>
                             <td>User Account</td>
-                            <td>@TransactionData.account.address</td>
+                            <td>@swapData.data.transaction.account</td>
                         </tr>
                         <tr>
                             <td>Swap</td>
-                            <td>@TokenAmountConverter.Convert(@TransactionData.fillSA, @TransactionData.tokenA.decimals) @TransactionData.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(@TransactionData.fillSB, @TransactionData.tokenB.decimals) @TransactionData.tokenB.symbol</td>
+                            <td>@TokenAmountConverter.Convert(swapData.data.transaction.fillSA, swapData.data.transaction.tokenA.decimals) @swapData.data.transaction.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(swapData.data.transaction.fillSB, swapData.data.transaction.tokenB.decimals) @swapData.data.transaction.tokenB.symbol</td>
                         </tr>
                         <tr>
                             <td>Fee</td>
-                            <td>@TokenAmountConverter.Convert(@TransactionData.feeA,  @TransactionData.tokenB.decimals)</td>
+                            <td>@TokenAmountConverter.Convert(swapData.data.transaction.feeA,  swapData.data.transaction.tokenB.decimals)</td>
                         </tr>
                         <tr>
                             <td>Pool</td>
-                            <td>@TransactionData.pool.address</td>
+                            <td>@swapData.data.transaction.pool.address</td>
                         </tr>
                         <tr>
                             <td>Raw Data</td>
-                            <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@TransactionData.data" Lines="5"/></td>
+                  
                         </tr>
                     </tbody>
                 </MudSimpleTable>
 
 @code {
     [Parameter]
-    public Transaction TransactionData { get; set; }
+    public Swap swapData { get; set; }
 
     public string swapSymbol = "<>";
 }

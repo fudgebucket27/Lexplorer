@@ -113,7 +113,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransaction(int transactionId)
+        public async Task<Swap> GetSwapTransaction(string transactionId)
         {
             var transactionQuery = @"
               query transaction($id: ID!) {
@@ -179,7 +179,7 @@ namespace Lexplorer.Services
             });
 
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Transactions>(response.Content);
+            var data = JsonConvert.DeserializeObject<Swap>(response.Content);
             return data;
         }
 
