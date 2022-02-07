@@ -47,11 +47,17 @@ else
     [Parameter]
     public Swap SwapDetails { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string previousPageNumber { get; set; }
+
     public string swapSymbol = "<>";
 
     private void GoToBlockOverviewPage()
     {
-        string parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber=0";
+        string tempPreviousPageNumber = "";
+        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
+        string parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
         NavigationManager.NavigateTo(parameters);
     }
 }
