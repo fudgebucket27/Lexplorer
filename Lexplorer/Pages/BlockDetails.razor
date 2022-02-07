@@ -40,7 +40,7 @@ else
 
 @if(transactionData != null)
 {
-    <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true">
+    <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">Transactions in block #@blockData.data.block.id</MudText>
                     </ToolBarContent>
@@ -59,13 +59,23 @@ else
                         <TransactionTableDetails TransactionData=@context />
                     </RowTemplate>
     </MudTable>
+    @if(pageNumber == "0")
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
 }
 else
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
-
 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
+<MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
 
 @code {
     private Block blockData;
@@ -86,15 +96,40 @@ else
         {
             pageNumber = "0";
         }
-        blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+        if(blockData == null)
+        {
+            blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+        }
         StateHasChanged();
-        transactionData = await GraphQLService.GetTransactions(0, 10, blockNumber);
+        isLoading = true;
+        StateHasChanged();
+        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber);
+        isLoading = false;
         StateHasChanged();
     }
 
     private void GoToBlocksOverviewPage()
     {
         string parameters = "blocks/";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+        private void GoToNextPage()
+    {
+        int nextPage = Int32.Parse(pageNumber) + 1;
+        string parameters = $"blocks/{blockNumber}?pageNumber={nextPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToPreviousPage()
+    {
+        int previousPage = Int32.Parse(pageNumber) - 1;
+        string parameters = $"blocks/{blockNumber}?pageNumber={previousPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    private void GoToStartPage()
+    {
+        string parameters = $"blocks/{blockNumber}?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 
