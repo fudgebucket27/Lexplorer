@@ -1,0 +1,31 @@
+﻿@page "/transaction/{transactionType}/{transactionId}"
+@using Lexplorer.Components;
+@using Lexplorer.Helpers;
+@using Lexplorer.Models;
+@inject IAppCache AppCache;
+@inject Lexplorer.Services.GraphQLService GraphQLService;
+
+<PageTitle>The Lexplorer - Transaction</PageTitle>
+
+<SwapTransactionDetail SwapDetails=@swapData />
+
+
+@code {
+    private Swap swapData;
+
+    [Parameter]
+    public string transactionType { get; set; }
+
+    [Parameter]
+    public string transactionId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (swapData == null && transactionType == "Swap")
+        {
+            swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetSwapTransaction(transactionId));
+            StateHasChanged();
+        }
+        
+    }
+}

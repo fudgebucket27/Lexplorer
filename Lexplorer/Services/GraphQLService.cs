@@ -65,7 +65,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Block> GetBlock(int blockId)
+        public async Task<Block> GetBlockDetails(int blockId)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -113,7 +113,77 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Swap> GetSwapTransaction(string transactionId)
+        {
+            var transactionQuery = @"
+              query transaction($id: ID!) {
+                transaction(id: $id) {
+                  id
+                  block {
+                    id
+                    blockHash
+                    timestamp
+                    transactionCount
+                  }
+                  data
+                  ...AddFragment
+                  ...RemoveFragment
+                  ...SwapFragment
+                  ...OrderbookTradeFragment
+                  ...DepositFragment
+                  ...WithdrawalFragment
+                  ...TransferFragment
+                  ...AccountUpdateFragment
+                  ...AmmUpdateFragment
+                  ...SignatureVerificationFragment
+                  ...TradeNFTFragment
+                  ...SwapNFTFragment
+                  ...WithdrawalNFTFragment
+                  ...TransferNFTFragment
+                  ...MintNFTFragment
+                  ...DataNFTFragment
+                }
+              }
+            "
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment
+              + GraphQLFragments.PoolFragment
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.AddFragment
+              + GraphQLFragments.RemoveFragment
+              + GraphQLFragments.SwapFragment
+              + GraphQLFragments.OrderBookTradeFragment
+              + GraphQLFragments.DepositFragment
+              + GraphQLFragments.WithdrawalFragment
+              + GraphQLFragments.TransferFragment
+              + GraphQLFragments.AccountUpdateFragment
+              + GraphQLFragments.AmmUpdateFragment
+              + GraphQLFragments.SignatureVerificationFragment
+              + GraphQLFragments.TradeNFTFragment
+              + GraphQLFragments.SwapNFTFragment
+              + GraphQLFragments.WithdrawalNFTFragment
+              + GraphQLFragments.TransferNFTFragment
+              + GraphQLFragments.MintNFTFragment
+              + GraphQLFragments.DataNFTFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddJsonBody(new
+            {
+                query = transactionQuery,
+                variables = new
+                {
+                    id = transactionId
+                }
+            });
+
+            var response = await _client.PostAsync(request);
+            var data = JsonConvert.DeserializeObject<Swap>(response.Content);
+            return data;
+        }
+
+        public async Task<Transactions> GetTransactionsForBlock(int skip, int first, string? blockId = null, string? typeName = null)
         {
             var transactionsQuery = @"
               query transactions(
@@ -217,7 +287,7 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            if(blockId != null)
+            if (blockId != null)
             {
                 request.AddJsonBody(new
                 {

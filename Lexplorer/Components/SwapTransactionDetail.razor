@@ -1,0 +1,57 @@
+﻿@using Lexplorer.Models;
+@using Lexplorer.Helpers;
+@inject NavigationManager NavigationManager;
+
+@if (SwapDetails != null)
+{
+                      <MudText Typo="Typo.h6">Transaction #@SwapDetails.data.transaction.id</MudText>
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Block #</td>
+                                <td>@SwapDetails.data.transaction.block.id</td>
+                            </tr>
+                            <tr>
+                                <td>Verified at</td>
+                                <td>@TimestampToUTCConverter.Convert(SwapDetails.data.transaction.block.timestamp)</td>
+                            </tr>
+                            <tr>
+                                <td>User Account</td>
+                                <td>@SwapDetails.data.transaction.account.address</td>
+                            </tr>
+                            <tr>
+                                <td>Swap</td>
+                                <td>@TokenAmountConverter.Convert(SwapDetails.data.transaction.fillSA, SwapDetails.data.transaction.tokenA.decimals) @SwapDetails.data.transaction.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(SwapDetails.data.transaction.fillSB, SwapDetails.data.transaction.tokenB.decimals) @SwapDetails.data.transaction.tokenB.symbol</td>
+                            </tr>
+                            <tr>
+                                <td>Fee</td>
+                                <td>@TokenAmountConverter.Convert(SwapDetails.data.transaction.feeA,  SwapDetails.data.transaction.tokenB.decimals) @SwapDetails.data.transaction.tokenB.symbol</td>
+                            </tr>
+                            <tr>
+                                <td>Pool</td>
+                                <td>@SwapDetails.data.transaction.pool.address</td>
+                            </tr>
+                            <tr>
+                                <td>Raw Data</td>
+                                <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@SwapDetails.data.transaction.data" Lines="3"/></td>
+                            </tr>
+                        </tbody>
+        </MudSimpleTable>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+@code {
+    [Parameter]
+    public Swap SwapDetails { get; set; }
+
+    public string swapSymbol = "<>";
+
+    private void GoToBlockOverviewPage()
+    {
+        string parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber=0";
+        NavigationManager.NavigateTo(parameters);
+    }
+}

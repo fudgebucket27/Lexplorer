@@ -51,11 +51,6 @@
     public class Block
     {
         public BlockData data { get; set; }
-
-        public Block(BlockData data)
-        {
-            this.data = data;
-        }
     }
 
 
