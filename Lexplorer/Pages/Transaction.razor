@@ -23,7 +23,7 @@
     {
         if (swapData == null && transactionType == "Swap")
         {
-            swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetSwapTransaction(transactionId));
+            swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetTransaction<Swap>(transactionId));
             StateHasChanged();
         }
         
