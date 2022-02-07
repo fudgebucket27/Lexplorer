@@ -1,51 +1,85 @@
 ﻿@page "/blocks/{blockNumber}"
+@using Lexplorer.Components
 @using Lexplorer.Models;
 @using Lexplorer.Helpers;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
 
-@if(blockData != null)
+@if (blockData != null)
 {
-    <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
-    <MudSimpleTable Dense="true">
-      <thead>
-        <tr>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Block Hash</td>
-                <td>@blockData.data.block.blockHash</td>
-            </tr>
-            <tr>
-                <td>Block Size</td>
-                <td>@blockData.data.block.blockSize</td>
-            </tr>
-            <tr>
-                <td>L1 Transaction Hash</td>
-                <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
-            </tr>
-            <tr>
-                <td>Verified At (UTC)</td>
-                <td>@TimestampToUTCConverter.Convert(@blockData.data.block.timestamp)</td>
-            </tr>
-            <tr>
-                <td>Raw Data</td>
-                <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@blockData.data.block.data" Lines="5"/></td>
-            </tr>
-        </tbody>
-    </MudSimpleTable>
+        <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
+        <MudSimpleTable Dense="true">
+            <tbody>
+                <tr>
+                    <td>Block Hash</td>
+                    <td>@blockData.data.block.blockHash</td>
+                </tr>
+                <tr>
+                    <td>Block Size</td>
+                    <td>@blockData.data.block.blockSize</td>
+                </tr>
+                <tr>
+                    <td>L1 Transaction Hash</td>
+                    <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
+                </tr>
+                <tr>
+                    <td>Verified At (UTC)</td>
+                    <td>@TimestampToUTCConverter.Convert(@blockData.data.block.timestamp)</td>
+                </tr>
+                <tr>
+                    <td>Raw Data</td>
+                    <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@blockData.data.block.data" Lines="5"/></td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
 }
 else
 {
-     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+@if(transactionData != null)
+{
+    <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Transactions in block #@blockData.data.block.id</MudText>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Tx Id</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>From</MudTh>
+                        <MudTh>To</MudTh>
+                        <MudTh>Amount</MudTh>
+                        <MudTh>Fee</MudTh>
+                        <MudTh>Time(UTC)</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Block Id">@context.id</MudTd>
+                        <MudTd DataLabel="Type">@context.__typename</MudTd>
+                        <TransactionTableDetails TransactionData=@context />
+                    </RowTemplate>
+    </MudTable>
+    @if(pageNumber == "0")
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
+<MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
 
 @code {
     private Block blockData;
+    private Transactions transactionData;
 
     [Parameter]
     public string blockNumber { get; set; }
@@ -62,8 +96,14 @@ else
         {
             pageNumber = "0";
         }
+        if(blockData == null)
+        {
+            blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+        }
+        StateHasChanged();
         isLoading = true;
-        blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+        StateHasChanged();
+        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber);
         isLoading = false;
         StateHasChanged();
     }
@@ -71,6 +111,25 @@ else
     private void GoToBlocksOverviewPage()
     {
         string parameters = "blocks/";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+        private void GoToNextPage()
+    {
+        int nextPage = Int32.Parse(pageNumber) + 1;
+        string parameters = $"blocks/{blockNumber}?pageNumber={nextPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToPreviousPage()
+    {
+        int previousPage = Int32.Parse(pageNumber) - 1;
+        string parameters = $"blocks/{blockNumber}?pageNumber={previousPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    private void GoToStartPage()
+    {
+        string parameters = $"blocks/{blockNumber}?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 

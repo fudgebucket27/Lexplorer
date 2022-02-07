@@ -113,7 +113,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransactions(int skip, int first)
+        public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
         {
             var transactionsQuery = @"
               query transactions(
@@ -217,17 +217,39 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(new
+            if(blockId != null)
             {
-                query = transactionsQuery,
-                variables = new
+                request.AddJsonBody(new
                 {
-                    skip = skip,
-                    first = first,
-                    orderBy = "internalID",
-                    orderDirection = "desc"
-                }
-            });
+                    query = transactionsQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        orderBy = "internalID",
+                        orderDirection = "desc"
+                    },
+                    where = new
+                    {
+                        block = blockId
+                    }
+                });
+            }
+            else
+            {
+                request.AddJsonBody(new
+                {
+                    query = transactionsQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        orderBy = "internalID",
+                        orderDirection = "desc"
+                    }
+                });
+            }
+
             var response = await _client.PostAsync(request);
             var data = JsonConvert.DeserializeObject<Transactions>(response.Content);
             return data;
