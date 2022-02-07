@@ -4,31 +4,32 @@
 @using Lexplorer.Helpers;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
+@inject IAppCache AppCache;
 
-@if (blockData != null)
+@if (block != null)
 {
-        <MudText Typo="Typo.h6">Block #@blockData.data.block.id</MudText>
+        <MudText Typo="Typo.h6">Block #@block.data.block.id</MudText>
         <MudSimpleTable Dense="true">
             <tbody>
                 <tr>
                     <td>Block Hash</td>
-                    <td>@blockData.data.block.blockHash</td>
+                    <td>@block.data.block.blockHash</td>
                 </tr>
                 <tr>
                     <td>Block Size</td>
-                    <td>@blockData.data.block.blockSize</td>
+                    <td>@block.data.block.blockSize</td>
                 </tr>
                 <tr>
                     <td>L1 Transaction Hash</td>
-                    <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@blockData.data.block.txHash" target="_blank">@blockData.data.block.txHash</a></td>
+                    <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@block.data.block.txHash" target="_blank">@block.data.block.txHash</a></td>
                 </tr>
                 <tr>
                     <td>Verified At (UTC)</td>
-                    <td>@TimestampToUTCConverter.Convert(@blockData.data.block.timestamp)</td>
+                    <td>@TimestampToUTCConverter.Convert(block.data.block.timestamp)</td>
                 </tr>
                 <tr>
                     <td>Raw Data</td>
-                    <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@blockData.data.block.data" Lines="5"/></td>
+                    <td><MudTextField T="string" Variant="Variant.Text" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
                 </tr>
             </tbody>
         </MudSimpleTable>
@@ -42,7 +43,7 @@ else
 {
     <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">Transactions in block #@blockData.data.block.id</MudText>
+                        <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id</MudText>
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>Tx Id</MudTh>
@@ -78,7 +79,7 @@ else
 <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
 
 @code {
-    private Block blockData;
+    private Block block;
     private Transactions transactionData;
 
     [Parameter]
@@ -96,14 +97,14 @@ else
         {
             pageNumber = "0";
         }
-        if(blockData == null)
+        if(block == null)
         {
-            blockData = await GraphQLService.GetBlock(Int32.Parse(blockNumber));
+            block = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}", () => GraphQLService.GetBlock(Int32.Parse(blockNumber)));
         }
         StateHasChanged();
         isLoading = true;
         StateHasChanged();
-        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber);
+        transactionData = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}-page{pageNumber}", () =>GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber));
         isLoading = false;
         StateHasChanged();
     }
