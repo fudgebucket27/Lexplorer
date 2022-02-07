@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="GraphQL.Client" Version="4.0.2" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="4.0.2" />
+    <PackageReference Include="LazyCache" Version="2.4.0" />
+    <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
     <PackageReference Include="MudBlazor" Version="6.0.2" />
     <PackageReference Include="RestSharp" Version="107.2.1" />
   </ItemGroup>

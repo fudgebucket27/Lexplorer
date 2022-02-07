@@ -15,6 +15,7 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<GraphQLService>();
+builder.Services.AddLazyCache();
 
 var app = builder.Build();
 
