@@ -121,7 +121,7 @@ else
         string cacheKey = $"blockDetailOverview-{blockNumber}";
 
         isBlockLoading = true;
-        block = await AppCache.GetOrAddAsync(cacheKey, async () => await GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(5));
+        block = await AppCache.GetOrAddAsync(cacheKey, async () => await GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(2));
         blockData = new List<BlockData>();
         blockData.Add(block.data);
         isBlockLoading = false;
