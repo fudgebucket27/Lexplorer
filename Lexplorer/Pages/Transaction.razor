@@ -15,6 +15,10 @@ else if(transferData != null)
 {
     <TransferTransactionDetail TransferDetails=@transferData />
 }
+else if(tradeData != null)
+{
+    <OrderbookTradeTransactionDetail TradeDetails=@tradeData />
+}
 else
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -23,6 +27,7 @@ else
 @code {
     private Swap swapData;
     private Transfer transferData;
+    private OrderbookTrade tradeData;
 
     [Parameter]
     public string transactionType { get; set; }
@@ -40,6 +45,11 @@ else
         }else if (transferData == null  && transactionType == "Transfer")
         {
             transferData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<Transfer>(transactionId));
+            StateHasChanged();
+        }
+        else if (tradeData == null  && transactionType == "OrderbookTrade")
+        {
+            tradeData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<OrderbookTrade>(transactionId));
             StateHasChanged();
         }
 

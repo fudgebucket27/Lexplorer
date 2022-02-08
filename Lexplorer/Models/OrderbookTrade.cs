@@ -2,7 +2,7 @@
 
 namespace Lexplorer.Models
 {
-    public class TradeBlock
+    public class OrderbookTradeBlock
     {
         public string id { get; set; }
         public string blockHash { get; set; }
@@ -10,19 +10,19 @@ namespace Lexplorer.Models
         public string transactionCount { get; set; }
     }
 
-    public class TradeAccountA
+    public class OrderbookTradeAccountA
     {
         public string id { get; set; }
         public string address { get; set; }
     }
 
-    public class TradeAccountB
+    public class OrderbookTradeAccountB
     {
         public string id { get; set; }
         public string address { get; set; }
     }
 
-    public class TradeTokenA
+    public class OrderbookTradeTokenA
     {
         public string id { get; set; }
         public string name { get; set; }
@@ -31,7 +31,7 @@ namespace Lexplorer.Models
         public string address { get; set; }
     }
 
-    public class TradeTokenB
+    public class OrderbookTradeTokenB
     {
         public string id { get; set; }
         public string name { get; set; }
@@ -40,33 +40,33 @@ namespace Lexplorer.Models
         public string address { get; set; }
     }
 
-    public class TradeToken0
+    public class OrderbookTradeToken0
     {
         public string symbol { get; set; }
     }
 
-    public class TradeToken1
+    public class OrderbookTradeToken1
     {
         public string symbol { get; set; }
     }
 
-    public class TradePair
+    public class OrderbookTradePair
     {
         public string id { get; set; }
-        public TradeToken0 token0 { get; set; }
-        public TradeToken1 token1 { get; set; }
+        public OrderbookTradeToken0 token0 { get; set; }
+        public OrderbookTradeToken1 token1 { get; set; }
     }
 
-    public class TradeTransaction
+    public class OrderbookTradeTransaction
     {
         public string id { get; set; }
-        public TradeBlock block { get; set; }
+        public OrderbookTradeBlock block { get; set; }
         public string data { get; set; }
-        public TradeAccountA accountA { get; set; }
-        public TradeAccountB accountB { get; set; }
-        public TradeTokenA tokenA { get; set; }
-        public TradeTokenB tokenB { get; set; }
-        public TradePair pair { get; set; }
+        public OrderbookTradeAccountA accountA { get; set; }
+        public OrderbookTradeAccountB accountB { get; set; }
+        public OrderbookTradeTokenA tokenA { get; set; }
+        public OrderbookTradeTokenB tokenB { get; set; }
+        public OrderbookTradePair pair { get; set; }
         public string tokenAPrice { get; set; }
         public string tokenBPrice { get; set; }
         public string fillSA { get; set; }
@@ -82,14 +82,14 @@ namespace Lexplorer.Models
         public string typeName { get; set; }
     }
 
-    public class TradeData
+    public class OrderbookTradeData
     {
-        public TradeTransaction transaction { get; set; }
+        public OrderbookTradeTransaction transaction { get; set; }
     }
 
-    public class Trade
+    public class OrderbookTrade
     {
-        public TradeData data { get; set; }
+        public OrderbookTradeData data { get; set; }
     }
 
 
