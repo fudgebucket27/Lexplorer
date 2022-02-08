@@ -1,0 +1,73 @@
+﻿@using Lexplorer.Models;
+@using Lexplorer.Helpers;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>The Lexplorer - Trade Details</PageTitle>
+
+@if (TradeDetails != null)
+{
+                          <MudText Typo="Typo.h6">Transaction #@TradeDetails.data.transaction.id</MudText>
+                        <MudSimpleTable Dense="true">
+                            <tbody>
+                                <tr>
+                                    <td>Block #</td>
+                                    <td>@TradeDetails.data.transaction.block.id</td>
+                                </tr>
+                                <tr>
+                                    <td>Verified At (UTC)</td>
+                                    <td>@TimestampToUTCConverter.Convert(TradeDetails.data.transaction.block.timestamp)</td>
+                                </tr>
+                                <tr>
+                                    <td>Transaction Type</td>
+                                    <td>@TradeDetails.data.transaction.typeName</td>
+                                </tr>
+                                <tr>
+                                    <td>Account 1</td>
+                                    <td>@TradeDetails.data.transaction.accountA.address</td>
+                                </tr>
+                                <tr>
+                                    <td>Account 2</td>
+                                    <td>@TradeDetails.data.transaction.accountB.address</td>
+                                </tr>
+                                <tr>
+                                    <td>Trade</td>
+                                    <td>@TokenAmountConverter.Convert(TradeDetails.data.transaction.fillSA, TradeDetails.data.transaction.tokenA.decimals) @TradeDetails.data.transaction.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(TradeDetails.data.transaction.fillSB, TradeDetails.data.transaction.tokenB.decimals) @TradeDetails.data.transaction.tokenB.symbol</td>
+                                </tr>
+                                <tr>
+                                    <td>Fee</td>
+                                        @if (Double.Parse(TradeDetails.data.transaction.feeA) > 0)
+                                        {
+                                         <td>@TokenAmountConverter.Convert(TradeDetails.data.transaction.feeA,  TradeDetails.data.transaction.tokenB.decimals) @TradeDetails.data.transaction.tokenB.symbol</td>
+                                        }
+                                        else if (Double.Parse(TradeDetails.data.transaction.feeB) > 0)
+                                        {
+                                         <td>@TokenAmountConverter.Convert(TradeDetails.data.transaction.feeB,  TradeDetails.data.transaction.tokenA.decimals) @TradeDetails.data.transaction.tokenA.symbol</td>
+                                        }
+                                    </tr>
+                                <tr>
+                                    <td>Transaction Data</td>
+                                    <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@TradeDetails.data.transaction.data" Lines="3"/></td>
+                                </tr>
+                            </tbody>
+            </MudSimpleTable>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+}
+
+@code {
+    [Parameter]
+    public OrderbookTrade TradeDetails { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string previousPageNumber { get; set; }
+
+    public string swapSymbol = "<>";
+
+    private void GoToBlockOverviewPage()
+    {
+        string tempPreviousPageNumber = "";
+        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
+        string parameters = $"blocks/{TradeDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.NavigateTo(parameters);
+    }
+}

@@ -51,6 +51,7 @@ namespace Lexplorer.Models
         public string transferNFTCount { get; set; }
         public string withdrawalCount { get; set; }
         public string withdrawalNFTCount { get; set; }
+        public string data { get; set; }
     }
 
     public class Token0
@@ -151,6 +152,9 @@ namespace Lexplorer.Models
         public string fillBA { get; set; }
         public string fillSA { get; set; }
         public string fillSB { get; set; }
+        public string fillBB { get; set; }
+        public bool fillAmountBorSA { get; set; }
+        public bool fillAmountBorSB { get; set; }
         public string id { get; set; }
         public string internalID { get; set; }
         public Pair pair { get; set; }
@@ -169,6 +173,9 @@ namespace Lexplorer.Models
         public Token token { get; set; }
         public int? nonce { get; set; }
         public User user { get; set; }
+
+        public Account accountA { get; set; }
+        public Account accountB { get; set; }
     }
 
     public class TransactionsData

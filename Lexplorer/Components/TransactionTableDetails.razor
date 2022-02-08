@@ -4,12 +4,25 @@
 
 @switch(TransactionData.typeName)
 {
+    case "OrderbookTrade":
+        <MudTd DataLabel="From Address">@TransactionData.accountA.address.Substring(0,5)...@TransactionData.accountA.address.Substring(TransactionData.accountA.address.Length - 6, 6)</MudTd>
+        <MudTd DataLabel="To Address">@TransactionData.accountB.address.Substring(0,5)...@TransactionData.accountB.address.Substring(TransactionData.accountB.address.Length - 6, 6)</MudTd>
+        <MudTd DataLabel="Amount">@Decimal.Parse(@TokenAmountConverter.Convert(TransactionData.fillBA, TransactionData.tokenB.decimals),NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint).ToString("N4") @TransactionData.tokenB.symbol</MudTd>
+        @if(Double.Parse(TransactionData.feeA) > 0)
+        {
+            <MudTd DataLabel="Fee">@Decimal.Parse(TokenAmountConverter.Convert(TransactionData.feeA, TransactionData.tokenB.decimals), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint) @TransactionData.tokenB.symbol</MudTd>
+        }
+        else if(Double.Parse(TransactionData.feeB) > 0)
+        {
+            <MudTd DataLabel="Fee">@Decimal.Parse(TokenAmountConverter.Convert(TransactionData.feeB, TransactionData.tokenA.decimals), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint) @TransactionData.tokenA.symbol</MudTd>
+        }
+        break;
     case "Transfer":
-    <MudTd DataLabel="From Address">@TransactionData.fromAccount.address.Substring(0,5)...@TransactionData.fromAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 6)</MudTd>
-    <MudTd DataLabel="To Address">@TransactionData.toAccount.address.Substring(0,5)...@TransactionData.toAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 6)</MudTd>
-    <MudTd DataLabel="Amount">@Decimal.Parse(@TokenAmountConverter.Convert(TransactionData.amount, TransactionData.token.decimals),NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint).ToString("N4") @TransactionData.token.symbol</MudTd>
-    <MudTd DataLabel="Fee">@Decimal.Parse(TokenAmountConverter.Convert(TransactionData.fee, TransactionData.feeToken.decimals), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint) @TransactionData.feeToken.symbol</MudTd>
-    break;
+        <MudTd DataLabel="From Address">@TransactionData.fromAccount.address.Substring(0,5)...@TransactionData.fromAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 6)</MudTd>
+        <MudTd DataLabel="To Address">@TransactionData.toAccount.address.Substring(0,5)...@TransactionData.toAccount.address.Substring(TransactionData.fromAccount.address.Length - 6, 6)</MudTd>
+        <MudTd DataLabel="Amount">@Decimal.Parse(@TokenAmountConverter.Convert(TransactionData.amount, TransactionData.token.decimals),NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint).ToString("N4") @TransactionData.token.symbol</MudTd>
+        <MudTd DataLabel="Fee">@Decimal.Parse(TokenAmountConverter.Convert(TransactionData.fee, TransactionData.feeToken.decimals), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint) @TransactionData.feeToken.symbol</MudTd>
+        break;
     case "Swap":
     <MudTd DataLabel="From Address">@TransactionData.account.address.Substring(0,5)...@TransactionData.account.address.Substring(TransactionData.account.address.Length - 6, 6)</MudTd>
     <MudTd DataLabel="To Address">@TransactionData.pool.address.Substring(0,5)...@TransactionData.pool.address.Substring(TransactionData.pool.address.Length - 6, 6)</MudTd>
