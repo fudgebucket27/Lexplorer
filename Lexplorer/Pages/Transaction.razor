@@ -7,11 +7,24 @@
 
 <PageTitle>The Lexplorer - Transaction</PageTitle>
 
-<SwapTransactionDetail SwapDetails=@swapData />
+@if(swapData != null)
+{
+    <SwapTransactionDetail SwapDetails=@swapData />
+}
+else if(transferData != null)
+{
+    <TransferTransactionDetail TransferDetails=@transferData />
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
 
 
 @code {
     private Swap swapData;
+    private Transfer transferData;
 
     [Parameter]
     public string transactionType { get; set; }
@@ -21,11 +34,16 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        string transactionCacheKey = $"transactionDetails-{transactionType}-{transactionId}";
         if (swapData == null && transactionType == "Swap")
         {
-            swapData = await AppCache.GetOrAddAsync($"transactionDetails-{transactionType}-{transactionId}", () => GraphQLService.GetTransaction<Swap>(transactionId));
+            swapData = await AppCache.GetOrAddAsync(transactionCacheKey, () => GraphQLService.GetTransaction<Swap>(transactionId));
+            StateHasChanged();
+        }else if (transferData == null  && transactionType == "Transfer")
+        {
+            transferData = await AppCache.GetOrAddAsync(transactionCacheKey, () => GraphQLService.GetTransaction<Transfer>(transactionId));
             StateHasChanged();
         }
-        
+
     }
 }

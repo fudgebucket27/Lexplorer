@@ -8,6 +8,8 @@
             {
                 case "Swap":
                     return $"transaction/Swap/{transactionId}?previousPageNumber={previousPageNumber}";
+                case "Transfer":
+                    return $"transaction/Transfer/{transactionId}?previousPageNumber={previousPageNumber}";
                 default:
                     return "404";
             }

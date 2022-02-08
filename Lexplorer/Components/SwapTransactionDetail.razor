@@ -2,7 +2,7 @@
 @using Lexplorer.Helpers;
 @inject NavigationManager NavigationManager;
 
-<PageTitle>The Lexplorer - Swap Transaction Details</PageTitle>
+<PageTitle>The Lexplorer - Swap Details</PageTitle>
 
 @if (SwapDetails != null)
 {
@@ -41,10 +41,7 @@
         </MudSimpleTable>
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
 }
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
+
 @code {
     [Parameter]
     public Swap SwapDetails { get; set; }

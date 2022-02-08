@@ -185,6 +185,7 @@ namespace Lexplorer.Services
 
         public async Task<Transactions> GetTransactionsForBlock(int skip, int first, string? blockId = null, string? typeName = null)
         {
+            Debug.WriteLine(blockId);
             var transactionsQuery = @"
               query transactions(
                 $skip: Int
@@ -298,10 +299,11 @@ namespace Lexplorer.Services
                         first = first,
                         orderBy = "internalID",
                         orderDirection = "desc"
-                    },
-                    where = new
-                    {
-                        block = blockId
+                        ,
+                        where = new
+                        {
+                            block = blockId
+                        }
                     }
                 });
             }
