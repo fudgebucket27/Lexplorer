@@ -113,7 +113,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Swap> GetSwapTransaction(string transactionId)
+        public async Task<T> GetTransaction<T>(string transactionId) where T : new()
         {
             var transactionQuery = @"
               query transaction($id: ID!) {
@@ -179,12 +179,13 @@ namespace Lexplorer.Services
             });
 
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Swap>(response.Content);
+            var data = JsonConvert.DeserializeObject<T>(response.Content);
             return data;
         }
 
         public async Task<Transactions> GetTransactionsForBlock(int skip, int first, string? blockId = null, string? typeName = null)
         {
+            Debug.WriteLine(blockId);
             var transactionsQuery = @"
               query transactions(
                 $skip: Int
@@ -298,10 +299,11 @@ namespace Lexplorer.Services
                         first = first,
                         orderBy = "internalID",
                         orderDirection = "desc"
-                    },
-                    where = new
-                    {
-                        block = blockId
+                        ,
+                        where = new
+                        {
+                            block = blockId
+                        }
                     }
                 });
             }

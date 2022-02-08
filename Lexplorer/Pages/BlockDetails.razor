@@ -10,73 +10,73 @@
 
 @if (block != null)
 {
-        <MudText Typo="Typo.h6">Block #@block.data.block.id</MudText>
-        <MudSimpleTable Dense="true">
-            <tbody>
-                <tr>
-                    <td>Block Hash</td>
-                    <td>@block.data.block.blockHash</td>
-                </tr>
-                <tr>
-                    <td>Block Size</td>
-                    <td>@block.data.block.blockSize</td>
-                </tr>
-                <tr>
-                    <td>L1 Transaction Hash</td>
-                    <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@block.data.block.txHash" target="_blank">@block.data.block.txHash</a></td>
-                </tr>
-                <tr>
-                    <td>Verified At (UTC)</td>
-                    <td>@TimestampToUTCConverter.Convert(block.data.block.timestamp)</td>
-                </tr>
-                <tr>
-                    <td>Raw Data</td>
-                    <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
-                </tr>
-            </tbody>
-        </MudSimpleTable>
+            <MudText Typo="Typo.h6">Block #@block.data.block.id</MudText>
+            <MudSimpleTable Dense="true">
+                <tbody>
+                    <tr>
+                        <td>Block Hash</td>
+                        <td>@block.data.block.blockHash</td>
+                    </tr>
+                    <tr>
+                        <td>Block Size</td>
+                        <td>@block.data.block.blockSize</td>
+                    </tr>
+                    <tr>
+                        <td>L1 Transaction Hash</td>
+                        <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@block.data.block.txHash" target="_blank">@block.data.block.txHash</a></td>
+                    </tr>
+                    <tr>
+                        <td>Verified At (UTC)</td>
+                        <td>@TimestampToUTCConverter.Convert(block.data.block.timestamp)</td>
+                    </tr>
+                    <tr>
+                        <td>Raw Data</td>
+                        <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
 }
 else
 {
-         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+             <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
-@if(transactionData != null)
+@if (transactionData != null)
 {
-    <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id</MudText>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Tx Id</MudTh>
-                        <MudTh>Type</MudTh>
-                        <MudTh>From</MudTh>
-                        <MudTh>To</MudTh>
-                        <MudTh>Amount</MudTh>
-                        <MudTh>Fee</MudTh>
-                        <MudTh>Time(UTC)</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber)>@context.id</a></MudTd>
-                        <MudTd DataLabel="Type">@context.typeName</MudTd>
-                        <TransactionTableDetails TransactionData=@context />
-                        <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
-                    </RowTemplate>
-    </MudTable>
-    @if(pageNumber == "0")
+        <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id</MudText>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Tx Id</MudTh>
+                            <MudTh>Type</MudTh>
+                            <MudTh>From</MudTh>
+                            <MudTh>To</MudTh>
+                            <MudTh>Amount</MudTh>
+                            <MudTh>Fee</MudTh>
+                            <MudTh>Time(UTC)</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber)>@context.id</a></MudTd>
+                            <MudTd DataLabel="Type">@context.typeName</MudTd>
+                            <TransactionTableDetails TransactionData=@context />
+                            <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
+                        </RowTemplate>
+        </MudTable>
+    @if (pageNumber == "0")
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
     }
     else
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
     }
 }
 else
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
 <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
@@ -100,14 +100,16 @@ else
         {
             pageNumber = "0";
         }
-        if(block == null)
+        if (block == null)
         {
-            block = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}", () => GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)));
+            string cacheKey = $"blockDetailOverview-{blockNumber}";
+            block = await AppCache.GetOrAddAsync(cacheKey, () => GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)));
         }
         StateHasChanged();
         isLoading = true;
         StateHasChanged();
-        transactionData = await AppCache.GetOrAddAsync($"blockDetailOverview-{blockNumber}-page{pageNumber}", () =>GraphQLService.GetTransactionsForBlock(Int32.Parse(pageNumber) * 10, 10, blockNumber));
+        string transactionDatacacheKey = $"blockDetailTransactions-{blockNumber}-page{pageNumber}";
+        transactionData = await AppCache.GetOrAddAsync(transactionDatacacheKey, () => GraphQLService.GetTransactionsForBlock(Int32.Parse(pageNumber) * 10, 10, blockNumber));
         isLoading = false;
         StateHasChanged();
     }
