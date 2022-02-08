@@ -46,7 +46,9 @@
                             </tr>
                             <tr>
                                 <td>Raw Data</td>
-                                <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@block.data.block.data" Lines="5"/></td>
+                                <td>
+                                    <MudVirtualize Items="@blockData"><MudTextField T="string" Variant="Variant.Filled" Text="@context.block.data" Lines="5" ReadOnly="true" /></MudVirtualize>
+                                </td>
                             </tr>
                         </tbody>
                     </MudSimpleTable>
@@ -60,7 +62,7 @@ else
 {
                 <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isTransactionLoading">
                                 <ToolBarContent>
-                                    <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id</MudText>
+                                    <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
                                 </ToolBarContent>
                                 <HeaderContent>
                                     <MudTh>Tx Id</MudTh>
@@ -94,10 +96,10 @@ else
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
-<MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
 
 @code {
     private Block block;
+    private List<BlockData> blockData;
     private Transactions transactionData;
 
     [Parameter]
@@ -121,6 +123,8 @@ else
         isBlockLoading = true;
         StateHasChanged();
         block = await AppCache.GetOrAddAsync(cacheKey, async () => await GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)));
+        blockData = new List<BlockData>();
+        blockData.Add(block.data);
         isBlockLoading = false;
         StateHasChanged();
         isTransactionLoading = true;

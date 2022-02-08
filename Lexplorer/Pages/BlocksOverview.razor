@@ -10,7 +10,7 @@
 {
     <MudGrid>
         <MudItem sm="12">
-            <MudText Typo="Typo.h6">Latest Blocks</MudText>
+            <MudText Typo="Typo.h6">Latest Blocks <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
             <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true" Loading="@isLoading">
                 <HeaderContent>
                     <MudTh>Block ID</MudTh>
@@ -32,12 +32,10 @@
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-        <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
     }
     else
     {
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-        <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText>
     }
 }
 else
