@@ -121,14 +121,11 @@ else
         string cacheKey = $"blockDetailOverview-{blockNumber}";
 
         isBlockLoading = true;
-        StateHasChanged();
         block = await AppCache.GetOrAddAsync(cacheKey, async () => await GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)));
         blockData = new List<BlockData>();
         blockData.Add(block.data);
         isBlockLoading = false;
-        StateHasChanged();
         isTransactionLoading = true;
-        StateHasChanged();
         string transactionDatacacheKey = $"blockDetailTransactions-{blockNumber}-page{pageNumber}";
         transactionData = await AppCache.GetOrAddAsync(transactionDatacacheKey, async () => await GraphQLService.GetTransactionsForBlock(Int32.Parse(pageNumber) * 10, 10, blockNumber));
         isTransactionLoading = false;
