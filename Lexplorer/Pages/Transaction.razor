@@ -35,11 +35,11 @@ else
         string transactionCacheKey = $"transactionDetails-{transactionType}-{transactionId}";
         if (swapData == null && transactionType == "Swap")
         {
-            swapData = await AppCache.GetOrAddAsync(transactionCacheKey, () => GraphQLService.GetTransaction<Swap>(transactionId));
+            swapData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<Swap>(transactionId));
             StateHasChanged();
         }else if (transferData == null  && transactionType == "Transfer")
         {
-            transferData = await AppCache.GetOrAddAsync(transactionCacheKey, () => GraphQLService.GetTransaction<Transfer>(transactionId));
+            transferData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<Transfer>(transactionId));
             StateHasChanged();
         }
 
