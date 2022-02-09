@@ -1,13 +1,13 @@
-﻿@using Lexplorer.Components;
-@using Lexplorer.Helpers;
+﻿@using Lexplorer.Helpers;
 @using Lexplorer.Models;
+@using Lexplorer.Components;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
-@page "/transactions";
+@page "/transactions/Swap";
 
 @if (transactionData != null)
 {
-    <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="Transactions"></TransactionTable>
+    <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="Swaps"></TransactionTable>
     @if (pageNumber == "0")
     {
                                 <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
@@ -24,7 +24,6 @@ else
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
-
 @code {
     private Transactions transactionData;
     [Parameter]
@@ -39,7 +38,7 @@ else
             pageNumber = "0";
         }
         isLoading = true;
-        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25);
+        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25, typeName:"Swap");
         isLoading = false;
         StateHasChanged();
     }
@@ -47,19 +46,19 @@ else
     private void GoToNextPage()
     {
         int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"transactions?pageNumber={nextPage.ToString()}";
+        string parameters = $"transactions/Swap?pageNumber={nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPreviousPage()
     {
         int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"transactions?pageNumber={previousPage.ToString()}";
+        string parameters = $"transactions/Swap?pageNumber={previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
     private void GoToStartPage()
     {
-        string parameters = "transactions/";
+        string parameters = "transactions/Swap?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }

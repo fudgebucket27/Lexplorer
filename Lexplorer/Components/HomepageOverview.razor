@@ -154,7 +154,7 @@ else if (blockData != null && transactionData != null)
         string blockCacheKey = $"homepage-block";
         blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await GraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
         string transactionCacheKey = $"homepage-transaction";
-        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransactionsForBlock(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
         StateHasChanged();
@@ -190,7 +190,7 @@ else if (blockData != null && transactionData != null)
 
     private void GoToTransactionOverviewPage()
     {
-        string parameters = "transaction?pageNumber=0";
+        string parameters = "transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 

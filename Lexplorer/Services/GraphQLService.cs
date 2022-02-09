@@ -183,7 +183,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Transactions> GetTransactionsForBlock(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
         {
             Debug.WriteLine(blockId);
             var transactionsQuery = @"
@@ -303,6 +303,25 @@ namespace Lexplorer.Services
                         where = new
                         {
                             block = blockId
+                        }
+                    }
+                });
+            }
+            else if(typeName != null)
+            {
+                request.AddJsonBody(new
+                {
+                    query = transactionsQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        orderBy = "internalID",
+                        orderDirection = "desc"
+                                       ,
+                        where = new
+                        {
+                            typename = typeName
                         }
                     }
                 });
