@@ -1,7 +1,11 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink Href="/blocks" Match="NavLinkMatch.Prefix"  Icon="@Icons.Material.Filled.CropSquare">Blocks</MudNavLink>
-    <MudNavLink Href="/transactions" Match="NavLinkMatch.Prefix"  Icon="@Icons.Filled.AccountTree">Transactions</MudNavLink>
+    <MudNavGroup Title="Transactions" Expanded="true" Icon="@Icons.Filled.Ballot">
+            <MudNavLink Href="/transactions?pageNumber=" Match="NavLinkMatch.Prefix"  Icon="@Icons.Filled.AccountTree">All</MudNavLink>
+            <MudNavLink Href="/transactions/Swap" Match="NavLinkMatch.Prefix"  Icon="@Icons.Filled.SwapHoriz">Swaps</MudNavLink>
+    </MudNavGroup>
+
     <!-- <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
     <MudNavLink Href="/fetchdata" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Fetch data</MudNavLink> -->
 </MudNavMenu>
