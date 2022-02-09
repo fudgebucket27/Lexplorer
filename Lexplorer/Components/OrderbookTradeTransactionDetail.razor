@@ -63,11 +63,25 @@
 
     public string swapSymbol = "<>";
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string originatingPage { get; set; }
+
     private void GoToBlockOverviewPage()
     {
         string tempPreviousPageNumber = "";
+        string tempOriginatingPage = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"blocks/{TradeDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.TryGetQueryString<string>("originatingPage", out tempOriginatingPage);
+        string parameters = "";
+        if (tempOriginatingPage == "blockDetails")
+        {
+            parameters = $"blocks/{TradeDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        }
+        else
+        {
+            parameters = $"blocks/{TradeDetails.data.transaction.block.id}?pageNumber=0";
+        }
         NavigationManager.NavigateTo(parameters);
     }
 }

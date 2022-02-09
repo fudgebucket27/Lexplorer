@@ -55,19 +55,33 @@
     [SupplyParameterFromQuery]
     public string previousPageNumber { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string originatingPage { get; set; }
+
     private void GoToBlockOverviewPage()
     {
         string tempPreviousPageNumber = "";
+        string tempOriginatingPage = "";
+        string parameters = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.TryGetQueryString<string>("originatingPage", out tempOriginatingPage);
+        if(tempOriginatingPage== "blockDetails")
+        {
+            
+            parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        }
+        else
+        {
+            parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber=0";
+        }
+
         NavigationManager.NavigateTo(parameters);
     }
     
     private void GoToTransactionOverviewPage()
     {
-        string tempPreviousPageNumber = "";
-        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }

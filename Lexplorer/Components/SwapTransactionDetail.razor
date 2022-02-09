@@ -49,35 +49,45 @@
 }
 
 @code {
-    [Parameter]
-    public Swap SwapDetails { get; set; }
+        [Parameter]
+        public Swap SwapDetails { get; set; }
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string previousPageNumber { get; set; }
+
+    public string swapSymbol = "<>";
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string previousPageNumber { get; set; }
-
-    public string swapSymbol = "<>";
+    public string originatingPage { get; set; }
 
     private void GoToBlockOverviewPage()
     {
         string tempPreviousPageNumber = "";
+        string tempOriginatingPage = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.TryGetQueryString<string>("originatingPage", out tempOriginatingPage);
+        string parameters = "";
+        if (tempOriginatingPage == "blockDetails")
+        {
+            parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        }
+        else
+        {
+            parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber=0";
+        }
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToSwapOverviewPage()
     {
-        string tempPreviousPageNumber = "";
-        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions/Swap?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions/Swap?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
         private void GoToTransactionOverviewPage()
     {
-        string tempPreviousPageNumber = "";
-        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }

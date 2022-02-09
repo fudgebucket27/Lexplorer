@@ -74,7 +74,7 @@ else
                                     <MudTh>Time(UTC)</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber)>@context.id</a></MudTd>
+                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber, "blockDetails")>@context.id</a></MudTd>
                                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                                     <TransactionTableDetails TransactionData=@context />
                                     <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
