@@ -67,7 +67,7 @@
     {
         string tempPreviousPageNumber = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }
