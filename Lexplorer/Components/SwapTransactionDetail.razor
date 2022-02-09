@@ -18,6 +18,10 @@
                                 <td>@TimestampToUTCConverter.Convert(SwapDetails.data.transaction.block.timestamp)</td>
                             </tr>
                             <tr>
+                                <td>Transaction Type</td>
+                                <td>Swap</td>
+                            </tr>
+                            <tr>
                                 <td>User Account</td>
                                 <td>@SwapDetails.data.transaction.account.address</td>
                             </tr>
@@ -40,6 +44,8 @@
                         </tbody>
         </MudSimpleTable>
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToSwapOverviewPage">Back to recent Swaps</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToTransactionOverviewPage">Back to recent Transactions</MudButton>
 }
 
 @code {
@@ -57,6 +63,21 @@
         string tempPreviousPageNumber = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
         string parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToSwapOverviewPage()
+    {
+        string tempPreviousPageNumber = "";
+        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
+        string parameters = $"transactions/Swap?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.NavigateTo(parameters);
+    }
+        private void GoToTransactionOverviewPage()
+    {
+        string tempPreviousPageNumber = "";
+        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
+        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
         NavigationManager.NavigateTo(parameters);
     }
 }

@@ -18,6 +18,10 @@
                                 <td>@TimestampToUTCConverter.Convert(TransferDetails.data.transaction.block.timestamp)</td>
                             </tr>
                             <tr>
+                                <td>Transaction Type</td>
+                                <td>Swap</td>
+                            </tr>
+                            <tr>
                                 <td>From</td>
                                 <td>@TransferDetails.data.transaction.fromAccount.address</td>
                             </tr>
@@ -40,6 +44,7 @@
                         </tbody>
         </MudSimpleTable>
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToTransactionOverviewPage">Back to recent Transactions</MudButton>
 }
 
 @code {
@@ -55,6 +60,14 @@
         string tempPreviousPageNumber = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
         string parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    
+    private void GoToTransactionOverviewPage()
+    {
+        string tempPreviousPageNumber = "";
+        NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
+        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
         NavigationManager.NavigateTo(parameters);
     }
 }
