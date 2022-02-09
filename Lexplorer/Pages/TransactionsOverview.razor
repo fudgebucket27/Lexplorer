@@ -4,29 +4,11 @@
 @using Lexplorer.Models;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
+@page "/transactions";
 
 @if (transactionData != null)
 {
-                <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isLoading">
-                                <ToolBarContent>
-                                    <MudText Typo="Typo.h6">Latest Transactions <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
-                                </ToolBarContent>
-                                <HeaderContent>
-                                    <MudTh>Tx Id</MudTh>
-                                    <MudTh>Type</MudTh>
-                                    <MudTh>From</MudTh>
-                                    <MudTh>To</MudTh>
-                                    <MudTh>Amount</MudTh>
-                                    <MudTh>Fee</MudTh>
-                                    <MudTh>Time(UTC)</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber)>@context.id</a></MudTd>
-                                    <MudTd DataLabel="Type">@context.typeName</MudTd>
-                                    <TransactionTableDetails TransactionData=@context />
-                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@context.block.timestamp)</MudTd>
-                                </RowTemplate>
-                </MudTable>
+    <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="Transactions"></TransactionTable>
     @if (pageNumber == "0")
     {
                                 <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>

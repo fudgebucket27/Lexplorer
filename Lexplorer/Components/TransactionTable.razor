@@ -1,0 +1,38 @@
+﻿@using Lexplorer.Models;
+@using Lexplorer.Helpers;
+@if(transactions != null)
+{
+                    <MudTable Dense="true" Items="@transactions.data.transactions" Hover="true" Loading="@isLoading">
+                                <ToolBarContent>
+                                    <MudText Typo="Typo.h6">Latest @transactionType <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Tx Id</MudTh>
+                                    <MudTh>Type</MudTh>
+                                    <MudTh>From</MudTh>
+                                    <MudTh>To</MudTh>
+                                    <MudTh>Amount</MudTh>
+                                    <MudTh>Fee</MudTh>
+                                    <MudTh>Time(UTC)</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber)>@context.id</a></MudTd>
+                                    <MudTd DataLabel="Type">@context.typeName</MudTd>
+                                    <TransactionTableDetails TransactionData=@context />
+                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@context.block.timestamp)</MudTd>
+                                </RowTemplate>
+                   </MudTable>
+}
+@code {
+    [Parameter]
+    public Transactions transactions { get; set; }
+
+    [Parameter]
+    public bool isLoading { get; set; }
+
+    [Parameter]
+    public string pageNumber { get; set; }
+
+    [Parameter]
+    public string transactionType { get; set; }
+}
