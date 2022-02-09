@@ -4,6 +4,7 @@
 @using System.Diagnostics
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
+@inject IAppCache AppCache;
 
 @if (blockData == null && transactionData == null)
 {
@@ -134,6 +135,7 @@ else if (blockData != null && transactionData != null)
                     <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@blockData.data.blocks[0].timestamp)</MudTd>
                 </RowTemplate>
             </MudTable>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
         </MudItem>
     </MudGrid>
 }
@@ -149,8 +151,10 @@ else if (blockData != null && transactionData != null)
 
     protected override async Task OnInitializedAsync()
     {
-        blockData = await GraphQLService.GetBlocks(0, 10);
-        transactionData = await GraphQLService.GetTransactionsForBlock(0, 10);
+        string blockCacheKey = $"homepage-block";
+        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await GraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        string transactionCacheKey = $"homepage-transaction";
+        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransactionsForBlock(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
         StateHasChanged();
@@ -181,6 +185,12 @@ else if (blockData != null && transactionData != null)
     private void GoToBlockOverviewPage()
     {
         string parameters = "blocks?pageNumber=0";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToTransactionOverviewPage()
+    {
+        string parameters = "transaction?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 
