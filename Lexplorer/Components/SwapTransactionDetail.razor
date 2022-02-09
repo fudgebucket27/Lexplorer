@@ -70,14 +70,14 @@
     {
         string tempPreviousPageNumber = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions/Swap?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions/Swap?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
         private void GoToTransactionOverviewPage()
     {
         string tempPreviousPageNumber = "";
         NavigationManager.TryGetQueryString<string>("previousPageNumber", out tempPreviousPageNumber);
-        string parameters = $"transactions?pageNumber={tempPreviousPageNumber}";
+        string parameters = $"transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }
