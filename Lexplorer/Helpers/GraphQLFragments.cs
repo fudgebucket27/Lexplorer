@@ -22,6 +22,7 @@
             fragment AccountFragment on Account {
                 id
                 address
+                __typename
             }";
 
         public static string TokenFragment = @"

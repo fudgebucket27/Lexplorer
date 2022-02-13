@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Lexplorer.Helpers;
 
 namespace Lexplorer.Models
 {
@@ -27,6 +28,8 @@ namespace Lexplorer.Models
     {
         public string address { get; set; }
         public string id { get; set; }
+        [JsonProperty("__typename")]
+        public string typeName { get; set; }
     }
 
     public class TransactionBlock
@@ -176,6 +179,16 @@ namespace Lexplorer.Models
 
         public Account accountA { get; set; }
         public Account accountB { get; set; }
+
+        public string verifiedAt
+        {
+            get
+            {
+                if (block == null) return string.Empty;
+
+                return TimestampToUTCConverter.Convert(block.timestamp);
+            }
+        }
     }
 
     public class TransactionsData
@@ -188,6 +201,5 @@ namespace Lexplorer.Models
     {
         public TransactionsData data { get; set; }
     }
-
 
 }

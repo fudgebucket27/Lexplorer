@@ -4,6 +4,9 @@ using GraphQL.Client.Serializer.Newtonsoft;
 using Lexplorer.Helpers;
 using Lexplorer.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 
@@ -344,6 +347,148 @@ namespace Lexplorer.Services
             var response = await _client.PostAsync(request);
             var data = JsonConvert.DeserializeObject<Transactions>(response.Content);
             return data;
+        }
+        public async Task<Account> GetAccount(string accountId)
+        {
+            var accountQuery = @"
+            query account(
+                $accountId: Int
+              ) {
+                account(
+                  id: $accountId
+                ) {
+                  ...AccountFragment 
+                }
+            }"
+            + GraphQLFragments.AccountFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = accountQuery,
+                variables = new
+                {
+                    accountId = int.Parse(accountId)
+                }
+            });
+            var response = await _client.PostAsync(request);
+            try
+            {
+                JObject jresponse = JObject.Parse(response.Content);
+                JToken result = jresponse["data"]["account"];
+                return result.ToObject<Account>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+        public async Task<IList<Transaction>> GetAccountTransactions(int skip, int first, string accountId)
+        {
+            var accountQuery = @"
+            query accountTransactions(
+                $skip: Int
+                $first: Int
+                $accountId: Int
+                $orderBy: Transaction_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                account(
+                  id: $accountId
+                ) {
+                  transactions(
+                    skip: $skip
+                    first: $first
+                    orderBy: $orderBy
+                    orderDirection: $orderDirection
+                  ) {
+                    id
+                    __typename
+                    block {
+                      id
+                      blockHash
+                      timestamp
+                      transactionCount
+                    }
+                    data
+                    ...AddFragment
+                    ...RemoveFragment
+                    ...SwapFragment
+                    ...OrderbookTradeFragment
+                    ...DepositFragment
+                    ...WithdrawalFragment
+                    ...TransferFragment
+                    ...AccountUpdateFragment
+                    ...AmmUpdateFragment
+                    ...SignatureVerificationFragment
+                    ...TradeNFTFragment
+                    ...SwapNFTFragment
+                    ...WithdrawalNFTFragment
+                    ...TransferNFTFragment
+                    ...MintNFTFragment
+                    ...DataNFTFragment
+                  }
+                }
+             }
+            "
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment
+              + GraphQLFragments.PoolFragment
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.AddFragment
+              + GraphQLFragments.RemoveFragment
+              + GraphQLFragments.SwapFragment
+              + GraphQLFragments.OrderBookTradeFragment
+              + GraphQLFragments.DepositFragment
+              + GraphQLFragments.WithdrawalFragment
+              + GraphQLFragments.TransferFragment
+              + GraphQLFragments.AccountUpdateFragment
+              + GraphQLFragments.AmmUpdateFragment
+              + GraphQLFragments.SignatureVerificationFragment
+              + GraphQLFragments.TradeNFTFragment
+              + GraphQLFragments.SwapNFTFragment
+              + GraphQLFragments.WithdrawalNFTFragment
+              + GraphQLFragments.TransferNFTFragment
+              + GraphQLFragments.MintNFTFragment
+              + GraphQLFragments.DataNFTFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = accountQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    accountId = int.Parse(accountId),
+                    orderBy = "internalID",
+                    orderDirection = "desc"
+                }
+            }); 
+            var response = await _client.PostAsync(request);
+            try
+            {
+                JObject jresponse = JObject.Parse(response.Content);
+                IList<JToken> transactionTokens = jresponse["data"]["account"]["transactions"].Children().ToList();
+                IList<Transaction> transactions = new List<Transaction>();
+                foreach (JToken result in transactionTokens)
+                {
+                    // JToken.ToObject is a helper method that uses JsonSerializer internally
+                    Transaction transaction = result.ToObject<Transaction>();
+                    transactions.Add(transaction);
+                }
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+
         }
     }
 }

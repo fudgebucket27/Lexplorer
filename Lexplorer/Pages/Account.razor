@@ -1,0 +1,93 @@
+﻿@page "/account/{accountId}"
+@using Lexplorer.Models
+@using Lexplorer.Helpers
+@using Lexplorer.Components
+@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>The Lexplorer - Account</PageTitle>
+
+@if (account != null)
+{
+            <MudText Typo="Typo.h6">Account #@account.id</MudText>
+            <MudSimpleTable Dense="true">
+                <tbody>
+                    <tr>
+                        <td>L1 Address</td>
+                        <td>@account.address</td>
+                    </tr>
+                    <tr>
+                        <td>Account Type</td>
+                        <td>@account.typeName</td>
+                    </tr>
+                    <tr>
+                        <td>Created At (UTC)</td>
+                        <td>todo</td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+}
+else
+{
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+    <br />
+
+@if (transactions != null)
+{
+            <MudTable Dense="true" Items="@transactions" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Transactions</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Tx Id</MudTh>
+                    <MudTh>Type</MudTh>
+                    <MudTh>From</MudTh>
+                    <MudTh>To</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Fee</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Type">@context.typeName</MudTd>
+                    <TransactionTableDetails TransactionData=@context />
+                    <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+                </RowTemplate>
+            </MudTable>
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+
+@code {
+    [Parameter]
+    public string? accountId { get; set; }
+
+    private Lexplorer.Models.Account? account { get; set; }
+    private IList<Lexplorer.Models.Transaction>? transactions { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //did the account change?
+        if (account != null && account.id != accountId)
+        {
+            account = null;
+            transactions = null;
+            StateHasChanged();
+        }
+        if (accountId == null) return;
+        if (account == null)
+        {
+            account = await GraphQLService.GetAccount(accountId);
+            StateHasChanged();
+        }
+        if (transactions== null)
+        {
+            transactions = await GraphQLService.GetAccountTransactions(0, 25, accountId);
+            StateHasChanged();
+        }
+    }
+}
