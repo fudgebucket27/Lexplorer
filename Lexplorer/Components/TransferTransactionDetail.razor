@@ -6,7 +6,7 @@
 
 @if (TransferDetails != null)
 {
-                      <MudText Typo="Typo.h6">Transaction #@TransferDetails.data.transaction.id</MudText>
+                    <MudText Typo="Typo.h6">Transaction #@TransferDetails.data.transaction.id</MudText>
                     <MudSimpleTable Dense="true">
                         <tbody>
                             <tr>
@@ -23,11 +23,11 @@
                             </tr>
                             <tr>
                                 <td>From</td>
-                                <td>@TransferDetails.data.transaction.fromAccount.address</td>
+                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.data.transaction.fromAccount, false)</td>
                             </tr>
                             <tr>
                                 <td>To</td>
-                                <td>@TransferDetails.data.transaction.toAccount.address</td>
+                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.data.transaction.toAccount, false)</td>
                             </tr>
                             <tr>
                                 <td>Amount</td>

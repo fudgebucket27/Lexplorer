@@ -90,11 +90,9 @@ namespace Lexplorer.Models
         public Token token { get; set; }
     }
 
-    public class Pool
+    public class Pool : Account
     {
-        public string address { get; set; }
         public List<Balance> balances { get; set; }
-        public string id { get; set; }
     }
 
     public class TokenA
@@ -124,22 +122,8 @@ namespace Lexplorer.Models
         public string symbol { get; set; }
     }
 
-    public class FromAccount
+    public class User : Account
     {
-        public string address { get; set; }
-        public string id { get; set; }
-    }
-
-    public class ToAccount
-    {
-        public string address { get; set; }
-        public string id { get; set; }
-    }
-
-    public class User
-    {
-        public string address { get; set; }
-        public string id { get; set; }
         public string publicKey { get; set; }
     }
 
@@ -171,8 +155,8 @@ namespace Lexplorer.Models
         public string amount { get; set; }
         public string fee { get; set; }
         public FeeToken feeToken { get; set; }
-        public FromAccount fromAccount { get; set; }
-        public ToAccount toAccount { get; set; }
+        public Account fromAccount { get; set; }
+        public Account toAccount { get; set; }
         public Token token { get; set; }
         public int? nonce { get; set; }
         public User user { get; set; }

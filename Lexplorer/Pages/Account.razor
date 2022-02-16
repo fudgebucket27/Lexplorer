@@ -51,7 +51,7 @@ else
                 <RowTemplate>
                     <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
-                    <TransactionTableDetails TransactionData=@context />
+                    <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
                     <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
                 </RowTemplate>
             </MudTable>

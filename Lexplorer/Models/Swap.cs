@@ -2,12 +2,6 @@
 
 namespace Lexplorer.Models
 {
-    public class SwapAccount
-    {
-        public string address { get; set; }
-        public string id { get; set; }
-    }
-
     public class SwapBlock
     {
         public string blockHash { get; set; }
@@ -49,11 +43,9 @@ namespace Lexplorer.Models
         public Token token { get; set; }
     }
 
-    public class SwapPool
+    public class SwapPool : Account
     {
-        public string address { get; set; }
         public List<Balance> balances { get; set; }
-        public string id { get; set; }
     }
     public class SwapTokenA
     {
@@ -77,7 +69,7 @@ namespace Lexplorer.Models
     {
         [JsonProperty(PropertyName = "__typename")]
         public string typeName { get; set; }
-        public SwapAccount account { get; set; }
+        public Account account { get; set; }
         public SwapBlock block { get; set; }
         public string data { get; set; }
         public string feeA { get; set; }

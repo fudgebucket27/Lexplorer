@@ -10,18 +10,6 @@ namespace Lexplorer.Models
         public string transactionCount { get; set; }
     }
 
-    public class OrderbookTradeAccountA
-    {
-        public string id { get; set; }
-        public string address { get; set; }
-    }
-
-    public class OrderbookTradeAccountB
-    {
-        public string id { get; set; }
-        public string address { get; set; }
-    }
-
     public class OrderbookTradeTokenA
     {
         public string id { get; set; }
@@ -62,8 +50,8 @@ namespace Lexplorer.Models
         public string id { get; set; }
         public OrderbookTradeBlock block { get; set; }
         public string data { get; set; }
-        public OrderbookTradeAccountA accountA { get; set; }
-        public OrderbookTradeAccountB accountB { get; set; }
+        public Account accountA { get; set; }
+        public Account accountB { get; set; }
         public OrderbookTradeTokenA tokenA { get; set; }
         public OrderbookTradeTokenB tokenB { get; set; }
         public OrderbookTradePair pair { get; set; }
