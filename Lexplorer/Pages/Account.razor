@@ -35,7 +35,7 @@ else
 
 @if (transactions != null)
 {
-            <MudTable Dense="true" Items="@transactions" Hover="true">
+            <MudTable Dense="true" Items="@transactions" Hover="true" Loading=@isLoading>
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Transactions</MudText>
                 </ToolBarContent>
@@ -54,7 +54,20 @@ else
                     <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
                     <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
                 </RowTemplate>
+                <FooterContent>
+                    <MudText Typo="Typo.caption">Current Page: @readablePageNumber</MudText>
+                </FooterContent>
             </MudTable>
+            if (pageNumber != "0")
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+            }
 }
 else
 {
@@ -66,6 +79,14 @@ else
     [Parameter]
     public string? accountId { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? pageNumber { get; set; }
+
+    public string readablePageNumber { get { return (Int32.Parse(pageNumber) + 1).ToString(); } }
+
+    public bool isLoading;
+
     private Lexplorer.Models.Account? account { get; set; }
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; }
 
@@ -76,6 +97,7 @@ else
         {
             account = null;
             transactions = null;
+            pageNumber = "0";
             StateHasChanged();
         }
         if (accountId == null) return;
@@ -84,10 +106,32 @@ else
             account = await GraphQLService.GetAccount(accountId);
             StateHasChanged();
         }
-        if (transactions== null)
+        if (String.IsNullOrEmpty(pageNumber))
         {
-            transactions = await GraphQLService.GetAccountTransactions(0, 25, accountId);
-            StateHasChanged();
+            pageNumber = "0";
         }
+
+        isLoading = true;
+        transactions = await GraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
+        isLoading = false;
+        StateHasChanged();
+    }
+    private void GoToNextPage()
+    {
+        int nextPage = Int32.Parse(pageNumber) + 1;
+        string parameters = $"/account/{accountId}?pageNumber={nextPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToPreviousPage()
+    {
+        int previousPage = Int32.Parse(pageNumber) - 1;
+        string parameters = $"/account/{accountId}?pageNumber={previousPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    private void GoToStartPage()
+    {
+        string parameters = $"/account/{accountId}?pageNumber=0";
+        NavigationManager.NavigateTo(parameters);
     }
 }
