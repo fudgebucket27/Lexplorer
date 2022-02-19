@@ -10,61 +10,12 @@ namespace Lexplorer.Models
         public string transactionCount { get; set; }
     }
 
-    public class SwapToken0
-    {
-        public string symbol { get; set; }
-    }
-
-    public class SwapToken1
-    {
-        public string symbol { get; set; }
-    }
-
     public class SwapPair
     {
         public string id { get; set; }
-        public SwapToken0 token0 { get; set; }
-        public SwapToken1 token1 { get; set; }
+        public Token token0 { get; set; }
+        public Token token1 { get; set; }
     }
-
-    public class SwapToken
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
-    }
-
-    public class SwapBalance
-    {
-        public string balance { get; set; }
-        public string id { get; set; }
-        public Token token { get; set; }
-    }
-
-    public class SwapPool : Account
-    {
-        public List<Balance> balances { get; set; }
-    }
-    public class SwapTokenA
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
-    }
-
-    public class SwapTokenB
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
-    }
-
     public class SwapTransaction
     {
         [JsonProperty(PropertyName = "__typename")]
@@ -79,12 +30,12 @@ namespace Lexplorer.Models
         public string fillSB { get; set; }
         public string id { get; set; }
         public SwapPair pair { get; set; }
-        public SwapPool pool { get; set; }
+        public Pool pool { get; set; }
         public string protocolFeeA { get; set; }
         public string protocolFeeB { get; set; }
-        public SwapTokenA tokenA { get; set; }
+        public Token tokenA { get; set; }
         public string tokenAPrice { get; set; }
-        public SwapTokenB tokenB { get; set; }
+        public Token tokenB { get; set; }
         public string tokenBPrice { get; set; }
     }
 

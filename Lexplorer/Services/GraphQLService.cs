@@ -386,6 +386,60 @@ namespace Lexplorer.Services
             }
 
         }
+        public async Task<List<AccountBalance>> GetAccountBalance(string accountId)
+        {
+            var balanceQuery = @"
+            query accountBalances(
+                $accountId: Int
+              ) {
+                account(
+                  id: $accountId
+                ) {
+                  balances 
+                  {
+                    id
+                    balance
+                    token
+                    {
+                      ...TokenFragment
+                    }
+                  }
+                }
+             }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = balanceQuery,
+                variables = new
+                {
+                    accountId = Int32.Parse(accountId)
+                }
+            });
+            var response = await _client.PostAsync(request);
+            try
+            {
+                JObject jresponse = JObject.Parse(response.Content);
+                IList<JToken> balanceTokens = jresponse["data"]["account"]["balances"].Children().ToList();
+                List<AccountBalance> balances = new List<AccountBalance>();
+                foreach (JToken result in balanceTokens)
+                {
+                    // JToken.ToObject is a helper method that uses JsonSerializer internally
+                    AccountBalance balance = result.ToObject<AccountBalance>();
+                    balances.Add(balance);
+                }
+                return balances;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public async Task<IList<Transaction>> GetAccountTransactions(int skip, int first, string accountId)
         {
             var accountQuery = @"
@@ -488,7 +542,6 @@ namespace Lexplorer.Services
                 Debug.WriteLine(ex.Message);
                 return null;
             }
-
         }
     }
 }

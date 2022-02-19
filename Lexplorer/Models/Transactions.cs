@@ -30,6 +30,12 @@ namespace Lexplorer.Models
         public string id { get; set; }
         [JsonProperty("__typename")]
         public string typeName { get; set; }
+        public List<AccountBalance> balances { get; set; }
+    }
+
+    public class Pool : Account
+    {
+        public int feeBipsAMM { get; set; }
     }
 
     public class TransactionBlock
@@ -57,21 +63,11 @@ namespace Lexplorer.Models
         public string data { get; set; }
     }
 
-    public class Token0
-    {
-        public string symbol { get; set; }
-    }
-
-    public class Token1
-    {
-        public string symbol { get; set; }
-    }
-
     public class Pair
     {
         public string id { get; set; }
-        public Token0 token0 { get; set; }
-        public Token1 token1 { get; set; }
+        public Token token0 { get; set; }
+        public Token token1 { get; set; }
     }
 
     public class Token
@@ -83,43 +79,12 @@ namespace Lexplorer.Models
         public string symbol { get; set; }
     }
 
-    public class Balance
+    public class AccountBalance
     {
         public string balance { get; set; }
         public string id { get; set; }
         public Token token { get; set; }
-    }
-
-    public class Pool : Account
-    {
-        public List<Balance> balances { get; set; }
-    }
-
-    public class TokenA
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
-    }
-
-    public class TokenB
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
-    }
-
-    public class FeeToken
-    {
-        public string address { get; set; }
-        public int decimals { get; set; }
-        public string id { get; set; }
-        public string name { get; set; }
-        public string symbol { get; set; }
+        public Account account { get; set; }
     }
 
     public class User : Account
@@ -148,13 +113,13 @@ namespace Lexplorer.Models
         public Pool pool { get; set; }
         public string protocolFeeA { get; set; }
         public string protocolFeeB { get; set; }
-        public TokenA tokenA { get; set; }
+        public Token tokenA { get; set; }
         public string tokenAPrice { get; set; }
-        public TokenB tokenB { get; set; }
+        public Token tokenB { get; set; }
         public string tokenBPrice { get; set; }
         public string amount { get; set; }
         public string fee { get; set; }
-        public FeeToken feeToken { get; set; }
+        public Token feeToken { get; set; }
         public Account fromAccount { get; set; }
         public Account toAccount { get; set; }
         public Token token { get; set; }
