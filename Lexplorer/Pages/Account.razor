@@ -1,0 +1,158 @@
+﻿@page "/account/{accountId}"
+@using Lexplorer.Models
+@using Lexplorer.Helpers
+@using Lexplorer.Components
+@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>The Lexplorer - Account</PageTitle>
+
+@if (account != null)
+{
+            <MudText Typo="Typo.h6">Account #@account.id</MudText>
+            <MudSimpleTable Dense="true">
+                <tbody>
+                    <tr>
+                        <td>L1 Address</td>
+                        <td>@account.address</td>
+                    </tr>
+                    <tr>
+                        <td>Account Type</td>
+                        <td>@account.typeName</td>
+                    </tr>
+                    <tr>
+                        <td>Created At (UTC)</td>
+                        <td>todo</td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+
+            <br />
+
+            <MudTable Dense="true" Items="@account.balances" Hover="true" Loading=@balancesLoadíng>
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Token balances</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Token</MudTh>
+                    <MudTh>Balance</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Token">@context.token.name</MudTd>
+                    <MudTd DataLabel="Balance">@TokenAmountConverter.Convert(@context.balance, @context.token.decimals) @context.token.symbol</MudTd>                
+                </RowTemplate>
+            </MudTable>
+}
+else
+{
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+    <br />
+
+@if (transactions != null)
+{
+            <MudTable Dense="true" Items="@transactions" Hover="true" Loading=@isLoading>
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Transactions</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Tx Id</MudTh>
+                    <MudTh>Type</MudTh>
+                    <MudTh>From</MudTh>
+                    <MudTh>To</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Fee</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Type">@context.typeName</MudTd>
+                    <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
+                    <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+                </RowTemplate>
+                <FooterContent>
+                    <MudText Typo="Typo.caption">Current Page: @readablePageNumber</MudText>
+                </FooterContent>
+            </MudTable>
+            if (pageNumber != "0")
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+            }
+}
+else
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+
+@code {
+    [Parameter]
+    public string? accountId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? pageNumber { get; set; }
+
+    public string readablePageNumber { get { return (pageNumber == null ? 0 : Int32.Parse(pageNumber) + 1).ToString(); } }
+
+    public bool balancesLoadíng;
+    public bool isLoading;
+
+    private Lexplorer.Models.Account? account { get; set; }
+    private IList<Lexplorer.Models.Transaction>? transactions { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //did the account change?
+        if (account != null && account.id != accountId)
+        {
+            account = null;
+            transactions = null;
+            pageNumber = "0";
+            StateHasChanged();
+        }
+        if (accountId == null) return;
+        if (account == null)
+        {
+            balancesLoadíng = true;
+            account = await GraphQLService.GetAccount(accountId);
+            StateHasChanged();
+            account.balances = await GraphQLService.GetAccountBalance(accountId);
+            balancesLoadíng = false;
+            StateHasChanged();
+        }
+        if (String.IsNullOrEmpty(pageNumber))
+        {
+            pageNumber = "0";
+        }
+
+        isLoading = true;
+        transactions = await GraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
+        isLoading = false;
+        StateHasChanged();
+    }
+    private void GoToNextPage()
+    {
+        int nextPage = Int32.Parse(pageNumber) + 1;
+        string parameters = $"/account/{accountId}?pageNumber={nextPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToPreviousPage()
+    {
+        int previousPage = Int32.Parse(pageNumber) - 1;
+        string parameters = $"/account/{accountId}?pageNumber={previousPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    private void GoToStartPage()
+    {
+        string parameters = $"/account/{accountId}?pageNumber=0";
+        NavigationManager.NavigateTo(parameters);
+    }
+}

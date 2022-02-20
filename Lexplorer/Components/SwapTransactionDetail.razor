@@ -23,7 +23,7 @@
                             </tr>
                             <tr>
                                 <td>User Account</td>
-                                <td>@SwapDetails.data.transaction.account.address</td>
+                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.data.transaction.account, false)</td>
                             </tr>
                             <tr>
                                 <td>Swap</td>
@@ -35,7 +35,7 @@
                             </tr>
                             <tr>
                                 <td>Pool</td>
-                                <td>@SwapDetails.data.transaction.pool.address</td>
+                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.data.transaction.pool, false)</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>

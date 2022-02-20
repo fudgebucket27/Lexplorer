@@ -8,18 +8,6 @@
         public string transactionCount { get; set; }
     }
 
-    public class TransferFromAccount
-    {
-        public string id { get; set; }
-        public string address { get; set; }
-    }
-
-    public class TransferToAccount
-    {
-        public string id { get; set; }
-        public string address { get; set; }
-    }
-
     public class TransferToken
     {
         public string id { get; set; }
@@ -43,8 +31,8 @@
         public string id { get; set; }
         public TransferBlock block { get; set; }
         public string data { get; set; }
-        public TransferFromAccount fromAccount { get; set; }
-        public TransferToAccount toAccount { get; set; }
+        public Account fromAccount { get; set; }
+        public Account toAccount { get; set; }
         public TransferToken token { get; set; }
         public TransferFeeToken feeToken { get; set; }
         public string amount { get; set; }
