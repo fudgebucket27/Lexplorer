@@ -4,6 +4,7 @@
 @using Lexplorer.Components
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
+@inject IDialogService DialogService
 
 <PageTitle>The Lexplorer - Account</PageTitle>
 
@@ -90,6 +91,7 @@ else
                     <MudText Typo="Typo.caption">Current Page: @readablePageNumber</MudText>
                 </FooterContent>
             </MudTable>
+            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowCSVOptions">Download...</MudButton>
             if (pageNumber != "0")
             {
                 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
@@ -171,5 +173,14 @@ else
     {
         string parameters = $"/account/{accountId}?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
+    }
+    private void ShowCSVOptions()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("accountId", accountId);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        DialogService.Show<TransactionExportDialog>("Export", parameters, options);
     }
 }

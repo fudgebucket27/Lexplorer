@@ -1,0 +1,40 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudText>Please specify options for generating the CSV before downloading it.</MudText>
+        <MudItem xs="12">
+            <MudSelect T="string" @bind-Value="CSVType" Label="CSV type" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Default")" />
+                <MudSelectItem Value="@("Koinly")" />
+                <MudSelectItem Value="@("Accointing")" />
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12">
+            <MudDatePicker Label="Start date:" @bind-Date="startDate" />
+            <MudDatePicker Label="End date:" @bind-Date="endDate" />
+        </MudItem>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Download</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] 
+    public string accountId { get; set; }
+
+    public DateTime? startDate = new DateTime(DateTime.Today.Year, 1, 1);
+    public DateTime? endDate = DateTime.Today;
+    public string? CSVType = "Default";
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}
