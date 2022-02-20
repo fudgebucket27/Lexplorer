@@ -51,6 +51,8 @@
                             </tbody>
             </MudSimpleTable>
             <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToOrderbookTradeOverviewPage">Back to recent Orderbook Trades</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToTransactionOverviewPage">Back to recent Transactions</MudButton>
 }
 
 @code {
@@ -82,6 +84,18 @@
         {
             parameters = $"blocks/{TradeDetails.data.transaction.block.id}?pageNumber=0";
         }
+        NavigationManager.NavigateTo(parameters);
+    }
+    
+    private void GoToOrderbookTradeOverviewPage()
+    {
+        string parameters = $"transactions/OrderbookTrade?pageNumber=0";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToTransactionOverviewPage()
+    {
+        string parameters = $"transactions?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }
