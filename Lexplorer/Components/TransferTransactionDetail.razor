@@ -44,6 +44,7 @@
                         </tbody>
         </MudSimpleTable>
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlockOverviewPage">Back to originating block</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToTransferOverviewPage">Back to recent Transfers</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToTransactionOverviewPage">Back to recent Transactions</MudButton>
 }
 
@@ -76,6 +77,13 @@
             parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber=0";
         }
 
+        NavigationManager.NavigateTo(parameters);
+    }
+
+
+    private void GoToTransferOverviewPage()
+    {
+        string parameters = $"transactions/Transfer?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
     
