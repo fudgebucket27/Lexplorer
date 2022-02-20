@@ -3,11 +3,11 @@
 @using Lexplorer.Components;
 @inject Lexplorer.Services.GraphQLService GraphQLService;
 @inject NavigationManager NavigationManager;
-@page "/transactions/Transfer";
+@page "/transactions/OrderbookTrade";
 
 @if (transactionData != null)
 {
-    <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="Transfers"></TransactionTable>
+    <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="OrderbookTrades"></TransactionTable>
     @if (pageNumber == "0")
     {
                                 <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
@@ -38,7 +38,7 @@ else
             pageNumber = "0";
         }
         isLoading = true;
-        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25, typeName:"Transfer");
+        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25, typeName:"OrderbookTrade");
         isLoading = false;
         StateHasChanged();
     }
@@ -46,19 +46,19 @@ else
     private void GoToNextPage()
     {
         int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"transactions/Transfer?pageNumber={nextPage.ToString()}";
+        string parameters = $"transactions/OrderbookTrade?pageNumber={nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPreviousPage()
     {
         int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"transactions/Transfer?pageNumber={previousPage.ToString()}";
+        string parameters = $"transactions/OrderbookTrade?pageNumber={previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
     private void GoToStartPage()
     {
-        string parameters = "transactions/Transfer?pageNumber=0";
+        string parameters = "transactions/OrderbookTrade?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
     }
 }
