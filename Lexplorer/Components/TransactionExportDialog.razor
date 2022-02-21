@@ -1,4 +1,7 @@
-﻿
+﻿@using Lexplorer.Services;
+@inject Lexplorer.Services.TransactionExportService TransactionExportService;
+@inject IJSRuntime JS;
+
 <MudDialog>
     <DialogContent>
         <MudText>Please specify options for generating the CSV before downloading it.</MudText>
@@ -13,28 +16,48 @@
             <MudDatePicker Label="Start date:" @bind-Date="startDate" />
             <MudDatePicker Label="End date:" @bind-Date="endDate" />
         </MudItem>
+         <p hidden="@(!downloadProcessing)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Download</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="DownloadFileFromStream" Disabled=@downloadProcessing >Download</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] 
-    MudDialogInstance MudDialog { get; set; }
+    MudDialogInstance? MudDialog { get; set; }
 
-    [Parameter] 
-    public string accountId { get; set; }
+    [Parameter]
+    public string accountId { get; set; } = "";
 
     public DateTime? startDate = new DateTime(DateTime.Today.Year, 1, 1);
     public DateTime? endDate = DateTime.Today;
     public string? CSVType = "Default";
+    public bool downloadProcessing = false;
 
-    void Submit()
+
+    //download relying on JavaScript (in _Host.cshtml) as outlined here
+    //https://docs.microsoft.com/en-us/answers/questions/243420/blazor-server-app-downlaod-files-from-server.html
+    //since we're not on a page and don't have a corresponding PageModel, other approaches likes these could not be used
+    //https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
+    //https://stackoverflow.com/questions/59596338/how-to-download-in-memory-file-from-blazor-server-side
+    //https://stackoverflow.com/questions/67880262/save-razor-component-as-jpg-png-pdf-via-download-link/69350066#69350066
+    //https://stackoverflow.com/questions/62086035/how-to-dynamically-generate-file-for-download-in-razor-pages
+
+    private async Task DownloadFileFromStream()
     {
-        MudDialog.Close(DialogResult.Ok(true));
+        downloadProcessing = true;
+
+        var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, startDate, endDate);
+        var fileName = $"Transactions_{accountId}.txt";
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+
+        MudDialog!.Close(DialogResult.Ok(true));
     }
 
-    void Cancel() => MudDialog.Cancel();
+    void Cancel() => MudDialog!.Cancel();
 }

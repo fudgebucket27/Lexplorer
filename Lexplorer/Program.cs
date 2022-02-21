@@ -12,6 +12,7 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<LoopringGraphQLService>();
 builder.Services.AddSingleton<UniswapGraphQLService>();
+builder.Services.AddSingleton<TransactionExportService>();
 builder.Services.AddLazyCache();
 
 var app = builder.Build();
