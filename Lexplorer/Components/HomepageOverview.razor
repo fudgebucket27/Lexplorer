@@ -19,7 +19,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data.proxy.transactionCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data!.proxy!.transactionCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -27,7 +27,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data.proxy.blockCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data!.proxy!.blockCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -35,7 +35,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data.proxy.userCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData.data!.proxy!.userCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -71,7 +71,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data.proxy.nftMintCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data!.proxy!.nftMintCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -79,7 +79,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data.proxy.tradeNFTCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data!.proxy!.tradeNFTCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -87,7 +87,7 @@ else if (blockData != null && transactionData != null)
             <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data.proxy.transferNFTCount</MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center">@transactionData.data!.proxy!.transferNFTCount</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -95,7 +95,7 @@ else if (blockData != null && transactionData != null)
 
     <MudGrid>
         <MudItem sm="6">
-            <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true">
+            <MudTable Dense="true" Items="@blockData.data!.blocks" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Latest Blocks</MudText>
                 </ToolBarContent>
@@ -107,15 +107,15 @@ else if (blockData != null && transactionData != null)
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash.Substring(0,15)...</a></MudTd>
+                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash!.Substring(0,15)...</a></MudTd>
                     <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
-                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@context.timestamp)</MudTd>
+                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@context.timestamp!)</MudTd>
                 </RowTemplate>
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
         </MudItem>
         <MudItem sm="6">
-            <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true">
+            <MudTable Dense="true" Items="@transactionData.data!.transactions" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Latest Transactions</MudText>
                 </ToolBarContent>
@@ -129,10 +129,10 @@ else if (blockData != null && transactionData != null)
                     <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
-                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@blockData.data.blocks[0].timestamp)</MudTd>
+                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@blockData.data!.blocks![0].timestamp!)</MudTd>
                 </RowTemplate>
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
@@ -142,8 +142,8 @@ else if (blockData != null && transactionData != null)
 
 @code
 {
-    private Blocks blockData;
-    private Transactions transactionData;
+    private Blocks? blockData;
+    private Transactions? transactionData;
 
     private double averageBlockTime;
     private long averageTransactions;
@@ -165,11 +165,11 @@ else if (blockData != null && transactionData != null)
         long transactionCount = 0;
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         List<long> timeBetweenBlocks = new List<long>();
-        foreach (var block in blockData.data.blocks)
+        foreach (var block in blockData!.data!.blocks!)
         {
-            transactionCount += Int64.Parse(block.transactionCount);
-            timeBetweenBlocks.Add(currentTime - Int64.Parse(block.timestamp));
-            currentTime = Int64.Parse(block.timestamp);
+            transactionCount += block.transactionCount;
+            timeBetweenBlocks.Add(currentTime - Int64.Parse(block.timestamp!));
+            currentTime = Int64.Parse(block.timestamp!);
         }
         averageTransactions = transactionCount / blockData.data.blocks.Count;
         averageBlockTime = Math.Floor(timeBetweenBlocks.Average() / 60);
@@ -178,7 +178,7 @@ else if (blockData != null && transactionData != null)
     private void CalculateLastBlockSubmitted()
     {
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-        long timeSinceLastBlock = currentTime - Int64.Parse(blockData.data.blocks[0].timestamp);
+        long timeSinceLastBlock = currentTime - Int64.Parse(blockData!.data!.blocks![0].timestamp!);
         lastBlockSubmittedTime = Math.Floor((double)timeSinceLastBlock / 60);
     }
 

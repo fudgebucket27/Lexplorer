@@ -7,17 +7,17 @@
 
 <PageTitle>The Lexplorer - Transaction</PageTitle>
 
-@if(swapData != null)
+@if(transaction is Swap)
 {
-    <SwapTransactionDetail SwapDetails=@swapData />
+    <SwapTransactionDetail SwapDetails=@(transaction as Swap) />
 }
-else if(transferData != null)
+else if(transaction is Transfer)
 {
-    <TransferTransactionDetail TransferDetails=@transferData />
+    <TransferTransactionDetail TransferDetails=@(transaction as Transfer) />
 }
-else if(tradeData != null)
+else if(transaction is OrderBookTrade)
 {
-    <OrderbookTradeTransactionDetail TradeDetails=@tradeData />
+    <OrderbookTradeTransactionDetail TradeDetails=@(transaction as OrderBookTrade) />
 }
 else
 {
@@ -25,33 +25,21 @@ else
 }
 
 @code {
-    private Swap swapData;
-    private Transfer transferData;
-    private OrderbookTrade tradeData;
+    private Models.Transaction? transaction;
 
     [Parameter]
-    public string transactionType { get; set; }
+    public string transactionType { get; set; } = "";
 
     [Parameter]
-    public string transactionId { get; set; }
+    public string transactionId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
     {
         string transactionCacheKey = $"transactionDetails-{transactionType}-{transactionId}";
-        if (swapData == null && transactionType == "Swap")
+        if (transaction == null)
         {
-            swapData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<Swap>(transactionId));
-            StateHasChanged();
-        }else if (transferData == null  && transactionType == "Transfer")
-        {
-            transferData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<Transfer>(transactionId));
+            transaction = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction(transactionId));
             StateHasChanged();
         }
-        else if (tradeData == null  && transactionType == "OrderbookTrade")
-        {
-            tradeData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction<OrderbookTrade>(transactionId));
-            StateHasChanged();
-        }
-
     }
 }

@@ -6,16 +6,16 @@
 
 @if (SwapDetails != null)
 {
-                      <MudText Typo="Typo.h6">Transaction #@SwapDetails.data.transaction.id</MudText>
+                      <MudText Typo="Typo.h6">Transaction #@SwapDetails.id</MudText>
                     <MudSimpleTable Dense="true">
                         <tbody>
                             <tr>
                                 <td>Block #</td>
-                                <td>@SwapDetails.data.transaction.block.id</td>
+                                <td>@SwapDetails.block!.id</td>
                             </tr>
                             <tr>
                                 <td>Verified At (UTC)</td>
-                                <td>@TimestampToUTCConverter.Convert(SwapDetails.data.transaction.block.timestamp)</td>
+                                <td>@TimestampToUTCConverter.Convert(SwapDetails.block!.timestamp!)</td>
                             </tr>
                             <tr>
                                 <td>Transaction Type</td>
@@ -23,23 +23,23 @@
                             </tr>
                             <tr>
                                 <td>User Account</td>
-                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.data.transaction.account, false)</td>
+                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.account!, false)</td>
                             </tr>
                             <tr>
                                 <td>Swap</td>
-                                <td>@TokenAmountConverter.Convert(SwapDetails.data.transaction.fillSA, SwapDetails.data.transaction.tokenA.decimals) @SwapDetails.data.transaction.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(SwapDetails.data.transaction.fillSB, SwapDetails.data.transaction.tokenB.decimals) @SwapDetails.data.transaction.tokenB.symbol</td>
+                                <td>@TokenAmountConverter.Convert(SwapDetails.fillSA, SwapDetails.tokenA!.decimals) @SwapDetails.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(SwapDetails.fillSB, SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
                             </tr>
                             <tr>
                                 <td>Fee</td>
-                                <td>@TokenAmountConverter.Convert(SwapDetails.data.transaction.feeA,  SwapDetails.data.transaction.tokenB.decimals) @SwapDetails.data.transaction.tokenB.symbol</td>
+                                <td>@TokenAmountConverter.Convert(SwapDetails.feeA,  SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
                             </tr>
                             <tr>
                                 <td>Pool</td>
-                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.data.transaction.pool, false)</td>
+                                <td>@AccountLinkHelper.CreateUserLink(SwapDetails.pool!, false)</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>
-                                <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@SwapDetails.data.transaction.data" Lines="3"/></td>
+                                <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@SwapDetails.data" Lines="3"/></td>
                             </tr>
                         </tbody>
         </MudSimpleTable>
@@ -49,18 +49,18 @@
 }
 
 @code {
-        [Parameter]
-        public Swap SwapDetails { get; set; }
+    [Parameter]
+    public Swap? SwapDetails { get; set; }
 
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public string previousPageNumber { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string previousPageNumber { get; set; } = "0";
 
     public string swapSymbol = "<>";
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string originatingPage { get; set; }
+    public string? originatingPage { get; set; }
 
     private void GoToBlockOverviewPage()
     {
@@ -71,11 +71,11 @@
         string parameters = "";
         if (tempOriginatingPage == "blockDetails")
         {
-            parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+            parameters = $"blocks/{SwapDetails!.block!.id}?pageNumber={tempPreviousPageNumber}";
         }
         else
         {
-            parameters = $"blocks/{SwapDetails.data.transaction.block.id}?pageNumber=0";
+            parameters = $"blocks/{SwapDetails!.block!.id}?pageNumber=0";
         }
         NavigationManager.NavigateTo(parameters);
     }

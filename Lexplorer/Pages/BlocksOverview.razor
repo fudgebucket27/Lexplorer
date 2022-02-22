@@ -11,7 +11,7 @@
     <MudGrid>
         <MudItem sm="12">
             <MudText Typo="Typo.h6">Latest Blocks <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
-            <MudTable Dense="true" Items="@blockData.data.blocks" Hover="true" Loading="@isLoading">
+            <MudTable Dense="true" Items="@blockData.data!.blocks" Hover="true" Loading="@isLoading">
                 <HeaderContent>
                     <MudTh>Block ID</MudTh>
                     <MudTh>L1 Transaction Hash</MudTh>
@@ -20,9 +20,9 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash.Substring(0,15)...</a></MudTd>
+                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash!.Substring(0,15)...</a></MudTd>
                     <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
-                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@context.timestamp)</MudTd>
+                    <MudTd DataLabel="Timestamp">@TimestampToUTCConverter.Convert(@context.timestamp!)</MudTd>
                 </RowTemplate>
             </MudTable>
         </MudItem>
@@ -44,11 +44,11 @@ else
 }
 
 @code {
-    private Blocks blockData;
+    private Blocks? blockData;
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? pageNumber { get; set; }
+    public string pageNumber { get; set; } = "0";
 
     public bool isLoading;
 

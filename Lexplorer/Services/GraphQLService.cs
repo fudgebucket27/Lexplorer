@@ -64,7 +64,7 @@ namespace Lexplorer.Services
                 }
             });
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Blocks>(response.Content);
+            var data = JsonConvert.DeserializeObject<Blocks>(response.Content!);
             return data;
         }
 
@@ -112,11 +112,11 @@ namespace Lexplorer.Services
                 }
             });
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Block>(response.Content);
+            var data = JsonConvert.DeserializeObject<Block>(response.Content!);
             return data;
         }
 
-        public async Task<T> GetTransaction<T>(string transactionId) where T : new()
+        public async Task<Transaction?> GetTransaction(string transactionId)
         {
             var transactionQuery = @"
               query transaction($id: ID!) {
@@ -128,7 +128,6 @@ namespace Lexplorer.Services
                     timestamp
                     transactionCount
                   }
-                  data
                   ...AddFragment
                   ...RemoveFragment
                   ...SwapFragment
@@ -182,8 +181,17 @@ namespace Lexplorer.Services
             });
 
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<T>(response.Content);
-            return data;
+            try
+            {
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["transaction"]!;
+                return result.ToObject<Transaction>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
@@ -345,10 +353,10 @@ namespace Lexplorer.Services
             }
 
             var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Transactions>(response.Content);
+            var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
             return data;
         }
-        public async Task<Account> GetAccount(string accountId)
+        public async Task<Account?> GetAccount(string accountId)
         {
             var accountQuery = @"
             query account(
@@ -375,9 +383,9 @@ namespace Lexplorer.Services
             var response = await _client.PostAsync(request);
             try
             {
-                JObject jresponse = JObject.Parse(response.Content);
-                JToken result = jresponse["data"]["account"];
-                return result.ToObject<Account>();
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["account"]!;
+                return result.ToObject<Account>()!;
             }
             catch (Exception ex)
             {
@@ -386,7 +394,7 @@ namespace Lexplorer.Services
             }
 
         }
-        public async Task<List<AccountBalance>> GetAccountBalance(string accountId)
+        public async Task<List<AccountBalance>?> GetAccountBalance(string accountId)
         {
             var balanceQuery = @"
             query accountBalances(
@@ -422,13 +430,13 @@ namespace Lexplorer.Services
             var response = await _client.PostAsync(request);
             try
             {
-                JObject jresponse = JObject.Parse(response.Content);
-                IList<JToken> balanceTokens = jresponse["data"]["account"]["balances"].Children().ToList();
+                JObject jresponse = JObject.Parse(response.Content!);
+                IList<JToken> balanceTokens = jresponse["data"]!["account"]!["balances"]!.Children().ToList();
                 List<AccountBalance> balances = new List<AccountBalance>();
                 foreach (JToken result in balanceTokens)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    AccountBalance balance = result.ToObject<AccountBalance>();
+                    AccountBalance balance = result.ToObject<AccountBalance>()!;
                     balances.Add(balance);
                 }
                 return balances;
@@ -440,7 +448,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<Transaction>> GetAccountTransactions(int skip, int first, string accountId)
+        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -526,13 +534,13 @@ namespace Lexplorer.Services
             var response = await _client.PostAsync(request);
             try
             {
-                JObject jresponse = JObject.Parse(response.Content);
-                IList<JToken> transactionTokens = jresponse["data"]["account"]["transactions"].Children().ToList();
+                JObject jresponse = JObject.Parse(response.Content!);
+                IList<JToken> transactionTokens = jresponse["data"]!["account"]!["transactions"]!.Children().ToList();
                 IList<Transaction> transactions = new List<Transaction>();
                 foreach (JToken result in transactionTokens)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    Transaction transaction = result.ToObject<Transaction>();
+                    Transaction transaction = result.ToObject<Transaction>()!;
                     transactions.Add(transaction);
                 }
                 return transactions;

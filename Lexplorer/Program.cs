@@ -1,7 +1,4 @@
-using Lexplorer.Data;
 using Lexplorer.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +9,6 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 {
     o.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB
 });
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<GraphQLService>();
 builder.Services.AddLazyCache();
