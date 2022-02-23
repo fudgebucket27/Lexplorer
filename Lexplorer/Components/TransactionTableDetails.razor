@@ -4,6 +4,12 @@
 
 @switch(TransactionData!.typeName)
 {
+    case "Deposit":
+        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(deposit!.toAccount!.id!, deposit!.toAccount!.address!)</MudTd>
+        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(deposit!.toAccount!.id! ,deposit!.toAccount!.address!)</MudTd>
+        <MudTd DataLabel="Amount">@Decimal.Parse(@TokenAmountConverter.Convert(deposit!.amount, deposit!.token!.decimals),NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint).ToString("N4") @deposit!.token!.symbol</MudTd>
+        <MudTd DataLabel="Fee"></MudTd>
+        break;
     case "OrderbookTrade":
         <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(orderBookTrade!.accountA!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(orderBookTrade!.accountB!, ignoreUserIDForLink)</MudTd>
@@ -50,6 +56,7 @@
     public OrderBookTrade? orderBookTrade { get { return TransactionData as OrderBookTrade; } }
     public Swap? swap { get { return TransactionData as Swap; } }
     public Transfer? transfer { get { return TransactionData as Transfer; } }
+    public Deposit? deposit { get { return TransactionData as Deposit; } }
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }
 }

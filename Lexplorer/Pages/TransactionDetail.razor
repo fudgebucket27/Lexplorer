@@ -19,6 +19,10 @@ else if(transaction is OrderBookTrade)
 {
     <OrderbookTradeTransactionDetail TradeDetails=@(transaction as OrderBookTrade) />
 }
+else if(transaction is Deposit)
+{
+    <DepositTransactionDetail DepositDetails=@(transaction as Deposit) />
+}
 else
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />

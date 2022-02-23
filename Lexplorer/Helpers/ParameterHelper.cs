@@ -6,6 +6,8 @@
         {
             switch (transactionType)
             {
+                case "Deposit":
+                    return $"transactions/Deposit/{transactionId}?previousPageNumber={previousPageNumber}&originatingPage={originatingPage}";
                 case "Swap":
                     return $"transactions/Swap/{transactionId}?previousPageNumber={previousPageNumber}&originatingPage={originatingPage}";
                 case "Transfer":

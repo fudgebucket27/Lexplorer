@@ -5,6 +5,9 @@
 @inject NavigationManager NavigationManager;
 @page "/transactions";
 
+<PageTitle>The Lexplorer - Transactions</PageTitle>
+
+
 @if (transactionData != null)
 {
     <TransactionTable transactions=@transactionData isLoading=@isLoading pageNumber=@pageNumber transactionType="Transactions"></TransactionTable>
