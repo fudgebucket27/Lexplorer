@@ -134,7 +134,7 @@ namespace Lexplorer.Models
         public string? typeName { get; set; }
         public string? data { get; set; }
         public BlockDetail? block { get; set; }
-        public AccountBalance? tokenBalances { get; set; }
+        public List<AccountBalance>? tokenBalances { get; set; }
         public List<Account>? accounts { get; set; }
         public string verifiedAt
         {
