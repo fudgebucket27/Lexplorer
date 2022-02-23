@@ -128,6 +128,7 @@ namespace Lexplorer.Services
                     timestamp
                     transactionCount
                   }
+                  data
                   ...AddFragment
                   ...RemoveFragment
                   ...SwapFragment
