@@ -6,40 +6,39 @@
 
 @if (TransferDetails != null)
 {
-                    <MudText Typo="Typo.h6">Transaction #@TransferDetails.data.transaction.id</MudText>
+                    <MudText Typo="Typo.h6">Transaction #@TransferDetails.id</MudText>
                     <MudSimpleTable Dense="true">
                         <tbody>
                             <tr>
                                 <td>Block #</td>
-                                <td>@TransferDetails.data.transaction.block.id</td>
+                                <td>@TransferDetails.block!.id</td>
                             </tr>
                             <tr>
                                 <td>Verified At (UTC)</td>
-                                <td>@TimestampToUTCConverter.Convert(TransferDetails.data.transaction.block.timestamp)</td>
+                                <td>@TimestampToUTCConverter.Convert(TransferDetails.block.timestamp!)</td>
                             </tr>
-                            <tr>
-                                <td>Transaction Type</td>
+                            <tr>                                <td>Transaction Type</td>
                                 <td>Swap</td>
                             </tr>
                             <tr>
                                 <td>From</td>
-                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.data.transaction.fromAccount, false)</td>
+                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.fromAccount!, false)</td>
                             </tr>
                             <tr>
                                 <td>To</td>
-                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.data.transaction.toAccount, false)</td>
+                                <td>@AccountLinkHelper.CreateUserLink(TransferDetails.toAccount!, false)</td>
                             </tr>
                             <tr>
                                 <td>Amount</td>
-                                <td>@TokenAmountConverter.Convert(TransferDetails.data.transaction.amount, TransferDetails.data.transaction.token.decimals) @TransferDetails.data.transaction.token.symbol</td>
+                                <td>@TokenAmountConverter.Convert(TransferDetails.amount, TransferDetails.token!.decimals) @TransferDetails.token!.symbol</td>
                             </tr>
                             <tr>
                                 <td>Fee</td>
-                                <td>@TokenAmountConverter.Convert(TransferDetails.data.transaction.fee, TransferDetails.data.transaction.feeToken.decimals) @TransferDetails.data.transaction.feeToken.symbol</td>
+                                <td>@TokenAmountConverter.Convert(TransferDetails.fee, TransferDetails.feeToken!.decimals) @TransferDetails.feeToken!.symbol</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>
-                                <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@TransferDetails.data.transaction.data" Lines="3"/></td>
+                                <td><MudTextField T="string" Variant="Variant.Filled"  ReadOnly="true" Text="@TransferDetails.data" Lines="3"/></td>
                             </tr>
                         </tbody>
         </MudSimpleTable>
@@ -50,15 +49,15 @@
 
 @code {
     [Parameter]
-    public Transfer TransferDetails { get; set; }
+    public Transfer? TransferDetails { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string previousPageNumber { get; set; }
+    public string? previousPageNumber { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string originatingPage { get; set; }
+    public string? originatingPage { get; set; }
 
     private void GoToBlockOverviewPage()
     {
@@ -70,11 +69,11 @@
         if(tempOriginatingPage== "blockDetails")
         {
             
-            parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber={tempPreviousPageNumber}";
+            parameters = $"blocks/{TransferDetails!.block!.id}?pageNumber={tempPreviousPageNumber}";
         }
         else
         {
-            parameters = $"blocks/{TransferDetails.data.transaction.block.id}?pageNumber=0";
+            parameters = $"blocks/{TransferDetails!.block!.id}?pageNumber=0";
         }
 
         NavigationManager.NavigateTo(parameters);

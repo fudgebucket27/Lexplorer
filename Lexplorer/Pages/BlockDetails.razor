@@ -10,20 +10,20 @@
 
 @if (block != null)
 {
-            <MudText Typo="Typo.h6">Block #@block.data.block.id</MudText>
-    if (block.data.block.id != block.data.proxy.blockCount)
-    {
+            <MudText Typo="Typo.h6">Block #@block.data!.block!.id</MudText>
+            if (Int64.Parse(block.data!.block!.id!) != block.data!.proxy!.blockCount)
+            {
                         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToPreviousBlockPage">Previous Block</MudButton>
                         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextBlockPage">Next Block</MudButton>
-    }
-    else
-    {
+            }
+            else
+            {
                         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToPreviousBlockPage">Previous Block</MudButton>
-    }
-    @if (isBlockLoading)
-    {
-                   <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /> 
-    }
+            }
+            @if (isBlockLoading)
+            {
+                        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /> 
+            }
 
             <MudSimpleTable Dense="true">
                         <tbody>
@@ -42,12 +42,12 @@
                             </tr>
                             <tr>
                                 <td>Verified At (UTC)</td>
-                                <td>@TimestampToUTCConverter.Convert(block.data.block.timestamp)</td>
+                                <td>@TimestampToUTCConverter.Convert(block.data!.block!.timestamp!)</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>
                                 <td>
-                                    <MudVirtualize Items="@blockData"><MudTextField T="string" Variant="Variant.Filled" Text="@context.block.data" Lines="5" ReadOnly="true" /></MudVirtualize>
+                                    <MudVirtualize Items="@blockData"><MudTextField T="string" Variant="Variant.Filled" Text="@context.block!.data" Lines="5" ReadOnly="true" /></MudVirtualize>
                                 </td>
                             </tr>
                         </tbody>
@@ -58,11 +58,11 @@ else
                      <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 
-@if (transactionData != null)
+@if ((block != null) && (transactionData != null))
 {
-                <MudTable Dense="true" Items="@transactionData.data.transactions" Hover="true" Loading="@isTransactionLoading">
+                <MudTable Dense="true" Items="@transactionData.data!.transactions" Hover="true" Loading="@isTransactionLoading">
                                 <ToolBarContent>
-                                    <MudText Typo="Typo.h6">Transactions in block #@block.data.block.id <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
+                                    <MudText Typo="Typo.h6">Transactions in block #@block.data!.block!.id <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
                                 </ToolBarContent>
                                 <HeaderContent>
                                     <MudTh>Tx Id</MudTh>
@@ -74,10 +74,10 @@ else
                                     <MudTh>Time(UTC)</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id, @pageNumber, "blockDetails")>@context.id</a></MudTd>
+                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!, @pageNumber, "blockDetails")>@context.id</a></MudTd>
                                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                                     <TransactionTableDetails TransactionData=@context />
-                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data.block.timestamp)</MudTd>
+                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data!.block!.timestamp!)</MudTd>
                                 </RowTemplate>
                 </MudTable>
     @if (pageNumber == "0")
@@ -98,16 +98,16 @@ else
 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToBlocksOverviewPage">Back to Blocks Overview</MudButton>
 
 @code {
-    private Block block;
-    private List<BlockData> blockData;
-    private Transactions transactionData;
+    private Block? block;
+    private List<BlockData>? blockData;
+    private Transactions? transactionData;
 
     [Parameter]
-    public string blockNumber { get; set; }
+    public string blockNumber { get; set; } = "";
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? pageNumber { get; set; }
+    public string pageNumber { get; set; } = "0";
 
     public bool isTransactionLoading;
     public bool isBlockLoading;
@@ -123,7 +123,7 @@ else
         isBlockLoading = true;
         block = await AppCache.GetOrAddAsync(blockCacheKey, async () => await GraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(5));
         blockData = new List<BlockData>();
-        blockData.Add(block.data);
+        blockData.Add(block.data!);
         isBlockLoading = false;
         isTransactionLoading = true;
         string transactionDatacacheKey = $"blockDetailTransactions-{blockNumber}-page{pageNumber}";

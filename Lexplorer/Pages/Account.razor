@@ -38,8 +38,8 @@
                     <MudTh>Balance</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Token">@context.token.name</MudTd>
-                    <MudTd DataLabel="Balance">@TokenAmountConverter.Convert(@context.balance, @context.token.decimals) @context.token.symbol</MudTd>                
+                    <MudTd DataLabel="Token">@context.token!.name</MudTd>
+                    <MudTd DataLabel="Balance">@TokenAmountConverter.Convert(@context.balance, @context.token!.decimals) @context.token.symbol</MudTd>                
                 </RowTemplate>
             </MudTable>
 }
@@ -65,7 +65,7 @@ else
                     <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName,@context.id)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
                     <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
@@ -97,7 +97,7 @@ else
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? pageNumber { get; set; }
+    public string pageNumber { get; set; } = "0";
 
     public string readablePageNumber { get { return (pageNumber == null ? 0 : Int32.Parse(pageNumber) + 1).ToString(); } }
 
@@ -123,7 +123,7 @@ else
             balancesLoadíng = true;
             account = await GraphQLService.GetAccount(accountId);
             StateHasChanged();
-            account.balances = await GraphQLService.GetAccountBalance(accountId);
+            account!.balances = await GraphQLService.GetAccountBalance(accountId);
             balancesLoadíng = false;
             StateHasChanged();
         }

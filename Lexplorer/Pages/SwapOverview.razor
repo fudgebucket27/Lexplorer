@@ -25,10 +25,10 @@ else
 }
 
 @code {
-    private Transactions transactionData;
+    private Transactions? transactionData;
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? pageNumber { get; set; }
+    public string pageNumber { get; set; } = "0";
     public bool isLoading;
 
     protected override async Task OnParametersSetAsync()

@@ -30,7 +30,7 @@ namespace Lexplorer.Helpers
                 }
             }
 
-            value = default;
+            value = default!;
             return false;
         }
     }
