@@ -89,6 +89,7 @@ namespace Lexplorer.Models
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
         public List<AccountBalance>? balances { get; set; }
+        public Transaction? createdAtTransaction { get; set; }
     }
 
     public class Pool : Account

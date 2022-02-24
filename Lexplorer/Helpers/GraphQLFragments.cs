@@ -18,12 +18,46 @@
                 }
               }";
 
+        //to avoid recursion in User/PoolFragments for accountCreatedAt, use an un-nested fragment
+        //otherwise the transaction belongs to a block, which has an operator, which again is a pool
+        public static string AccountCreatedAtFragment = @"
+            fragment AccountCreatedAtFragment on Transaction {
+                id
+                __typename
+                block {
+                  id
+                  timestamp
+                }
+            }";
+
         public static string AccountFragment = @"
             fragment AccountFragment on Account {
                 id
                 address
                 __typename
             }";
+
+        public static string UserFragment = @"
+            fragment UserFragment on User {
+                id
+                address
+                __typename
+                createdAtTransaction {
+                  ...AccountCreatedAtFragment
+                }
+                publicKey
+              }";
+
+        public static string PoolFragment = @"
+            fragment PoolFragment on Pool {
+                id
+                address
+                __typename
+                createdAtTransaction {
+                  ...AccountCreatedAtFragment
+                }
+                feeBipsAMM
+              }";
 
         public static string TokenFragment = @"
             fragment TokenFragment on Token {
@@ -32,19 +66,6 @@
                 symbol
                 decimals
                 address
-              }";
-
-        public static string PoolFragment = @"
-            fragment PoolFragment on Pool {
-                id
-                address
-                balances {
-                  id
-                  balance
-                  token {
-                    ...TokenFragment
-                  }
-                }
               }";
 
         public static string NFTFragment = @"

@@ -22,9 +22,17 @@
                     </tr>
                     <tr>
                         <td>Created At (UTC)</td>
-                        <td>todo</td>
+                        <td>@account.createdAtTransaction!.verifiedAt</td>
                     </tr>
-                </tbody>
+            @if (account is User)
+            {
+                    <tr>
+                        <td>Public key</td>
+                        <td>0x@((account as User)!.publicKey)</td>
+                    </tr>
+                
+            }
+        </tbody>
             </MudSimpleTable>
 
             <br />
@@ -122,6 +130,7 @@ else
         {
             balancesLoadíng = true;
             account = await GraphQLService.GetAccount(accountId);
+            if (account == null) return;
             StateHasChanged();
             account!.balances = await GraphQLService.GetAccountBalance(accountId);
             balancesLoadíng = false;
