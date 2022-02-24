@@ -151,6 +151,7 @@ namespace Lexplorer.Services
               + GraphQLFragments.AccountFragment
               + GraphQLFragments.TokenFragment
               + GraphQLFragments.PoolFragment
+              + GraphQLFragments.AccountCreatedAtFragment
               + GraphQLFragments.NFTFragment
               + GraphQLFragments.AddFragment
               + GraphQLFragments.RemoveFragment
@@ -181,9 +182,9 @@ namespace Lexplorer.Services
                 }
             });
 
-            var response = await _client.PostAsync(request);
             try
             {
+                var response = await _client.PostAsync(request);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["transaction"]!;
                 return result.ToObject<Transaction>();
@@ -195,7 +196,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Transactions> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
         {
             Debug.WriteLine(blockId);
             var transactionsQuery = @"
@@ -280,6 +281,7 @@ namespace Lexplorer.Services
               + GraphQLFragments.AccountFragment
               + GraphQLFragments.TokenFragment
               + GraphQLFragments.PoolFragment
+              + GraphQLFragments.AccountCreatedAtFragment
               + GraphQLFragments.NFTFragment
               + GraphQLFragments.AddFragment
               + GraphQLFragments.RemoveFragment
@@ -353,9 +355,17 @@ namespace Lexplorer.Services
                 });
             }
 
-            var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
-            return data;
+            try
+            { 
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
         }
         public async Task<Account?> GetAccount(string accountId)
         {
@@ -366,10 +376,14 @@ namespace Lexplorer.Services
                 account(
                   id: $accountId
                 ) {
-                  ...AccountFragment 
+                  ...PoolFragment
+                  ...UserFragment
                 }
             }"
-            + GraphQLFragments.AccountFragment;
+            + GraphQLFragments.PoolFragment
+            + GraphQLFragments.UserFragment
+            + GraphQLFragments.AccountCreatedAtFragment
+            + GraphQLFragments.BlockFragment;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -381,9 +395,9 @@ namespace Lexplorer.Services
                     accountId = int.Parse(accountId)
                 }
             });
-            var response = await _client.PostAsync(request);
             try
             {
+                var response = await _client.PostAsync(request);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["account"]!;
                 return result.ToObject<Account>()!;
@@ -500,6 +514,7 @@ namespace Lexplorer.Services
               + GraphQLFragments.AccountFragment
               + GraphQLFragments.TokenFragment
               + GraphQLFragments.PoolFragment
+              + GraphQLFragments.AccountCreatedAtFragment
               + GraphQLFragments.NFTFragment
               + GraphQLFragments.AddFragment
               + GraphQLFragments.RemoveFragment
