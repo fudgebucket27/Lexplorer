@@ -9,8 +9,10 @@
 
 @if (account != null)
 {
-            <MudText Typo="Typo.h6">Account #@account.id</MudText>
-            <MudSimpleTable Dense="true">
+            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">@account.typeName #@account.id</MudText>
+                </div>
                 <tbody>
                     <tr>
                         <td>L1 Address</td>
@@ -37,18 +39,24 @@
 
             <br />
 
-            <MudTable Dense="true" Items="@account.balances" Hover="true" Loading=@balancesLoadíng>
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@account.balances" Hover="true" Loading=@balancesLoadíng>
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Token balances</MudText>
                 </ToolBarContent>
                 <HeaderContent>
-                    <MudTh>Token</MudTh>
-                    <MudTh>Balance</MudTh>
+                    <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Token">@context.token!.name</MudTd>
+                    <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
                     <MudTd DataLabel="Balance">@TokenAmountConverter.Convert(@context.balance, @context.token!.decimals) @context.token.symbol</MudTd>                
                 </RowTemplate>
+                <PagerContent>
+            @if (account.balances!.Count > 10)
+            {
+                    <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left"/>
+            }
+                </PagerContent>
             </MudTable>
 }
 else
@@ -59,7 +67,7 @@ else
 
 @if (transactions != null)
 {
-            <MudTable Dense="true" Items="@transactions" Hover="true" Loading=@isLoading>
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Transactions</MudText>
                 </ToolBarContent>

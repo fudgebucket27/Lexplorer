@@ -119,6 +119,12 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public Token? token { get; set; }
         public Account? account { get; set; }
+        public Double fBalance {
+            get
+            {
+                return balance / Math.Pow(10, token!.decimals);
+            }
+        }
     }
 
     public class User : Account
