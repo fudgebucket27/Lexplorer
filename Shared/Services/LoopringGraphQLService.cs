@@ -9,6 +9,10 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace Lexplorer.Services
 {

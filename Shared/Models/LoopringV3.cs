@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Lexplorer.Helpers;
 using JsonSubTypes;
+using System;
+using System.Collections.Generic;
 
 //source: https://thegraph.com/hosted-service/subgraph/loopring/loopring
 

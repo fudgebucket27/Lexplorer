@@ -7,9 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lexplorer", "Lexplorer\Lexp
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{E3CCB3F9-47E9-4F8E-85D6-9C964F24367C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xUnitTests", "xUnitTests\xUnitTests.csproj", "{246057E4-2CD6-46C3-9A50-37D8E365DD1E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\Shared.projitems*{08e09796-c41d-4db7-bee7-76d525af10b8}*SharedItemsImports = 5
+		Shared\Shared.projitems*{246057e4-2cd6-46c3-9a50-37d8e365dd1e}*SharedItemsImports = 5
 		Shared\Shared.projitems*{e3ccb3f9-47e9-4f8e-85d6-9c964f24367c}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +24,10 @@ Global
 		{08E09796-C41D-4DB7-BEE7-76D525AF10B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08E09796-C41D-4DB7-BEE7-76D525AF10B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08E09796-C41D-4DB7-BEE7-76D525AF10B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{246057E4-2CD6-46C3-9A50-37D8E365DD1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{246057E4-2CD6-46C3-9A50-37D8E365DD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{246057E4-2CD6-46C3-9A50-37D8E365DD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{246057E4-2CD6-46C3-9A50-37D8E365DD1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

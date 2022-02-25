@@ -1,4 +1,6 @@
-﻿namespace Lexplorer.Helpers
+﻿using System;
+
+namespace Lexplorer.Helpers
 {
     public static class TimestampToUTCConverter
     { 
