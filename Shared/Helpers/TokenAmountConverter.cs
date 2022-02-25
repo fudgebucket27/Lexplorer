@@ -5,10 +5,13 @@ namespace Lexplorer.Helpers
 {
     public static class TokenAmountConverter
     {
-        public static string Convert(Double balance, int decimals)
+        public static decimal ToDecimal(Double balance, int decimals, decimal conversionRate = 1)
         {
-            var result = balance / Math.Pow(10, (double)decimals);
-            return result.ToString();
+            return (decimal) (balance / Math.Pow(10, (double)decimals)) * conversionRate; 
+        }
+        public static string Convert(Double balance, int decimals, decimal conversionRate = 1)
+        {
+            return ToDecimal(balance, decimals, conversionRate).ToString();
         }
 
 

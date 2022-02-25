@@ -9,12 +9,32 @@ using System.Globalization;
 
 namespace xUnitTests.HelperTests
 {
+    public class TestTokenAmountConverterToDecimal
+    {
+        Double x = 12345678;
+
+        [Fact]
+        public void TestToDecimalSimple()
+        {
+            Assert.Equal((decimal) x / 1000, TokenAmountConverter.ToDecimal(x, 3), 0);
+        }
+        [Fact]
+        public void TestConvertSimpleConversion()
+        {
+            Assert.Equal((decimal)x / 4000, TokenAmountConverter.ToDecimal(x, 3, (decimal)1 / 4), 0);
+        }
+    }
     public class TestTokenAmountConverterConvert
     {
         [Fact]
         public void TestConvertSimple()
         {
             Assert.Equal("100", TokenAmountConverter.Convert(1E5, 3));
+        }
+        [Fact]
+        public void TestConvertSimpleConversion()
+        {
+            Assert.Equal("100,00", TokenAmountConverter.Convert(1E5 * 4, 3, (decimal)1/4));
         }
     }
 
