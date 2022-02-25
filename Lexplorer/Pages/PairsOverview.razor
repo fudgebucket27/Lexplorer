@@ -22,14 +22,14 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
-                   @if(uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas.Count > 0)
+                   @if(@context.dailyEntities.Count > 0 && @context.weeklyEntities.Count > 0 && uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas.Count > 0)
                    {
                         <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
                         <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
                     }
                     else
                     {
-                       <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
+                       <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(0, @context.token1!.decimals, 0) </MudTd>
                        <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
                     }
 
@@ -45,8 +45,15 @@
     }
     else
     {
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
     }
+}
+else if (pairsData != null && pairsData!.data!.pairs!.Count == 0)
+{
+     <MudText Typo="Typo.h6">No pairs to show</MudText>
+     <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+     <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
 }
 else
 {
