@@ -3,7 +3,7 @@
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
 @inject IAppCache AppCache;
-@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 
 <PageTitle>The Lexplorer - Transaction</PageTitle>
 
@@ -42,7 +42,7 @@ else
         string transactionCacheKey = $"transactionDetails-{transactionType}-{transactionId}";
         if (transaction == null)
         {
-            transaction = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransaction(transactionId));
+            transaction = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
             StateHasChanged();
         }
     }

@@ -2,7 +2,7 @@
 @using Lexplorer.Models
 @using Lexplorer.Helpers
 @using Lexplorer.Components
-@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
@@ -137,10 +137,10 @@ else
         if (account == null)
         {
             balancesLoadíng = true;
-            account = await GraphQLService.GetAccount(accountId);
+            account = await LoopringGraphQLService.GetAccount(accountId);
             if (account == null) return;
             StateHasChanged();
-            account!.balances = await GraphQLService.GetAccountBalance(accountId);
+            account!.balances = await LoopringGraphQLService.GetAccountBalance(accountId);
             balancesLoadíng = false;
             StateHasChanged();
         }
@@ -150,7 +150,7 @@ else
         }
 
         isLoading = true;
-        transactions = await GraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
+        transactions = await LoopringGraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
         isLoading = false;
         StateHasChanged();
     }

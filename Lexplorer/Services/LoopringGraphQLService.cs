@@ -12,13 +12,13 @@ using System.Diagnostics;
 
 namespace Lexplorer.Services
 {
-    public class GraphQLService
+    public class LoopringGraphQLService
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/loopring/loopring";
 
         readonly RestClient _client;
 
-        public GraphQLService()
+        public LoopringGraphQLService()
         {
             _client = new RestClient(_baseUrl);
         }
@@ -198,7 +198,6 @@ namespace Lexplorer.Services
 
         public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
         {
-            Debug.WriteLine(blockId);
             var transactionsQuery = @"
               query transactions(
                 $skip: Int
@@ -560,6 +559,75 @@ namespace Lexplorer.Services
                     transactions.Add(transaction);
                 }
                 return transactions;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Pairs?> GetPairs(int skip = 0, int first = 10 , string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
+        {
+            var pairsQuery = @"
+             query pairs(
+                $skip: Int
+                $first: Int
+                $orderBy: Pair_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                pairs(
+                  skip: $skip
+                  first: $first
+                  orderBy: $orderBy
+                  orderDirection: $orderDirection
+                ) {
+                  id
+                  internalID
+                  token0 {
+                    ...TokenFragment
+                  }
+                  token1 {
+                    ...TokenFragment
+                  }
+                  dailyEntities(skip: 1, first: 1, orderBy: dayEnd, orderDirection: desc) {
+                    tradedVolumeToken1Swap
+                    tradedVolumeToken0Swap
+                    id
+                  }
+                  weeklyEntities(
+                    skip: 0
+                    first: 1
+                    orderBy: weekEnd
+                    orderDirection: desc
+                  ) {
+                    tradedVolumeToken1Swap
+                    tradedVolumeToken0Swap
+                    id
+                  }
+                }
+              }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = pairsQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
+                return data;
             }
             catch (Exception ex)
             {

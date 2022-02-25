@@ -1,7 +1,7 @@
 ﻿@page "/blocks"
 @using Lexplorer.Models
 @using Lexplorer.Helpers
-@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 
 <PageTitle>The Lexplorer - Blocks</PageTitle>
@@ -59,7 +59,7 @@ else
             pageNumber = "0";
         }
         isLoading = true;
-        blockData = await GraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
+        blockData = await LoopringGraphQLService.GetBlocks(Int32.Parse(pageNumber) * 25, 25);
         isLoading = false;
         StateHasChanged();
     }
