@@ -9,12 +9,12 @@
 
 <PageTitle>The Lexplorer - Pairs</PageTitle>
 
-@if (pairsData != null && uniswapTokens!.Count > 0)
+@if (pairsData != null && uniswapTokens != null && uniswapTokens!.Count > 0)
 {
         <MudGrid>
             <MudItem sm="12">
                 <MudText Typo="Typo.h6">Pairs <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
-                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true">
+                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading=@isLoading>
                     <HeaderContent>
                         <MudTh>Pair</MudTh>
                         <MudTh>Volume 24H</MudTh>
@@ -68,21 +68,36 @@ else
     [SupplyParameterFromQuery]
     public string pageNumber { get; set; } = "0";
 
+    private bool isLoading;
+
+
     protected override async Task OnParametersSetAsync()
     {
-        uniswapTokens = new List<UniswapToken>();
         if (String.IsNullOrEmpty(pageNumber))
         {
             pageNumber = "0";
         }
+        isLoading = true;
         string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
         pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
+        int pairCount = 0;
         foreach (var pair in pairsData!.data!.pairs!)
         {
             string uniswapTokenCacheKey = $"pairsOverview-token-{pair!.token1!.address!}-pageNumber{pageNumber}";
             var uniswapToken = await AppCache.GetOrAddAsync(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
-            uniswapTokens.Add(uniswapToken!);
+            if(uniswapToken != null && pairCount == 0)
+            {
+                uniswapTokens = new List<UniswapToken>();
+                uniswapTokens!.Add(uniswapToken!);
+            }
+            else
+            {
+                uniswapTokens!.Add(uniswapToken!);
+            }
+
+            pairCount++;
         }
+        isLoading = false;
         StateHasChanged();
     }
 

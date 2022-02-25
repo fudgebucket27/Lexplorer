@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
-@if (blockData == null && transactionData == null && pairsData == null && uniswapTokens!.Count == 0)
+@if (blockData == null && transactionData == null && pairsData == null && uniswapTokens == null)
 {
     <br />
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -166,7 +166,7 @@ else if (blockData != null && transactionData != null && pairsData != null && un
     private Blocks? blockData;
     private Transactions? transactionData;
     private Pairs? pairsData;
-    private List<UniswapToken>? uniswapTokens = new List<UniswapToken>();
+    private List<UniswapToken>? uniswapTokens;
 
     private double averageBlockTime;
     private long averageTransactions;
@@ -180,11 +180,21 @@ else if (blockData != null && transactionData != null && pairsData != null && un
         transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         string pairsCacheKey = $"homepage-pairs";
         pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
+        int pairCount = 0;
         foreach(var pair in pairsData!.data!.pairs!)
         {
             string uniSwapTokenCache = $"homepage-uniswapToken-{pair!.token1!.address!}";
             var uniswapToken = await AppCache.GetOrAddAsync(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
-            uniswapTokens!.Add(uniswapToken!);
+            if(uniswapToken != null && pairCount == 0)
+            {
+                uniswapTokens = new List<UniswapToken>();
+                uniswapTokens!.Add(uniswapToken!);
+            }
+            else
+            {
+                uniswapTokens!.Add(uniswapToken!);
+            }
+            pairCount++;
         }
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
