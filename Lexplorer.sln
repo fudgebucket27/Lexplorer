@@ -5,7 +5,13 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lexplorer", "Lexplorer\Lexplorer.csproj", "{08E09796-C41D-4DB7-BEE7-76D525AF10B8}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{E3CCB3F9-47E9-4F8E-85D6-9C964F24367C}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{08e09796-c41d-4db7-bee7-76d525af10b8}*SharedItemsImports = 5
+		Shared\Shared.projitems*{e3ccb3f9-47e9-4f8e-85d6-9c964f24367c}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
