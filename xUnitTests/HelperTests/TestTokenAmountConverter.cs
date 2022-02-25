@@ -24,28 +24,28 @@ namespace xUnitTests.HelperTests
             Assert.Equal((decimal)x / 4000, TokenAmountConverter.ToDecimal(x, 3, (decimal)1 / 4), 0);
         }
     }
-    public class TestTokenAmountConverterConvert
+    public class TestTokenAmountConverterToString
     {
         [Fact]
         public void TestConvertSimple()
         {
-            Assert.Equal("100", TokenAmountConverter.Convert(1E5, 3));
+            Assert.Equal("100", TokenAmountConverter.ToString(1E5, 3));
         }
         [Fact]
         public void TestConvertSimpleConversion()
         {
-            Assert.Equal("100,00", TokenAmountConverter.Convert(1E5 * 4, 3, (decimal)1/4));
+            Assert.Equal("100,00", TokenAmountConverter.ToString(1E5 * 4, 3, (decimal)1/4));
         }
     }
 
-    public class TestTokenAmountConverterDecimalWithExponent
+    public class TestTokenAmountConverterToDecimalWithExponent
     {
         [Fact]
         public void TestZero()
         {
             string ExpPrefix = "";
 
-            Assert.Equal(0, TokenAmountConverter.DecimalWithExponent(0, out ExpPrefix));
+            Assert.Equal(0, TokenAmountConverter.ToDecimalWithExponent(0, out ExpPrefix));
             Assert.Equal("", ExpPrefix);
         }
         [Fact]
@@ -53,7 +53,7 @@ namespace xUnitTests.HelperTests
         {
             string ExpPrefix = "";
 
-            Assert.Equal(985, TokenAmountConverter.DecimalWithExponent(985, out ExpPrefix));
+            Assert.Equal(985, TokenAmountConverter.ToDecimalWithExponent(985, out ExpPrefix));
             Assert.Equal("", ExpPrefix);
         }
         [Fact]
@@ -61,7 +61,7 @@ namespace xUnitTests.HelperTests
         {
             string ExpPrefix = "";
 
-            Assert.Equal(1, TokenAmountConverter.DecimalWithExponent(1000, out ExpPrefix));
+            Assert.Equal(1, TokenAmountConverter.ToDecimalWithExponent(1000, out ExpPrefix));
             Assert.Equal("k", ExpPrefix);
         }
         [Fact]
@@ -69,7 +69,7 @@ namespace xUnitTests.HelperTests
         {
             string ExpPrefix = "";
 
-            Assert.Equal(3.498m, TokenAmountConverter.DecimalWithExponent(3498, out ExpPrefix));
+            Assert.Equal(3.498m, TokenAmountConverter.ToDecimalWithExponent(3498, out ExpPrefix));
             Assert.Equal("k", ExpPrefix);
         }
         [Fact]
@@ -77,7 +77,7 @@ namespace xUnitTests.HelperTests
         {
             string ExpPrefix = "";
 
-            Assert.Equal(7.568m, TokenAmountConverter.DecimalWithExponent(7568000, out ExpPrefix));
+            Assert.Equal(7.568m, TokenAmountConverter.ToDecimalWithExponent(7568000, out ExpPrefix));
             Assert.Equal("M", ExpPrefix);
         }
         [Fact]
@@ -85,34 +85,34 @@ namespace xUnitTests.HelperTests
         {
             string ExpPrefix = "";
 
-            Assert.Equal(1.258765m, TokenAmountConverter.DecimalWithExponent(1258765000, out ExpPrefix));
+            Assert.Equal(1.258765m, TokenAmountConverter.ToDecimalWithExponent(1258765000, out ExpPrefix));
             Assert.Equal("B", ExpPrefix);
         }
     }
 
-    public class TestTokenAmountConverterToKMB
+    public class TestTokenAmountConverterToStringWithExponent
     {
         Double x = 12345678;
 
         [Fact]
-        public void TestToKMBMillons()
+        public void TestMillons()
         {
-            Assert.Equal("1.235M", TokenAmountConverter.ToKMB(x, 1, 1));
+            Assert.Equal("1.235M", TokenAmountConverter.ToStringWithExponent(x, 1, 1));
         }
         [Fact]
-        public void TestToKMBBillons()
+        public void TestBillons()
         {
-            Assert.Equal("1.235B", TokenAmountConverter.ToKMB(x, -2, 1));
+            Assert.Equal("1.235B", TokenAmountConverter.ToStringWithExponent(x, -2, 1));
         }
         [Fact]
-        public void TestToKMBKilo()
+        public void TestKilo()
         {
-            Assert.Equal("1.235k", TokenAmountConverter.ToKMB(x, 4, 1));
+            Assert.Equal("1.235k", TokenAmountConverter.ToStringWithExponent(x, 4, 1));
         }
         [Fact]
-        public void TestToKMBNoPrefix()
+        public void TestNoPrefix()
         {
-            Assert.Equal("1.235", TokenAmountConverter.ToKMB(x, 7, 1));
+            Assert.Equal("1.235", TokenAmountConverter.ToStringWithExponent(x, 7, 1));
         }
     }
 }

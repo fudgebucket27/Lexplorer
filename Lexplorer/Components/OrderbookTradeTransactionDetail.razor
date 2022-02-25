@@ -31,17 +31,17 @@
                                 </tr>
                                 <tr>
                                     <td>Trade</td>
-                                    <td>@TokenAmountConverter.Convert(TradeDetails.fillSA, TradeDetails.tokenA!.decimals) @TradeDetails.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(TradeDetails.fillSB, TradeDetails.tokenB!.decimals) @TradeDetails.tokenB.symbol</td>
+                                    <td>@TokenAmountConverter.ToString(TradeDetails.fillSA, TradeDetails.tokenA!.decimals) @TradeDetails.tokenA.symbol @swapSymbol @TokenAmountConverter.ToString(TradeDetails.fillSB, TradeDetails.tokenB!.decimals) @TradeDetails.tokenB.symbol</td>
                                 </tr>
                                 <tr>
                                     <td>Fee</td>
                                         @if (TradeDetails.feeA > 0)
                                         {
-                                            <td>@TokenAmountConverter.Convert(TradeDetails.feeA,  TradeDetails.tokenB.decimals) @TradeDetails.tokenB.symbol</td>
+                                            <td>@TokenAmountConverter.ToString(TradeDetails.feeA,  TradeDetails.tokenB.decimals) @TradeDetails.tokenB.symbol</td>
                                         }
                                         else if (TradeDetails.feeB > 0)
                                         {
-                                         <td>@TokenAmountConverter.Convert(TradeDetails.feeB,  TradeDetails.tokenA.decimals) @TradeDetails.tokenA.symbol</td>
+                                         <td>@TokenAmountConverter.ToString(TradeDetails.feeB,  TradeDetails.tokenA.decimals) @TradeDetails.tokenA.symbol</td>
                                         }
                                     </tr>
                                 <tr>

@@ -9,12 +9,12 @@ namespace Lexplorer.Helpers
         {
             return (decimal) (balance / Math.Pow(10, (double)decimals)) * conversionRate; 
         }
-        public static string Convert(Double balance, int decimals, decimal conversionRate = 1)
+        public static string ToString(Double balance, int decimals, decimal conversionRate = 1)
         {
             return ToDecimal(balance, decimals, conversionRate).ToString();
         }
 
-        public static decimal DecimalWithExponent(decimal amount, out string exponentPrefix)
+        public static decimal ToDecimalWithExponent(decimal amount, out string exponentPrefix)
         {
             exponentPrefix = "";
             if (amount == 0) return amount;
@@ -42,10 +42,10 @@ namespace Lexplorer.Helpers
                 return amount;
         }
 
-        public static string ToKMB(double num, int decimals, decimal conversionRate, string format = "N3")
+        public static string ToStringWithExponent(double num, int decimals, decimal conversionRate, string format = "N3")
         {
             string expPrefix = "";
-            decimal amount = DecimalWithExponent(ToDecimal(num, decimals, conversionRate), out expPrefix);
+            decimal amount = ToDecimalWithExponent(ToDecimal(num, decimals, conversionRate), out expPrefix);
             return amount.ToString(format, CultureInfo.InvariantCulture) + expPrefix;
         }
     }

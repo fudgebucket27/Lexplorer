@@ -152,8 +152,8 @@ else if (blockData != null && transactionData != null && pairsData != null && un
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
-                    <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(@context.dailyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
-                    <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToKMB(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
+                    <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(@context.dailyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
+                    <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
                 </RowTemplate>
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToPairOverviewPage">View more pairs</MudButton>

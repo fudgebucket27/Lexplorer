@@ -27,11 +27,11 @@
                             </tr>
                             <tr>
                                 <td>Swap</td>
-                                <td>@TokenAmountConverter.Convert(SwapDetails.fillSA, SwapDetails.tokenA!.decimals) @SwapDetails.tokenA.symbol @swapSymbol @TokenAmountConverter.Convert(SwapDetails.fillSB, SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
+                                <td>@TokenAmountConverter.ToString(SwapDetails.fillSA, SwapDetails.tokenA!.decimals) @SwapDetails.tokenA.symbol @swapSymbol @TokenAmountConverter.ToString(SwapDetails.fillSB, SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
                             </tr>
                             <tr>
                                 <td>Fee</td>
-                                <td>@TokenAmountConverter.Convert(SwapDetails.feeA,  SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
+                                <td>@TokenAmountConverter.ToString(SwapDetails.feeA,  SwapDetails.tokenB!.decimals) @SwapDetails.tokenB.symbol</td>
                             </tr>
                             <tr>
                                 <td>Pool</td>
