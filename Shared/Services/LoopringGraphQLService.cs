@@ -463,7 +463,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId)
+        public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -546,13 +546,24 @@ namespace Lexplorer.Services
                     orderBy = "internalID",
                     orderDirection = "desc"
                 }
-            }); 
-            var response = await _client.PostAsync(request);
+            });
             try
             {
-                JObject jresponse = JObject.Parse(response.Content!);
-                IList<JToken> transactionTokens = jresponse["data"]!["account"]!["transactions"]!.Children().ToList();
+                var response = await _client.PostAsync(request);
+                return response.Content;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        public IList<Transaction>? GetTransactionsFromJToken(JToken token)
+        {
+            try
+            {
                 IList<Transaction> transactions = new List<Transaction>();
+                IList<JToken> transactionTokens = token!.Children().ToList();
                 foreach (JToken result in transactionTokens)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
@@ -560,6 +571,22 @@ namespace Lexplorer.Services
                     transactions.Add(transaction);
                 }
                 return transactions;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId)
+        { 
+            try
+            {
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId);
+                JObject jresponse = JObject.Parse(response!);
+                JToken? token = jresponse["data"]!["account"]!["transactions"];
+                return GetTransactionsFromJToken(token!);
             }
             catch (Exception ex)
             {
