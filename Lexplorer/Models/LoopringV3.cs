@@ -102,6 +102,9 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public Token? token0 { get; set; }
         public Token? token1 { get; set; }
+
+        public List<DailyEntity>? dailyEntities { get; set; }
+        public List<WeeklyEntity>? weeklyEntities { get; set; }
     }
 
     public class Token
@@ -260,5 +263,32 @@ namespace Lexplorer.Models
     {
         public TransactionsData? data { get; set; }
     }
+
+    public class Pairs
+    {
+        public PairsData? data { get; set; }
+    }
+
+    public class PairsData
+    {
+        public List<Pair>? pairs { get; set; }
+    }
+
+    public class DailyEntity
+    {
+        public Double tradedVolumeToken1Swap { get; set; }
+        public Double tradedVolumeToken0Swap { get; set; }
+        public string? id { get; set; }
+    }
+
+    public class WeeklyEntity
+    {
+        public Double tradedVolumeToken1Swap { get; set; }
+        public Double tradedVolumeToken0Swap { get; set; }
+        public string? id { get; set; }
+    }
+
+
+
 
 }
