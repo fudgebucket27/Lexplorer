@@ -5,13 +5,17 @@ namespace Lexplorer.Helpers
 {
     public static class TokenAmountConverter
     {
+        //maybe some day use clients Culture? for now invariant
+        public static CultureInfo Culture = CultureInfo.InvariantCulture;
+
         public static decimal ToDecimal(Double balance, int decimals, decimal conversionRate = 1)
         {
             return (decimal) (balance / Math.Pow(10, (double)decimals)) * conversionRate; 
         }
-        public static string ToString(Double balance, int decimals, decimal conversionRate = 1)
+
+        public static string ToString(Double balance, int decimals, decimal conversionRate = 1, string format = "N2")
         {
-            return ToDecimal(balance, decimals, conversionRate).ToString();
+            return ToDecimal(balance, decimals, conversionRate).ToString(format, Culture);
         }
 
         public static decimal ToDecimalWithExponent(decimal amount, out string exponentPrefix)
@@ -46,7 +50,7 @@ namespace Lexplorer.Helpers
         {
             string expPrefix = "";
             decimal amount = ToDecimalWithExponent(ToDecimal(num, decimals, conversionRate), out expPrefix);
-            return amount.ToString(format, CultureInfo.InvariantCulture) + expPrefix;
+            return amount.ToString(format, Culture) + expPrefix;
         }
     }
 }
