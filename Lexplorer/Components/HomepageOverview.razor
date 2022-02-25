@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
-@if (blockData == null && transactionData == null)
+@if (blockData == null && transactionData == null && pairsData == null && uniswapTokens == null)
 {
     <br />
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
