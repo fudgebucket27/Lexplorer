@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
-@if (blockData == null && transactionData == null && pairsData == null && uniswapTokens == null)
+@if (blockData == null && transactionData == null && pairsData == null && uniswapTokens.Count == 0)
 {
     <br />
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -175,9 +175,9 @@ else if (blockData != null && transactionData != null && pairsData != null && un
     protected override async Task OnInitializedAsync()
     {
         string blockCacheKey = $"homepage-block";
-        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         string transactionCacheKey = $"homepage-transaction";
-        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         string pairsCacheKey = $"homepage-pairs";
         pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
         foreach(var pair in pairsData!.data!.pairs!)
