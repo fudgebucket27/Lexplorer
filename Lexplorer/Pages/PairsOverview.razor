@@ -3,6 +3,7 @@
 @using Lexplorer.Helpers
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject Lexplorer.Services.UniswapGraphQLService UniswapGraphQLService;
+@inject IAppCache AppCache;
 
 @inject NavigationManager NavigationManager;
 
@@ -13,7 +14,7 @@
         <MudGrid>
             <MudItem sm="12">
                 <MudText Typo="Typo.h6">Pairs <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
-                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading="@isLoading">
+                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true">
                     <HeaderContent>
                         <MudTh>Pair</MudTh>
                         <MudTh>Volume 24H</MudTh>
@@ -60,8 +61,6 @@ else
     [SupplyParameterFromQuery]
     public string pageNumber { get; set; } = "0";
 
-    public bool isLoading;
-
     protected override async Task OnParametersSetAsync()
     {
         uniswapTokens = new List<UniswapToken>();
@@ -69,15 +68,15 @@ else
         {
             pageNumber = "0";
         }
-        isLoading = true;
-        StateHasChanged();
-        pairsData = await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10);
+        string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
+        pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
         foreach (var pair in pairsData!.data!.pairs!)
         {
-            var uniswapToken = await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!);
-            uniswapTokens!.Add(uniswapToken!);
+            //var uniswapToken = await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!);
+            string uniswapTokenCacheKey = $"pairsOverview-token-{pair!.token1!.address!}-pageNumber{pageNumber}";
+            var uniswapToken = await AppCache.GetOrAddAsync(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
+            uniswapTokens.Add(uniswapToken!);
         }
-        isLoading = false;
         StateHasChanged();
     }
 
