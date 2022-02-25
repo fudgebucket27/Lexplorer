@@ -14,29 +14,39 @@ namespace Lexplorer.Helpers
             return ToDecimal(balance, decimals, conversionRate).ToString();
         }
 
-
-        public static string ToKMB(double num, int decimals, decimal conversionRate)
+        public static decimal DecimalWithExponent(decimal amount, out string exponentPrefix)
         {
-            num = num / Math.Pow(10, (double)decimals);
-            var result = (decimal) num * conversionRate;
-            if (result > 999999999 || num < -999999999)
+            exponentPrefix = "";
+            if (amount == 0) return amount;
+
+            //get the exponent - sign doesn't matter, i.e. 6 for 1,000,000 aka 1E6
+            var exponent = Math.Log10((double)Math.Abs(amount));
+
+            //we since we're only interested in k, M and B, keep it simple
+            if (exponent >= 9)
             {
-                return result.ToString("0,,,.###B", CultureInfo.InvariantCulture);
+                exponentPrefix = "B";
+                return amount / (decimal)1E9;
+            }
+            else if (exponent >= 6)
+            {
+                exponentPrefix = "M";
+                return amount / (decimal)1E6;
+            }
+            else if (exponent >= 3)
+            {
+                exponentPrefix = "k";
+                return amount / (decimal)1E3;
             }
             else
-            if (result > 999999 || num < -999999)
-            {
-                return result.ToString("0,,.##M", CultureInfo.InvariantCulture);
-            }
-            else
-            if (result > 999 || result < -999)
-            {
-                return result.ToString("0,.#K", CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                return result.ToString("0.##",CultureInfo.InvariantCulture);
-            }
+                return amount;
+        }
+
+        public static string ToKMB(double num, int decimals, decimal conversionRate, string format = "N3")
+        {
+            string expPrefix = "";
+            decimal amount = DecimalWithExponent(ToDecimal(num, decimals, conversionRate), out expPrefix);
+            return amount.ToString(format, CultureInfo.InvariantCulture) + expPrefix;
         }
     }
 }
