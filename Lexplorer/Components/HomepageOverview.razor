@@ -2,7 +2,8 @@
 @using Lexplorer.Helpers
 @using Lexplorer.Models
 @using System.Diagnostics
-@inject Lexplorer.Services.GraphQLService GraphQLService;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject Lexplorer.Services.UniswapGraphQLService UniswapGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
@@ -11,7 +12,7 @@
     <br />
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
-else if (blockData != null && transactionData != null && pairsData != null)
+else if (blockData != null && transactionData != null && pairsData != null && uniswapTokens != null)
 {
 
     <MudGrid>
@@ -151,8 +152,8 @@ else if (blockData != null && transactionData != null && pairsData != null)
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
-                    <MudTd DataLabel="Volume 24H">@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals) </MudTd>
-                    <MudTd DataLabel="Volume 7D">@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals) </MudTd>
+                    <MudTd DataLabel="Volume 24H">@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
+                    <MudTd DataLabel="Volume 7D">@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).First()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
                 </RowTemplate>
             </MudTable>
             <!--<MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more pairs</MudButton> -->
@@ -165,6 +166,7 @@ else if (blockData != null && transactionData != null && pairsData != null)
     private Blocks? blockData;
     private Transactions? transactionData;
     private Pairs? pairsData;
+    private List<UniswapToken>? uniswapTokens = new List<UniswapToken>();
 
     private double averageBlockTime;
     private long averageTransactions;
@@ -173,11 +175,17 @@ else if (blockData != null && transactionData != null && pairsData != null)
     protected override async Task OnInitializedAsync()
     {
         string blockCacheKey = $"homepage-block";
-        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await GraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
         string transactionCacheKey = $"homepage-transaction";
-        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await GraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
+        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(5));
         string pairsCacheKey = $"homepage-pairs";
-        pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await GraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddMinutes(5));
+        pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddMinutes(5));
+        foreach(var pair in pairsData!.data!.pairs!)
+        {
+            string uniSwapTokenCache = $"homepage-uniswapToken-{pair!.token1!.address!}";
+            var uniswapToken = await AppCache.GetOrAddAsync(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddMinutes(5));
+            uniswapTokens!.Add(uniswapToken!);
+        }
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
         StateHasChanged();

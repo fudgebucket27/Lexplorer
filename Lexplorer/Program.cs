@@ -10,7 +10,8 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
     o.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB
 });
 builder.Services.AddMudServices();
-builder.Services.AddSingleton<GraphQLService>();
+builder.Services.AddSingleton<LoopringGraphQLService>();
+builder.Services.AddSingleton<UniswapGraphQLService>();
 builder.Services.AddLazyCache();
 
 var app = builder.Build();

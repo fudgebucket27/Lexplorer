@@ -12,13 +12,13 @@ using System.Diagnostics;
 
 namespace Lexplorer.Services
 {
-    public class GraphQLService
+    public class LoopringGraphQLService
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/loopring/loopring";
 
         readonly RestClient _client;
 
-        public GraphQLService()
+        public LoopringGraphQLService()
         {
             _client = new RestClient(_baseUrl);
         }

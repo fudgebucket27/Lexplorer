@@ -11,26 +11,27 @@ namespace Lexplorer.Helpers
         }
 
 
-        public static string ToKMB(double num, int decimals)
+        public static string ToKMB(double num, int decimals, decimal conversionRate)
         {
             num = num / Math.Pow(10, (double)decimals);
-            if (num > 999999999 || num < -999999999)
+            var result = (decimal) num * conversionRate;
+            if (result > 999999999 || num < -999999999)
             {
-                return num.ToString("0,,,.###B", CultureInfo.InvariantCulture);
+                return result.ToString("0,,,.###B", CultureInfo.InvariantCulture);
             }
             else
-            if (num > 999999 || num < -999999)
+            if (result > 999999 || num < -999999)
             {
-                return num.ToString("0,,.##M", CultureInfo.InvariantCulture);
+                return result.ToString("0,,.##M", CultureInfo.InvariantCulture);
             }
             else
-            if (num > 999 || num < -999)
+            if (result > 999 || result < -999)
             {
-                return num.ToString("0,.#K", CultureInfo.InvariantCulture);
+                return result.ToString("0,.#K", CultureInfo.InvariantCulture);
             }
             else
             {
-                return num.ToString(CultureInfo.InvariantCulture);
+                return result.ToString(CultureInfo.InvariantCulture);
             }
         }
     }
