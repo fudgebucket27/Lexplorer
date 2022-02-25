@@ -17,20 +17,20 @@
                 <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading=@isLoading>
                     <HeaderContent>
                         <MudTh>Pair</MudTh>
-                        <MudTh>Volume 24H</MudTh>
-                        <MudTh>Volume 7D</MudTh>
+                        <MudTh Style="text-align:right">Volume 24H</MudTh>
+                        <MudTh Style="text-align:right">Volume 7D</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
                    @if(@context.dailyEntities!.Count > 0 && @context.weeklyEntities!.Count > 0 && uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas!.Count > 0)
                    {
-                        <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
-                        <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
+                        <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
+                        <MudTd Style="text-align:right" DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
                     }
                     else
                     {
-                       <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(0, @context.token1!.decimals, 0) </MudTd>
-                       <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
+                       <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(0, @context.token1!.decimals, 0) </MudTd>
+                       <MudTd Style="text-align:right" DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
                     }
 
                     </RowTemplate>
