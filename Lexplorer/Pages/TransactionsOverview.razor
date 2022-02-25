@@ -1,7 +1,7 @@
 ﻿@using Lexplorer.Components;
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
-@inject Lexplorer.Services.LoopringGraphQLService GraphQLService;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @page "/transactions";
 
@@ -42,7 +42,7 @@ else
             pageNumber = "0";
         }
         isLoading = true;
-        transactionData = await GraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25);
+        transactionData = await LoopringGraphQLService.GetTransactions(Int32.Parse(pageNumber) * 25, 25);
         isLoading = false;
         StateHasChanged();
     }

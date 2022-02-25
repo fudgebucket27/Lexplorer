@@ -31,7 +31,7 @@ namespace Lexplorer.Helpers
             }
             else
             {
-                return result.ToString(CultureInfo.InvariantCulture);
+                return result.ToString("0.##",CultureInfo.InvariantCulture);
             }
         }
     }

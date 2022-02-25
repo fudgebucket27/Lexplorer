@@ -1,4 +1,7 @@
-﻿namespace Lexplorer.Models
+﻿using Newtonsoft.Json;
+using System.ComponentModel;
+
+namespace Lexplorer.Models
 {
     public class TokenDayData
     {

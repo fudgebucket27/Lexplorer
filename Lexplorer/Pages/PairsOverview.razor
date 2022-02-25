@@ -1,0 +1,102 @@
+﻿@page "/pairs"
+@using Lexplorer.Models
+@using Lexplorer.Helpers
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject Lexplorer.Services.UniswapGraphQLService UniswapGraphQLService;
+
+@inject NavigationManager NavigationManager;
+
+<PageTitle>The Lexplorer - Pairs</PageTitle>
+
+@if (pairsData != null && uniswapTokens.Count > 0)
+{
+        <MudGrid>
+            <MudItem sm="12">
+                <MudText Typo="Typo.h6">Pairs <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
+                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading="@isLoading">
+                    <HeaderContent>
+                        <MudTh>Pair</MudTh>
+                        <MudTh>Volume 24H</MudTh>
+                        <MudTh>Volume 7D</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
+                   @if(uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas.Count > 0)
+                   {
+                        <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
+                        <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas[0]!.priceUSD) </MudTd>
+                    }
+                    else
+                    {
+                       <MudTd DataLabel="Volume 24H">$@TokenAmountConverter.ToKMB(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
+                       <MudTd DataLabel="Volume 7D">$@TokenAmountConverter.ToKMB(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
+                    }
+
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    if (pageNumber != "0")
+    {
+                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
+    else
+    {
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+    }
+}
+else
+{
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+
+@code {
+    private Pairs? pairsData;
+    private List<UniswapToken>? uniswapTokens;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "0";
+
+    public bool isLoading;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        uniswapTokens = new List<UniswapToken>();
+        if (String.IsNullOrEmpty(pageNumber))
+        {
+            pageNumber = "0";
+        }
+        isLoading = true;
+        StateHasChanged();
+        pairsData = await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10);
+        foreach (var pair in pairsData!.data!.pairs!)
+        {
+            var uniswapToken = await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!);
+            uniswapTokens!.Add(uniswapToken!);
+        }
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void GoToNextPage()
+    {
+        int nextPage = Int32.Parse(pageNumber) + 1;
+        string parameters = $"pairs?pageNumber={nextPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+
+    private void GoToPreviousPage()
+    {
+        int previousPage = Int32.Parse(pageNumber) - 1;
+        string parameters = $"pairs?pageNumber={previousPage.ToString()}";
+        NavigationManager.NavigateTo(parameters);
+    }
+    private void GoToStartPage()
+    {
+        string parameters = "pairs/";
+        NavigationManager.NavigateTo(parameters);
+    }
+}
