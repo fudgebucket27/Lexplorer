@@ -72,7 +72,6 @@ else
         pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
         foreach (var pair in pairsData!.data!.pairs!)
         {
-            //var uniswapToken = await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!);
             string uniswapTokenCacheKey = $"pairsOverview-token-{pair!.token1!.address!}-pageNumber{pageNumber}";
             var uniswapToken = await AppCache.GetOrAddAsync(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
             uniswapTokens.Add(uniswapToken!);
