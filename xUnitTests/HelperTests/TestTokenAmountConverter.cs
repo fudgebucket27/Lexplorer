@@ -29,7 +29,7 @@ namespace xUnitTests.HelperTests
         [Fact]
         public void TestConvertSimple()
         {
-            Assert.Equal("100", TokenAmountConverter.ToString(1E5, 3));
+            Assert.Equal("100.00", TokenAmountConverter.ToString(1E5, 3));
         }
         [Fact]
         public void TestConvertSimpleConversion()
