@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - loopscan
+name: Build and deploy ASP.Net Core app to Azure Web App - Lexplorer
 
 on:
   push:
@@ -21,10 +21,7 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: true
-          
-      - name: dotnet restore
-        run: dotnet restore
-        
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
@@ -54,7 +51,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'loopscan'
+          app-name: 'Lexplorer'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EAC3F36E739A4D569F39097776C73806 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5B4A3DAEC94440EA8FCA1EAC6F788EAF }}
           package: .
