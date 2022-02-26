@@ -1,7 +1,4 @@
-﻿using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
-using Lexplorer.Helpers;
+﻿using Lexplorer.Helpers;
 using Lexplorer.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
