@@ -463,7 +463,8 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId)
+        public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
+            DateTime? startDate = null, DateTime? endDate = null)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -472,6 +473,7 @@ namespace Lexplorer.Services
                 $accountId: Int
                 $orderBy: Transaction_orderBy
                 $orderDirection: OrderDirection
+                $where: Transaction_filter
               ) {
                 account(
                   id: $accountId
@@ -484,7 +486,9 @@ namespace Lexplorer.Services
                   ) {
                     id
                     __typename
-                    block {
+                    block (
+                      where: $where
+                    ) {
                       id
                       blockHash
                       timestamp
@@ -535,18 +539,45 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(new
+            if ((startDate != null) && (endDate != null))
             {
-                query = accountQuery,
-                variables = new
+                Int64 startDateUx = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
+                Int64 endDateUx = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
+                request.AddJsonBody(new
                 {
-                    skip = skip,
-                    first = first,
-                    accountId = int.Parse(accountId),
-                    orderBy = "internalID",
-                    orderDirection = "desc"
-                }
-            });
+                    query = accountQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        accountId = int.Parse(accountId),
+                        orderBy = "internalID",
+                        orderDirection = "desc",
+                        where = new
+                        { 
+                            startDateUx = startDateUx, 
+                            endDateUx = endDateUx 
+                        },
+                        //todo: add where but how?
+                        //account.transaction.block.timestamp
+                    }
+                });
+            }
+            else
+            {
+                request.AddJsonBody(new
+                {
+                    query = accountQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        accountId = int.Parse(accountId),
+                        orderBy = "internalID",
+                        orderDirection = "desc"
+                    }
+                });
+            }
             try
             {
                 var response = await _client.PostAsync(request);

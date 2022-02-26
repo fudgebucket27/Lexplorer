@@ -29,7 +29,9 @@ namespace xUnitTests.LoopringGraphTests
         public async void GetAccountTransactions()
         {
 
-            var response = await service.GetAccountTransactionsResponse(0, 10, fixture.testAccountId);
+            var response = await service.GetAccountTransactionsResponse(0, 10, fixture.testAccountId,
+              new DateTime(2022, 2, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+              new DateTime(2022, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc));
             Assert.NotNull(response);
             JObject jresponse = JObject.Parse(response!);
             JToken token = jresponse["data"]!["account"]!["transactions"]!;
