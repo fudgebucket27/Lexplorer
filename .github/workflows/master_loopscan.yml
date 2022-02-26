@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'loopscan'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_64579A28AAD2467DBF3304E00A54E168 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EAC3F36E739A4D569F39097776C73806 }}
           package: .
