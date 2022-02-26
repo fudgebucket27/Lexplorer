@@ -16,4 +16,6 @@
     <PackageReference Include="RestSharp" Version="107.2.1" />
   </ItemGroup>
 
+  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+
 </Project>

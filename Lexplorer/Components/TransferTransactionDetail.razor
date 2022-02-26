@@ -31,11 +31,11 @@
                             </tr>
                             <tr>
                                 <td>Amount</td>
-                                <td>@TokenAmountConverter.Convert(TransferDetails.amount, TransferDetails.token!.decimals) @TransferDetails.token!.symbol</td>
+                                <td>@TokenAmountConverter.ToString(TransferDetails.amount, TransferDetails.token!.decimals) @TransferDetails.token!.symbol</td>
                             </tr>
                             <tr>
                                 <td>Fee</td>
-                                <td>@TokenAmountConverter.Convert(TransferDetails.fee, TransferDetails.feeToken!.decimals) @TransferDetails.feeToken!.symbol</td>
+                                <td>@TokenAmountConverter.ToString(TransferDetails.fee, TransferDetails.feeToken!.decimals) @TransferDetails.feeToken!.symbol</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>

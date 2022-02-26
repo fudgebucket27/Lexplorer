@@ -5,6 +5,8 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System;
 
 namespace Lexplorer.Services
 {

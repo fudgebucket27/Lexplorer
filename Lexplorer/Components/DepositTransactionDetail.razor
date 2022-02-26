@@ -28,7 +28,7 @@
                             </tr>
                             <tr>
                                 <td>Amount</td>
-                                <td>@Decimal.Parse(@TokenAmountConverter.Convert(DepositDetails!.amount, DepositDetails!.token!.decimals), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint).ToString("N4") @DepositDetails!.token!.symbol</td>
+                                <td>@TokenAmountConverter.ToString(DepositDetails!.amount, DepositDetails!.token!.decimals) @DepositDetails!.token!.symbol</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>

@@ -49,7 +49,7 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
-                    <MudTd DataLabel="Balance">@TokenAmountConverter.Convert(@context.balance, @context.token!.decimals) @context.token.symbol</MudTd>                
+                    <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals, 1, "G0") @context.token.symbol</MudTd>                
                 </RowTemplate>
                 <PagerContent>
             @if (account.balances!.Count > 10)
