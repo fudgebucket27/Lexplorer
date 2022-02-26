@@ -3,6 +3,8 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
 	  <Nullable>enable</Nullable>
+	  	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects> 
+		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	  <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
