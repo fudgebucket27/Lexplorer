@@ -589,35 +589,16 @@ namespace Lexplorer.Services
                 return null;
             }
         }
-        public IList<Transaction>? GetTransactionsFromJToken(JToken token)
-        {
-            try
-            {
-                IList<Transaction> transactions = new List<Transaction>();
-                IList<JToken> transactionTokens = token!.Children().ToList();
-                foreach (JToken result in transactionTokens)
-                {
-                    // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    Transaction transaction = result.ToObject<Transaction>()!;
-                    transactions.Add(transaction);
-                }
-                return transactions;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                return null;
-            }
-        }
 
-        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId)
+        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
+            DateTime? startDate = null, DateTime? endDate = null)
         { 
             try
             {
-                string? response = await GetAccountTransactionsResponse(skip, first, accountId);
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, startDate, endDate);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
-                return GetTransactionsFromJToken(token!);
+                return token!.ToObject<IList<Transaction>>(); 
             }
             catch (Exception ex)
             {

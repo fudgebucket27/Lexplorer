@@ -49,7 +49,8 @@ namespace xUnitTests.LoopringGraphTests
                 arrayTestsToken.WriteTo(writer);
             }
 
-            IList<Transaction>? transactions = service.GetTransactionsFromJToken(token!);
+            IList<Transaction>? transactions = token!.ToObject<IList<Transaction>>();
+
             Assert.NotEmpty(transactions);
         }
 
@@ -57,7 +58,7 @@ namespace xUnitTests.LoopringGraphTests
         [JsonFileData("AccountTransactions.json")]
         public void EnsureTransactionsDescend(JArray transactionsJArray)
         {
-            IList<Transaction>? transactions = service.GetTransactionsFromJToken(transactionsJArray);
+            IList<Transaction>? transactions = transactionsJArray.ToObject<IList<Transaction>>();
             Assert.NotEmpty(transactions);
             for (int i = 0; i < transactions!.Count; i++)
             {
