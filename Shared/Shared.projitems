@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\UniswapV2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringGraphQLService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\TranscationExportDefaultCSVFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\UniswapGraphQLService.cs" />
   </ItemGroup>
 </Project>
