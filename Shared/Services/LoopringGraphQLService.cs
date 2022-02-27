@@ -603,7 +603,7 @@ namespace Lexplorer.Services
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return null;
+                return new List<Transaction>();
             }
         }
 

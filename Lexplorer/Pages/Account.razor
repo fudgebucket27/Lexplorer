@@ -4,7 +4,8 @@
 @using Lexplorer.Components
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
-@inject IDialogService DialogService
+@inject IDialogService DialogService;
+@inject IAppCache AppCache;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
 
@@ -66,48 +67,33 @@ else
 }
     <br />
 
-@if (transactions != null)
-{
-            <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Transactions</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Tx Id</MudTh>
-                    <MudTh>Type</MudTh>
-                    <MudTh>From</MudTh>
-                    <MudTh>To</MudTh>
-                    <MudTh>Amount</MudTh>
-                    <MudTh>Fee</MudTh>
-                    <MudTh>Verified At (UTC)</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
-                    <MudTd DataLabel="Type">@context.typeName</MudTd>
-                    <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
-                    <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-                </RowTemplate>
-                <FooterContent>
-                    <MudText Typo="Typo.caption">Current Page: @readablePageNumber</MudText>
-                </FooterContent>
-            </MudTable>
-            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowCSVOptions">Download...</MudButton>
-            if (pageNumber != "0")
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-            }
-            else
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-            }
-}
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
-
+    <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Transactions</MudText>
+            <MudSpacer/>
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)"/>
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)"/>
+            <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;"/>
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count == 0) OnClick="@(() => gotoPage += 1)"/>
+            <MudSpacer/>
+            <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tx Id</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>From</MudTh>
+            <MudTh>To</MudTh>
+            <MudTh>Amount</MudTh>
+            <MudTh>Fee</MudTh>
+            <MudTh>Verified At (UTC)</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
+            <MudTd DataLabel="Type">@context.typeName</MudTd>
+            <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
+            <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+        </RowTemplate>
+    </MudTable>
 
 @code {
     [Parameter]
@@ -117,21 +103,32 @@ else
     [SupplyParameterFromQuery]
     public string pageNumber { get; set; } = "0";
 
-    public string readablePageNumber { get { return (pageNumber == null ? 0 : Int32.Parse(pageNumber) + 1).ToString(); } }
+    public int gotoPage { 
+        get 
+        { 
+            return (pageNumber == null ? 0 : Int32.Parse(pageNumber) + 1); 
+        } 
+        set
+        {
+            string URL = $"/account/{accountId}?pageNumber={value - 1}";
+            NavigationManager.NavigateTo(URL);            
+        }
+    }
 
     public bool balancesLoadíng;
-    public bool isLoading;
+    public bool isLoading = true;
 
     private Lexplorer.Models.Account? account { get; set; }
-    private IList<Lexplorer.Models.Transaction>? transactions { get; set; }
+    private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
 
     protected override async Task OnParametersSetAsync()
     {
+        isLoading = true;
         //did the account change?
         if (account != null && account.id != accountId)
         {
             account = null;
-            transactions = null;
+            transactions = new List<Transaction>();
             pageNumber = "0";
             StateHasChanged();
         }
@@ -151,29 +148,14 @@ else
             pageNumber = "0";
         }
 
-        isLoading = true;
-        transactions = await LoopringGraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
+        string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
+        transactions = await AppCache.GetOrAddAsync(transactionCacheKey, 
+            async () => await LoopringGraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId), 
+            DateTimeOffset.UtcNow.AddMinutes(10));
         isLoading = false;
         StateHasChanged();
     }
-    private void GoToNextPage()
-    {
-        int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"/account/{accountId}?pageNumber={nextPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
 
-    private void GoToPreviousPage()
-    {
-        int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"/account/{accountId}?pageNumber={previousPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
-    private void GoToStartPage()
-    {
-        string parameters = $"/account/{accountId}?pageNumber=0";
-        NavigationManager.NavigateTo(parameters);
-    }
     private void ShowCSVOptions()
     {
         var parameters = new DialogParameters();
