@@ -145,7 +145,7 @@ namespace Lexplorer.Models
         public BlockDetail? block { get; set; }
         public List<AccountBalance>? tokenBalances { get; set; }
         public List<Account>? accounts { get; set; }
-        public string verifiedAt
+        public string? verifiedAt
         {
             get
             {

@@ -13,8 +13,8 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12">
-            <MudDatePicker Label="Start date:" @bind-Date="startDate" />
-            <MudDatePicker Label="End date:" @bind-Date="endDate" />
+            <MudDatePicker Disabled="true" Label="Start date:" @bind-Date="startDate" />
+            <MudDatePicker Disabled="true" Label="End date:" @bind-Date="endDate" />
         </MudItem>
          <p hidden="@(!downloadProcessing)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
          <p hidden="@(errorMessage==null)"><MudAlert Severity="Severity.Error">@errorMessage</MudAlert></p>

@@ -24,7 +24,7 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<Blocks> GetBlocks(int skip, int first)
+        public async Task<Blocks?> GetBlocks(int skip, int first)
         {
             var blocksQuery = @"
             query blocks(
@@ -69,7 +69,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Block> GetBlockDetails(int blockId)
+        public async Task<Block?> GetBlockDetails(int blockId)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -539,7 +539,7 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            if ((startDate != null) && (endDate != null))
+            /*if ((startDate != null) && (endDate != null))
             {
                 Int64 startDateUx = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
                 Int64 endDateUx = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
@@ -563,7 +563,7 @@ namespace Lexplorer.Services
                     }
                 });
             }
-            else
+            else*/
             {
                 request.AddJsonBody(new
                 {

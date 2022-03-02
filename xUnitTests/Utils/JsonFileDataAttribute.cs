@@ -57,7 +57,7 @@ namespace xUnitTests.Utils
             if (string.IsNullOrEmpty(_propertyName))
             {
                 //whole file is the data
-                var retValue = JsonConvert.DeserializeObject<List<object[]>>(fileData);
+                var retValue = JsonConvert.DeserializeObject<List<object[]>>(fileData)!;
                 return retValue;
             }
 
