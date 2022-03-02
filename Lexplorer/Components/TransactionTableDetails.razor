@@ -5,9 +5,15 @@
 @switch(TransactionData!.typeName)
 {
     case "Deposit":
-        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(deposit!.toAccount!.id!, deposit!.toAccount!.address!)</MudTd>
-        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(deposit!.toAccount!.id! ,deposit!.toAccount!.address!)</MudTd>
+        <MudTd DataLabel="From Address"></MudTd>
+        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(deposit!.amount, deposit!.token!.decimals) @deposit!.token!.symbol</MudTd>
+        <MudTd DataLabel="Fee"></MudTd>
+        break;
+    case "Withdrawal":
+        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address"></MudTd>
+        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
         <MudTd DataLabel="Fee"></MudTd>
         break;
     case "OrderbookTrade":
@@ -57,6 +63,7 @@
     public Swap? swap { get { return TransactionData as Swap; } }
     public Transfer? transfer { get { return TransactionData as Transfer; } }
     public Deposit? deposit { get { return TransactionData as Deposit; } }
+    public Withdrawal? withdrawal { get { return TransactionData as Withdrawal; } }
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }
 }
