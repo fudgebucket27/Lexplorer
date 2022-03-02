@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using Newtonsoft.Json;
 using xUnitTests.Utils;
+using Xunit.Sdk;
 
 namespace xUnitTests.LoopringGraphTests
 {
@@ -70,7 +71,15 @@ namespace xUnitTests.LoopringGraphTests
         {
             Assert.NotNull(transaction);
             //all transactions should descend from Transaction, never be of exactly the same type
-            Assert.IsNotType<Transaction>(transaction);
+            //this happens if we don't "know" a type yet
+            try
+            {
+                Assert.IsNotType<Transaction>(transaction);
+            }
+            catch (IsNotTypeException ex)
+            {
+                throw new XunitException($"transaction class \"{transaction?.typeName}\" unknown?\n{ex}");
+            }
         }
 
     }
