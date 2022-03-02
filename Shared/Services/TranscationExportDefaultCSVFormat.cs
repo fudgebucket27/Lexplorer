@@ -33,9 +33,10 @@ namespace Lexplorer.Services
             bool buyOrSellForUs = areWeAccountA ? orderBookTrade.fillAmountBorSA : orderBookTrade.fillAmountBorSB;
             if (areWeAccountA)
             {
+                //for now we're only checking fillAmountBorSA, because we're A, but worst case would be all 4 combinations with fillAmoutBorSB!
                 if (orderBookTrade.fillAmountBorSA)
                 {
-                    DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName);
+                    throw new InvalidOperationException("OrderBookTrade with fillAmountBorSA = true has no implemented export for now");
                 }
                 else
                 {
@@ -52,9 +53,10 @@ namespace Lexplorer.Services
             }
             else
             {
-                if (orderBookTrade.fillAmountBorSA)
+                //for now we're only checking fillAmountBorSB, because we're B, but worst case would be all 4 combinations with fillAmoutBorSA!
+                if (orderBookTrade.fillAmountBorSB)
                 {
-                    DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName);
+                    throw new InvalidOperationException("OrderBookTrade with fillAmountBorSB = true has no implemented export for now");
                 }
                 else
                 {
@@ -74,13 +76,8 @@ namespace Lexplorer.Services
         {
             if (swap.fillAmountBorSA)
             {
-                //a buy for us, 
-                DoBuildLine(swap.id, swap.verifiedAt, swap.typeName,
-                    from: swap.account?.address,
-                    to: swap.pool?.address
-
-
-                    );
+                //also did not find *any* Swap with fillAmountBorSA = true!
+                throw new InvalidOperationException("Swap with fillAmountBorSA = true has no implemented export for now");
             }
             else
             {

@@ -17,6 +17,7 @@
             <MudDatePicker Label="End date:" @bind-Date="endDate" />
         </MudItem>
          <p hidden="@(!downloadProcessing)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+         <p hidden="@(errorMessage==null)"><MudAlert Severity="Severity.Error">@errorMessage</MudAlert></p>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -35,6 +36,7 @@
     public DateTime? endDate = DateTime.Today;
     public string? CSVType = "Default";
     public bool downloadProcessing = false;
+    public string? errorMessage = null;
 
 
     //download relying on JavaScript (in _Host.cshtml) as outlined here
@@ -48,15 +50,24 @@
     private async Task DownloadFileFromStream()
     {
         downloadProcessing = true;
+        errorMessage = null;
 
-        var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, startDate, endDate);
-        var fileName = $"Transactions_{accountId}.txt";
+        try
+        {
+            var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, startDate, endDate);
+            var fileName = $"Transactions_{accountId}.txt";
 
-        using var streamRef = new DotNetStreamReference(stream: fileStream);
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
 
-        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
 
-        MudDialog!.Close(DialogResult.Ok(true));
+            MudDialog!.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            downloadProcessing = false;
+        }
     }
 
     void Cancel() => MudDialog!.Cancel();
