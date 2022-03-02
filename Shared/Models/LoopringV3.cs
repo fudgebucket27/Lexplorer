@@ -93,12 +93,10 @@ namespace Lexplorer.Models
         public List<AccountBalance>? balances { get; set; }
         public Transaction? createdAtTransaction { get; set; }
     }
-
     public class Pool : Account
     {
         public int feeBipsAMM { get; set; }
     }
-        
     public class Pair
     {
         public string? id { get; set; }
@@ -108,7 +106,6 @@ namespace Lexplorer.Models
         public List<DailyEntity>? dailyEntities { get; set; }
         public List<WeeklyEntity>? weeklyEntities { get; set; }
     }
-
     public class Token
     {
         public string? address { get; set; }
@@ -154,12 +151,9 @@ namespace Lexplorer.Models
             {
                 if (block == null) return string.Empty;
 
-                return TimestampToUTCConverter.Convert(block.timestamp!);
+                return TimestampToUTCConverter.Convert(block.timestamp);
             }
         }
-        public Swap? swap { get { return this as Swap; } }
-        public OrderBookTrade? orderBookTrade { get { return this as OrderBookTrade; } }
-        public Transfer? transer { get { return this as Transfer; } }
     }
 
     public class Swap : Transaction
@@ -230,7 +224,7 @@ namespace Lexplorer.Models
     }
     public class Add : Transaction
     {
-        public Account? account { get;set; }
+        public Account? account { get; set; }
         public Pool? pool { get; set; }
         public Token? token { get; set; }
         public Token? feeToken { get; set; }
@@ -253,6 +247,101 @@ namespace Lexplorer.Models
         public Double fee { get; set; }
         public string? publicKey { get; set; }
         public int? nonce { get; set; }
+    }
+    public class NonFungibleToken
+    {
+        public string? id { get; set; }
+        [JsonProperty("__typename")]
+        public string? typeName { get; set; }
+        public MintNFT? mintedAtTransaction { get; set; }
+        public Account? minter { get; set; }
+        public string? token { get; set; }
+        public string? nftID { get; set; }
+        public List<AccountNFTSlot>? slots { get; set; }
+        public List<TransactionNFT>? transactions { get; set; }
+    }
+    public class AccountNFTSlot
+    {
+        public string? id { get; set; }
+        [JsonProperty("__typename")]
+        public string? typeName { get; set; }
+        public Account? account { get; set; }
+        public Double balance { get; set; }
+        public Transaction? createdAtTransaction { get; set; }
+        public Transaction? lastUpdatedAtTransaction { get; set; }
+        public List<Transaction>? transactions { get; set; }
+    }
+
+    public class TransactionNFT : Transaction
+    {
+        public List<NonFungibleToken>? nfts { get; set; }
+        public List<AccountNFTSlot>? slots { get; set; }
+    }
+
+    public class MintNFT : TransactionNFT
+    {
+        public AccountNFTSlot? receiverSlot { get; set; }
+        public Account? minter { get; set; }
+        public Account? receiver { get; set; }
+        public NonFungibleToken? nft { get; set; }
+        public Token? feeToken { get; set; }
+        public Double fee { get; set; }
+        public Double amount { get; set; }
+        public string? extraData { get; set; }
+    }
+    public class WithDrawalNFT : TransactionNFT
+    {
+        public Account? fromAccount { get; set; }
+        public AccountNFTSlot? slot { get; set; }
+        public Token? feeToken { get; set; }
+        public Boolean valid { get; set; }
+        public Double? amount { get; set; }
+        public Double? fee { get; set; }
+    }
+    public class TransferNFT : TransactionNFT
+    {
+        public Account? fromAccount { get; set; }
+        public Account? toAccount { get; set; }
+        public AccountNFTSlot? fromSlot { get; set; }
+        public AccountNFTSlot? toSlot { get; set; }
+        public Token? feeToken { get; set; }
+        public Double? amount { get; set; }
+        public Double? fee { get; set; }
+    }
+    public class TradeNFT : TransactionNFT
+    {
+        public Account? accountSeller { get; set; }
+        public Account? accountBuyer { get; set; }
+        public AccountNFTSlot? slotSeller { get; set; }
+        public AccountNFTSlot? slotBuyer { get; set; }
+        public Token? token { get; set; }
+        public Double realizedNFTPrice { get; set; }
+        public Double fillSA { get; set; }
+        public Double fillSB { get; set; }
+        public Boolean fillAmountBorSA { get; set; }
+        public Boolean fillAmountBorSB { get; set; }
+        public Double fillBA { get; set; }
+        public Double fillBB { get; set; }
+        public Double feeSeller { get; set; }
+        public Double feeBuyer { get; set; }
+    }
+    public class SwapNFT : TransactionNFT
+    {
+        public Account? accountA { get; set; }
+        public Account? accountB { get; set; }
+        public AccountNFTSlot? slotASeller { get; set; }
+        public AccountNFTSlot? slotBSeller { get; set; }
+        public AccountNFTSlot? slotABuyer { get; set; }
+        public AccountNFTSlot? slotBBuyer { get; set; }
+        public Double fillSA { get; set; }
+        public Double fillSB { get; set; }
+        public Boolean fillAmountBorSA { get; set; }
+        public Boolean fillAmountBorSB { get; set; }
+        public Double fillBA { get; set; }
+        public Double fillBB { get; set; }
+        public Double feeSeller { get; set; }
+        public Double feeBuyer { get; set; }
+
     }
 
     public class TransactionsData
