@@ -27,6 +27,7 @@ namespace xUnitTests.LoopringGraphTests
         }
 
         [Fact]
+        [TestPriority(-5)]
         public async void GetAccountTransactions()
         {
 

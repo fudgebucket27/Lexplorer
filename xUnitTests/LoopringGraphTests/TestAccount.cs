@@ -22,6 +22,7 @@ namespace xUnitTests.LoopringGraphTests
         }
 
         [Fact]
+        [TestPriority(-10)]
         public async void GetAccount()
         {
             Account? account = await service.GetAccount(fixture.testAccountId);
