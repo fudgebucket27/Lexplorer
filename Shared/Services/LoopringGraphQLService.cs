@@ -24,7 +24,7 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<Blocks> GetBlocks(int skip, int first)
+        public async Task<Blocks?> GetBlocks(int skip, int first)
         {
             var blocksQuery = @"
             query blocks(
@@ -69,7 +69,7 @@ namespace Lexplorer.Services
             return data;
         }
 
-        public async Task<Block> GetBlockDetails(int blockId)
+        public async Task<Block?> GetBlockDetails(int blockId)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -463,7 +463,8 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId)
+        public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
+            DateTime? startDate = null, DateTime? endDate = null)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -472,6 +473,7 @@ namespace Lexplorer.Services
                 $accountId: Int
                 $orderBy: Transaction_orderBy
                 $orderDirection: OrderDirection
+                $where: Transaction_filter
               ) {
                 account(
                   id: $accountId
@@ -484,7 +486,9 @@ namespace Lexplorer.Services
                   ) {
                     id
                     __typename
-                    block {
+                    block (
+                      where: $where
+                    ) {
                       id
                       blockHash
                       timestamp
@@ -535,36 +539,71 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(new
+            /*if ((startDate != null) && (endDate != null))
             {
-                query = accountQuery,
-                variables = new
+                Int64 startDateUx = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
+                Int64 endDateUx = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
+                request.AddJsonBody(new
                 {
-                    skip = skip,
-                    first = first,
-                    accountId = int.Parse(accountId),
-                    orderBy = "internalID",
-                    orderDirection = "desc"
-                }
-            }); 
-            var response = await _client.PostAsync(request);
+                    query = accountQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        accountId = int.Parse(accountId),
+                        orderBy = "internalID",
+                        orderDirection = "desc",
+                        where = new
+                        { 
+                            startDateUx = startDateUx, 
+                            endDateUx = endDateUx 
+                        },
+                        //todo: add where but how?
+                        //account.transaction.block.timestamp
+                    }
+                });
+            }
+            else*/
+            {
+                request.AddJsonBody(new
+                {
+                    query = accountQuery,
+                    variables = new
+                    {
+                        skip = skip,
+                        first = first,
+                        accountId = int.Parse(accountId),
+                        orderBy = "internalID",
+                        orderDirection = "desc"
+                    }
+                });
+            }
             try
             {
-                JObject jresponse = JObject.Parse(response.Content!);
-                IList<JToken> transactionTokens = jresponse["data"]!["account"]!["transactions"]!.Children().ToList();
-                IList<Transaction> transactions = new List<Transaction>();
-                foreach (JToken result in transactionTokens)
-                {
-                    // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    Transaction transaction = result.ToObject<Transaction>()!;
-                    transactions.Add(transaction);
-                }
-                return transactions;
+                var response = await _client.PostAsync(request);
+                return response.Content;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 return null;
+            }
+        }
+
+        public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
+            DateTime? startDate = null, DateTime? endDate = null)
+        { 
+            try
+            {
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, startDate, endDate);
+                JObject jresponse = JObject.Parse(response!);
+                JToken? token = jresponse["data"]!["account"]!["transactions"];
+                return token!.ToObject<IList<Transaction>>(); 
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return new List<Transaction>();
             }
         }
 

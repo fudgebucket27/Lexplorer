@@ -49,7 +49,7 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request);
-                var data = JsonConvert.DeserializeObject<UniswapToken>(response.Content!);
+                var data = JsonConvert.DeserializeObject<UniswapToken>(response.Content!)!;
                 data.address = address;
                 return data;
             }

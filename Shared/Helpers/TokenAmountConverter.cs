@@ -8,13 +8,15 @@ namespace Lexplorer.Helpers
         //maybe some day use clients Culture? for now invariant
         public static CultureInfo Culture = CultureInfo.InvariantCulture;
 
-        public static decimal ToDecimal(Double balance, int decimals, decimal conversionRate = 1)
+        public static decimal ToDecimal(Double? balance, int? decimals, decimal conversionRate = 1)
         {
-            return (decimal) (balance / Math.Pow(10, (double)decimals)) * conversionRate; 
+            if (balance == null) return 0;
+            return (decimal)(((decimals ?? 0) > 0) ? balance / Math.Pow(10, (double)decimals!) : balance) * conversionRate;
         }
 
-        public static string ToString(Double balance, int decimals, decimal conversionRate = 1, string format = "N2")
+        public static string ToString(Double? balance, int? decimals, decimal conversionRate = 1, string format = "N2")
         {
+            if (balance == null) return "";
             return ToDecimal(balance, decimals, conversionRate).ToString(format, Culture);
         }
 

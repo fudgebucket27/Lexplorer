@@ -4,108 +4,90 @@
 @using Lexplorer.Components
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
+@inject IDialogService DialogService;
+@inject IAppCache AppCache;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
 
-@if (account != null)
-{
-            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-                    <MudText Typo="Typo.h6">@account.typeName #@account.id</MudText>
-                </div>
-                <tbody>
-                    <tr>
-                        <td>L1 Address</td>
-                        <td>@account.address</td>
-                    </tr>
-                    <tr>
-                        <td>Account Type</td>
-                        <td>@account.typeName</td>
-                    </tr>
-                    <tr>
-                        <td>Created At (UTC)</td>
-                        <td>@account.createdAtTransaction!.verifiedAt</td>
-                    </tr>
-            @if (account is User)
-            {
-                    <tr>
-                        <td>Public key</td>
-                        <td>0x@((account as User)!.publicKey)</td>
-                    </tr>
+        <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+            <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
+            </div>
+            <tbody>
+                <tr>
+                    <td>L1 Address</td>
+                    <td>@account?.address</td>
+                </tr>
+                <tr>
+                    <td>Account Type</td>
+                    <td>@account?.typeName</td>
+                </tr>
+                <tr>
+                    <td>Created At (UTC)</td>
+                    <td>@account?.createdAtTransaction?.verifiedAt</td>
+                </tr>
+        @if (account is User)
+        {
+                <tr>
+                    <td>Public key</td>
+                    <td>0x@((account as User)!.publicKey)</td>
+                </tr>
                 
-            }
-        </tbody>
-            </MudSimpleTable>
+        }
+            </tbody>
+        </MudSimpleTable>
 
-            <br />
+        <br />
 
-            <MudTable Dense="true" Striped="true" Bordered="true" Items="@account.balances" Hover="true" Loading=@balancesLoadíng>
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Token balances</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
-                    <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals, 1, "G0") @context.token.symbol</MudTd>                
-                </RowTemplate>
-                <PagerContent>
-            @if (account.balances!.Count > 10)
-            {
-                    <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left"/>
-            }
-                </PagerContent>
-            </MudTable>
-}
-else
-{
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
+        <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoadíng>
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Token balances</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
+                <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals, 1, "G0") @context.token.symbol</MudTd>                
+            </RowTemplate>
+            <PagerContent>
+        @if (account?.balances?.Count > 10)
+        {
+                <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left"/>
+        }
+            </PagerContent>
+        </MudTable>
+
     <br />
 
-@if (transactions != null)
-{
-            <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Transactions</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Tx Id</MudTh>
-                    <MudTh>Type</MudTh>
-                    <MudTh>From</MudTh>
-                    <MudTh>To</MudTh>
-                    <MudTh>Amount</MudTh>
-                    <MudTh>Fee</MudTh>
-                    <MudTh>Verified At (UTC)</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
-                    <MudTd DataLabel="Type">@context.typeName</MudTd>
-                    <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
-                    <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-                </RowTemplate>
-                <FooterContent>
-                    <MudText Typo="Typo.caption">Current Page: @readablePageNumber</MudText>
-                </FooterContent>
-            </MudTable>
-            if (pageNumber != "0")
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-            }
-            else
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-            }
-}
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
-
+    <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Transactions</MudText>
+            <MudSpacer/>
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)"/>
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)"/>
+            <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;"/>
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)"/>
+            <MudSpacer/>
+            <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tx Id</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>From</MudTh>
+            <MudTh>To</MudTh>
+            <MudTh>Amount</MudTh>
+            <MudTh>Fee</MudTh>
+            <MudTh>Verified At (UTC)</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
+            <MudTd DataLabel="Type">@context.typeName</MudTd>
+            <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId/>
+            <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+        </RowTemplate>
+    </MudTable>
 
 @code {
     [Parameter]
@@ -113,24 +95,36 @@ else
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string pageNumber { get; set; } = "0";
+    public string pageNumber { get; set; } = "1";
 
-    public string readablePageNumber { get { return (pageNumber == null ? 0 : Int32.Parse(pageNumber) + 1).ToString(); } }
+    public int gotoPage { 
+        get 
+        { 
+            return Int32.Parse(pageNumber ?? "1"); 
+        } 
+        set
+        {
+            string URL = $"/account/{accountId}?pageNumber={value}";
+            NavigationManager.NavigateTo(URL);            
+        }
+    }
 
     public bool balancesLoadíng;
-    public bool isLoading;
+    public bool isLoading = true;
+    public readonly int pageSize = 25;
 
     private Lexplorer.Models.Account? account { get; set; }
-    private IList<Lexplorer.Models.Transaction>? transactions { get; set; }
+    private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
 
     protected override async Task OnParametersSetAsync()
     {
+        isLoading = true;
         //did the account change?
         if (account != null && account.id != accountId)
         {
             account = null;
-            transactions = null;
-            pageNumber = "0";
+            transactions = new List<Transaction>();
+            pageNumber = "1";
             StateHasChanged();
         }
         if (accountId == null) return;
@@ -146,30 +140,24 @@ else
         }
         if (String.IsNullOrEmpty(pageNumber))
         {
-            pageNumber = "0";
+            pageNumber = "1";
         }
 
-        isLoading = true;
-        transactions = await LoopringGraphQLService.GetAccountTransactions(Int32.Parse(pageNumber) * 25, 25, accountId);
+        string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
+        transactions = await AppCache.GetOrAddAsync(transactionCacheKey, 
+            async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId), 
+            DateTimeOffset.UtcNow.AddMinutes(10));
         isLoading = false;
         StateHasChanged();
     }
-    private void GoToNextPage()
-    {
-        int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"/account/{accountId}?pageNumber={nextPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
 
-    private void GoToPreviousPage()
+    private void ShowCSVOptions()
     {
-        int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"/account/{accountId}?pageNumber={previousPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
-    private void GoToStartPage()
-    {
-        string parameters = $"/account/{accountId}?pageNumber=0";
-        NavigationManager.NavigateTo(parameters);
+        var parameters = new DialogParameters();
+        parameters.Add("accountId", accountId);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        DialogService.Show<TransactionExportDialog>("Export", parameters, options);
     }
 }

@@ -122,6 +122,7 @@ else
 
         isBlockLoading = true;
         block = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(5));
+        if (block == null) return;
         blockData = new List<BlockData>();
         blockData.Add(block.data!);
         isBlockLoading = false;

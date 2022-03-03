@@ -112,7 +112,7 @@ namespace xUnitTests.HelperTests
         [Fact]
         public void TestBillons()
         {
-            Assert.Equal("1.235B", TokenAmountConverter.ToStringWithExponent(x, -2, 1));
+            Assert.Equal("1.235B", TokenAmountConverter.ToStringWithExponent(x*100, 0, 1));
         }
         [Fact]
         public void TestKilo()
