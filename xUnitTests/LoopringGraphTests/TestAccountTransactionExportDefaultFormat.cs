@@ -16,8 +16,6 @@ namespace xUnitTests.LoopringGraphTests
 {
     public partial class TestAccountTransactions
     {
-        TranscationExportDefaultCSVFormat exporter;
-
         [Theory]
         [TestPriority(5)]
         [JsonFileData("AccountTransactions.json")]
