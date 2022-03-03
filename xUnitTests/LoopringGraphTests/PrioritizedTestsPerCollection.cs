@@ -7,6 +7,8 @@ using Xunit;
 using Xunit.Sdk;
 using Xunit.Abstractions;
 
+[assembly: TestCaseOrderer("xUnitTests.LoopringGraphTests.PriorityOrderer", "xUnitTests")]
+
 namespace xUnitTests.LoopringGraphTests
 {
     //test ordering: https://github.com/xunit/samples.xunit/blob/main/TestOrderExamples/
@@ -22,7 +24,7 @@ namespace xUnitTests.LoopringGraphTests
 
         public int Priority { get; private set; }
     }
-    public class DisplayNameOrderer : ITestCaseOrderer
+    public class PriorityOrderer : ITestCaseOrderer
     {
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases) where TTestCase : ITestCase
         {
