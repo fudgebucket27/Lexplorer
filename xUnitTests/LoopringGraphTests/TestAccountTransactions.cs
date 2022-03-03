@@ -15,7 +15,7 @@ using Xunit.Sdk;
 namespace xUnitTests.LoopringGraphTests
 {
     [Collection("LoopringGraphQL collection")]
-    public class TestAccountTransactions
+    public partial class TestAccountTransactions
     {
         GraphQLTestsFixture fixture;
         LoopringGraphQLService service;

@@ -14,25 +14,17 @@ using Newtonsoft.Json.Linq;
 
 namespace xUnitTests.LoopringGraphTests
 {
-    [Collection("LoopringGraphQL collection")]
-    public class TestAccountTransactionExportDefaultFormat
+    public partial class TestAccountTransactions
     {
-        GraphQLTestsFixture fixture;
-        LoopringGraphQLService service;
         TranscationExportDefaultCSVFormat exporter;
 
-        public TestAccountTransactionExportDefaultFormat(GraphQLTestsFixture fixture)
-        {
-            this.fixture = fixture;
-            this.service = fixture!.LGS;
-            exporter = new TranscationExportDefaultCSVFormat();
-        }
-
         [Theory]
+        [TestPriority(5)]
         [JsonFileData("AccountTransactions.json")]
         public void TestExport(JArray transactionsJArray)
         {
             IList<Transaction> transactions = transactionsJArray.ToObject<IList<Transaction>>()!;
+            TranscationExportDefaultCSVFormat exporter = new TranscationExportDefaultCSVFormat();
             foreach (Transaction transaction in transactions)
             {
                 exporter.WriteTransaction(transaction, fixture.testAccountId, (string line) =>
