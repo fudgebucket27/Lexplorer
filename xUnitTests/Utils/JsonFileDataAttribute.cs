@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit.Sdk;
@@ -46,7 +47,8 @@ namespace xUnitTests.Utils
             try
             {
                 // Get the absolute path to the JSON file
-                var path = Path.IsPathRooted(_filePath)
+                //don't trust isPathRooted on linux
+                var path = ((!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) && Path.IsPathRooted(_filePath))
                     ? _filePath
                     : Path.GetRelativePath(Directory.GetCurrentDirectory(), _filePath);
 
