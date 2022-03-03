@@ -42,15 +42,15 @@ namespace xUnitTests.Utils
         {
             if (testMethod == null) { throw new ArgumentNullException(nameof(testMethod)); }
 
-            string fileData;
+            string fileData, path;
             
             try
             {
                 // Get the absolute path to the JSON file
-                //don't trust isPathRooted on linux
-                var path = ((!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) && Path.IsPathRooted(_filePath))
+                path = Path.IsPathRooted(_filePath)
                     ? _filePath
-                    : Path.GetRelativePath(Directory.GetCurrentDirectory(), _filePath);
+                    : Path.Combine(Directory.GetCurrentDirectory(), _filePath);
+                path = Path.GetFullPath(path);
 
                 if (!File.Exists(path))
                 {
