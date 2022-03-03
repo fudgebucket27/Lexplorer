@@ -40,7 +40,7 @@ namespace xUnitTests.LoopringGraphTests
 
             //generte a .json file nested in 2 arrays, so it can be used with JsonFileData
             //and EnsureTransactionsDescend theory below
-            var path = Path.GetRelativePath(Directory.GetCurrentDirectory(), "AccountTransactions.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "AccountTransactions.json");
             JArray arrayParamToken = new JArray();
             arrayParamToken.Add(token);
             JArray arrayTestsToken = new JArray();
