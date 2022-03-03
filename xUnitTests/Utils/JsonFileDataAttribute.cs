@@ -41,30 +41,46 @@ namespace xUnitTests.Utils
         {
             if (testMethod == null) { throw new ArgumentNullException(nameof(testMethod)); }
 
-            // Get the absolute path to the JSON file
-            var path = Path.IsPathRooted(_filePath)
-                ? _filePath
-                : Path.GetRelativePath(Directory.GetCurrentDirectory(), _filePath);
-
-            if (!File.Exists(path))
+            string fileData;
+            
+            try
             {
-                throw new ArgumentException($"Could not find file at path: {path}");
+                // Get the absolute path to the JSON file
+                var path = Path.IsPathRooted(_filePath)
+                    ? _filePath
+                    : Path.GetRelativePath(Directory.GetCurrentDirectory(), _filePath);
+
+                if (!File.Exists(path))
+                {
+                    throw new ArgumentException($"Could not find file at path: {path}");
+                }
+
+                // Load the file
+                fileData = File.ReadAllText(_filePath);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting JSON test parameters from {_filePath}\n{ex.Message}");
             }
 
-            // Load the file
-            var fileData = File.ReadAllText(_filePath);
-
-            if (string.IsNullOrEmpty(_propertyName))
+            try
             {
-                //whole file is the data
-                var retValue = JsonConvert.DeserializeObject<List<object[]>>(fileData)!;
-                return retValue;
-            }
+                if (string.IsNullOrEmpty(_propertyName))
+                {
+                    //whole file is the data
+                    var retValue = JsonConvert.DeserializeObject<List<object[]>>(fileData)!;
+                    return retValue;
+                }
 
-            // Only use the specified property as the data
-            var allData = JObject.Parse(fileData);
-            var data = allData.SelectToken(_propertyName)!;
-            return data.ToObject<List<object[]>>()!;
+                // Only use the specified property as the data
+                var allData = JObject.Parse(fileData);
+                var data = allData.SelectToken(_propertyName)!;
+                return data.ToObject<List<object[]>>()!;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deserializing JSON test parameters from {_filePath}\n{ex.Message}");
+            }
         }
     }
 }
