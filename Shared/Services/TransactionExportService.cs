@@ -30,7 +30,7 @@ namespace Lexplorer.Services
             //todo: make dynamic, register various formats etc.
             return new TranscationExportDefaultCSVFormat();
         }
-        public async Task<Stream> GenerateCSV(string CSVFormat, string accountId, DateTime? startDate, DateTime? endDate)
+        public async Task<Stream> GenerateCSV(string CSVFormat, string accountId, DateTime startDate, DateTime endDate)
         {
             var format = getFormatService(CSVFormat);
 
@@ -39,11 +39,13 @@ namespace Lexplorer.Services
             {
                 CSVWriteLine writeLine = (string line) => writer.WriteLine(line);
                 format.WriteHeader(writeLine);
+                var blockIds = await _graphqlService.GetBlockDateRange(startDate, endDate);
                 var processed = 0;
                 while (true)
                 {
                     const int chunkSize = 10;
-                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize, accountId, startDate, endDate)!;
+                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize, 
+                        accountId, blockIds!.Item1, blockIds!.Item2)!;
                     if ((transactions == null) || (transactions.Count == 0))
                     {
                         if (processed == 0)

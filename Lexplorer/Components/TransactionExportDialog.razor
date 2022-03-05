@@ -55,7 +55,7 @@
 
         try
         {
-            var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, startDate, endDate);
+            var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, startDate!.Value, endDate!.Value);
             var fileName = $"Transactions_{accountId}.txt";
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);

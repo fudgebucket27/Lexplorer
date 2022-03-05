@@ -545,7 +545,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
-            DateTime? startDate = null, DateTime? endDate = null)
+            Double? firstBlockId = null, Double? lastBlockId = null)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -634,15 +634,11 @@ namespace Lexplorer.Services
                     },
                 }
             });
-            if (startDate.HasValue && endDate.HasValue)
+            if (firstBlockId.HasValue && lastBlockId.HasValue)
             {
-                Tuple<Double, Double>? blockIds = await GetBlockDateRange(startDate.Value, endDate.Value);
-                if (blockIds != null)
-                {
-                    JObject where = (jObject["variables"]!["where"] as JObject)!;
-                    where.Add(new JProperty("block_gte", blockIds.Item1.ToString()));
-                    where.Add(new JProperty("block_lte", blockIds.Item2.ToString()));
-                }
+                JObject where = (jObject["variables"]!["where"] as JObject)!;
+                where.Add(new JProperty("block_gte", firstBlockId.ToString()));
+                where.Add(new JProperty("block_lte", lastBlockId.ToString()));
             }
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
@@ -658,11 +654,11 @@ namespace Lexplorer.Services
         }
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
-            DateTime? startDate = null, DateTime? endDate = null)
+            Double? firstBlockId = null, Double? lastBlockId = null)
         { 
             try
             {
-                string? response = await GetAccountTransactionsResponse(skip, first, accountId, startDate, endDate);
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
                 return token!.ToObject<IList<Transaction>>(); 
