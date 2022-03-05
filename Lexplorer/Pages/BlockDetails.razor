@@ -42,7 +42,7 @@
                             </tr>
                             <tr>
                                 <td>Verified At (UTC)</td>
-                                <td>@TimestampToUTCConverter.Convert(block.data!.block!.timestamp!)</td>
+                                <td>@TimestampConverter.ToUTCString(block.data!.block!.timestamp!)</td>
                             </tr>
                             <tr>
                                 <td>Raw Data</td>
@@ -77,7 +77,7 @@ else
                                     <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!, @pageNumber, "blockDetails")>@context.id</a></MudTd>
                                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                                     <TransactionTableDetails TransactionData=@context />
-                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@block.data!.block!.timestamp!)</MudTd>
+                                    <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block.data!.block!.timestamp!)</MudTd>
                                 </RowTemplate>
                 </MudTable>
     @if (pageNumber == "0")

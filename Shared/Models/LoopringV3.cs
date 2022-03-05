@@ -151,7 +151,14 @@ namespace Lexplorer.Models
             {
                 if (block == null) return string.Empty;
 
-                return TimestampToUTCConverter.Convert(block.timestamp);
+                return TimestampConverter.ToUTCString(block.timestamp);
+            }
+        }
+        public DateTime? verifiedAtDateTime
+        {
+            get
+            {
+                return TimestampConverter.ToUTCDateTime(block?.timestamp);
             }
         }
     }

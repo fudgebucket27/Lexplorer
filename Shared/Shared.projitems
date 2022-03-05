@@ -11,7 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GraphQLFragments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\ParameterHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TimestampToUTCConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TimestampConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TokenAmountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\LoopringV3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\UniswapV2.cs" />

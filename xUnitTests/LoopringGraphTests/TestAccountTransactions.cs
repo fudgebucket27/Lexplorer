@@ -19,6 +19,9 @@ namespace xUnitTests.LoopringGraphTests
     {
         GraphQLTestsFixture fixture;
         LoopringGraphQLService service;
+        DateTime startDate = new DateTime(2022, 2, 01, 0, 0, 0, 0, DateTimeKind.Utc);
+        DateTime endDate = new DateTime(2022, 2, 28, 0, 0, 0, 0, DateTimeKind.Utc);
+
 
         public TestAccountTransactions(GraphQLTestsFixture fixture)
         {
@@ -31,9 +34,8 @@ namespace xUnitTests.LoopringGraphTests
         public async void GetAccountTransactions()
         {
 
-            var response = await service.GetAccountTransactionsResponse(0, 10, fixture.testAccountId,
-              new DateTime(2022, 2, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-              new DateTime(2022, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc));
+            var response = await service.GetAccountTransactionsResponse(0, 100, fixture.testAccountId,
+              startDate, endDate);
             Assert.NotNull(response);
             JObject jresponse = JObject.Parse(response!);
             JToken token = jresponse["data"]!["account"]!["transactions"]!;
@@ -58,13 +60,14 @@ namespace xUnitTests.LoopringGraphTests
 
         [Theory]
         [JsonFileData("AccountTransactions.json")]
-        public void EnsureTransactionsDescend(JArray transactionsJArray)
+        public void ValidateTransactions(JArray transactionsJArray)
         {
             IList<Transaction>? transactions = transactionsJArray.ToObject<IList<Transaction>>();
             Assert.NotEmpty(transactions);
             for (int i = 0; i < transactions!.Count; i++)
             {
                 EnsureTransactionDescends(transactions[i]);
+                EnsureTransactionDateRange(transactions[i]);
             }
         }
 
@@ -81,6 +84,12 @@ namespace xUnitTests.LoopringGraphTests
             {
                 throw new XunitException($"transaction class \"{transaction?.typeName}\" unknown?\n{ex}");
             }
+        }
+
+        internal void EnsureTransactionDateRange(Transaction? transaction)
+        {
+            Assert.NotNull(transaction);
+            Assert.InRange<DateTime>(transaction!.verifiedAtDateTime!.Value, startDate, endDate);
         }
 
     }

@@ -19,7 +19,7 @@
                                     <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!,@context.id!, @pageNumber)>@context.id</a></MudTd>
                                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                                     <TransactionTableDetails TransactionData=@context />
-                                    <MudTd DataLabel="Time">@TimestampToUTCConverter.Convert(@context.block!.timestamp!)</MudTd>
+                                    <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@context.block!.timestamp!)</MudTd>
                                 </RowTemplate>
                    </MudTable>
 }

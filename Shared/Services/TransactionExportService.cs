@@ -44,7 +44,12 @@ namespace Lexplorer.Services
                 {
                     const int chunkSize = 10;
                     IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize, accountId, startDate, endDate)!;
-                    if ((transactions == null) || (transactions.Count == 0)) break;
+                    if ((transactions == null) || (transactions.Count == 0))
+                    {
+                        if (processed == 0)
+                            throw new Exception("No transactions found in the given timespan");
+                        break;
+                    }
                     foreach (var transaction in transactions)
                     {
                         format.WriteTransaction(transaction, accountId, writeLine);
