@@ -39,6 +39,23 @@ namespace Lexplorer.Services
                 proxy(id: 0) {
                   blockCount
                   userCount
+                  transactionCount
+                  depositCount
+                  withdrawalCount
+                  transferCount
+                  addCount
+                  removeCount
+                  orderbookTradeCount
+                  swapCount
+                  accountUpdateCount
+                  ammUpdateCount
+                  signatureVerificationCount
+                  tradeNFTCount
+                  swapNFTCount
+                  withdrawalNFTCount
+                  transferNFTCount
+                  nftMintCount
+                  nftDataCount
                 }
                 blocks(
                   skip: $skip
