@@ -6,8 +6,35 @@
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
-    <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/></p>
     <MudGrid>
+        <p hidden="@(transactionData != null)">
+            <MudItem sm="12">
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+            </MudItem>
+        </p>
+        <MudItem sm="12" Class="d-flex justify-center flex-grow-1 gap-4">
+            <MudTextField  @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnAdornmentClick="DoSearch" />
+        </MudItem>
+        <p hidden="@(!searching)">
+            <MudItem sm="12">
+                <MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/>
+            </MudItem>
+        </p>
+        <MudItem sm="12">
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Found</MudTh>
+                    <MudTh>Type</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Found">@(context.GetType()?.GetProperty("id")?.GetValue(context, null))</MudTd>
+                    <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
         <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
@@ -249,7 +276,7 @@
         NavigationManager.NavigateTo(parameters);
     }
 
-private void GoToPairOverviewPage()
+    private void GoToPairOverviewPage()
     {
         string parameters = "pairs?pageNumber=0";
         NavigationManager.NavigateTo(parameters);
@@ -261,5 +288,25 @@ private void GoToPairOverviewPage()
         NavigationManager.NavigateTo(parameters);
     }
 
+    private IList<object>? searchResults;
+    private Boolean searching = false;
+    private string? _searchTerm;
+    private string? searchTerm { get { return _searchTerm; } 
+        set
+        {
+            _searchTerm = value;
+            DoSearch();
+        }
+    }
+    private async void DoSearch()
+    {
+        if (searchTerm == null) return;
+        searching = true;
+        searchResults = null;
+        StateHasChanged();
+        searchResults = await LoopringGraphQLService.Search(searchTerm);
+        searching = false;
+        StateHasChanged();
+    }
 
 }
