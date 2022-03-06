@@ -99,12 +99,12 @@ namespace Lexplorer.Services
             DoBuildLine(transfer.id, transfer.verifiedAt, transfer.typeName,
                 from: transfer.fromAccount?.address,
                 to: transfer.toAccount?.address,
-                added: (transfer.toAccount?.address == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
-                addedToken: (transfer.toAccount?.address == accountIdPerspective) ? transfer.token?.symbol : null,
+                added: (transfer.toAccount?.id == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
+                addedToken: (transfer.toAccount?.id == accountIdPerspective) ? transfer.token?.symbol : null,
                 fee: GetExportAmount(transfer.fee, transfer.feeToken),
                 feeToken: transfer.feeToken?.symbol,
-                total: (transfer.fromAccount?.address == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
-                totalToken: (transfer.fromAccount?.address == accountIdPerspective) ? transfer.token?.symbol : null);
+                total: (transfer.fromAccount?.id == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
+                totalToken: (transfer.fromAccount?.id  == accountIdPerspective) ? transfer.token?.symbol : null);
         }
         private void WriteDeposit(Deposit deposit, string accountIdPerspective, CSVWriteLine writeLine)
         {
