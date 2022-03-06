@@ -3,7 +3,7 @@
     using Microsoft.AspNetCore.Components;
     using Lexplorer.Models;
 
-    public class AccountLinkHelper
+    public class LinkHelper
     {
         public static MarkupString CreateUserLink(Account? account, string? ignoreId = null)
         {
