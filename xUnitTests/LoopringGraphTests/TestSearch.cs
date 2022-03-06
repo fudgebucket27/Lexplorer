@@ -28,7 +28,7 @@ namespace xUnitTests.LoopringGraphTests
             Assert.NotNull(searchResult);
             Assert.Equal(2, searchResult!.Count);
             Assert.IsType<User>(searchResult[0]);
-            Assert.IsType<Block>(searchResult[1]);
+            Assert.IsType<BlockDetail>(searchResult[1]);
         }
 
         [Fact]
