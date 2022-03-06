@@ -10,6 +10,8 @@ namespace Lexplorer.Models
 {
     public class BlockDetail
     {
+        [JsonProperty("__typename")]
+        public string? typeName { get; set; }
         public Int64 accountUpdateCount { get; set; }
         public Int64 addCount { get; set; }
         public Int64 ammUpdateCount { get; set; }

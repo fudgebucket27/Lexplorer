@@ -760,7 +760,7 @@ namespace Lexplorer.Services
             = new Dictionary<string, Type>
         {
                 { "accounts", typeof(Account) },
-                { "blocks", typeof(Block) },
+                { "blocks", typeof(BlockDetail) },
                 { "transactions", typeof(Transaction) }
         };
         public async Task<IList<object>?> Search(string searchTerm)

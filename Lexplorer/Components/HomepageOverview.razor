@@ -26,7 +26,7 @@
                     <MudTh>Type</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Found">@(context.GetType()?.GetProperty("id")?.GetValue(context, null))</MudTd>
+                    <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
                     <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
                 </RowTemplate>
             </MudTable>
@@ -301,6 +301,12 @@
         searchResults = null;
         StateHasChanged();
         searchResults = await LoopringGraphQLService.Search(searchTerm);
+        if (searchResults?.Count == 1)
+        {
+            Tuple<string, string>? adr = LinkHelper.GetObjectLinkAddress(searchResults[0]);
+            if (!string.IsNullOrEmpty(adr?.Item1))
+                NavigationManager.NavigateTo(adr.Item1);
+        }
         searching = false;
         StateHasChanged();
     }
