@@ -7,19 +7,15 @@
 @inject IAppCache AppCache;
 
     <MudGrid>
-        <p hidden="@(transactionData != null)">
-            <MudItem sm="12">
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
-            </MudItem>
-        </p>
-        <MudItem sm="12" Class="d-flex justify-center flex-grow-1 gap-4">
-            <MudTextField  @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnAdornmentClick="DoSearch" />
+        <MudItem sm="12">
+            <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/></p>
         </MudItem>
-        <p hidden="@(!searching)">
-            <MudItem sm="12">
-                <MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/>
-            </MudItem>
-        </p>
+        <MudItem sm="12">
+            <MudTextField @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnAdornmentClick="DoSearch" />
+        </MudItem>
+        <MudItem sm="12">
+            <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+        </MudItem>
         <MudItem sm="12">
             <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
                 <ToolBarContent>
