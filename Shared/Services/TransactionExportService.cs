@@ -6,18 +6,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Lexplorer.Models;
+using System.Linq;
 
 namespace Lexplorer.Services
 {
     public delegate void CSVWriteLine(string line);
     public interface ICSVFormatService
     {
+        public void SuggestFileName(ref string fileName, string accountId, DateTime startDate, DateTime endDate);
         public void WriteHeader(CSVWriteLine writeLine);
         public void WriteTransaction(Transaction transaction, string accountIdPerspective,  CSVWriteLine writeLine);
     }
 
     public class TransactionExportService
     {
+        private static readonly Dictionary<string, ICSVFormatService> registeredExportServices;
+
+        static TransactionExportService()
+        {
+            registeredExportServices = new Dictionary<string, ICSVFormatService>();
+        }
+
+        public static void RegisterExportService(string CSVFormatName, ICSVFormatService service)
+        {
+            registeredExportServices.Add(CSVFormatName, service);
+        }
+
         private readonly LoopringGraphQLService _graphqlService;
 
         public TransactionExportService(LoopringGraphQLService graphQLService)
@@ -25,15 +39,18 @@ namespace Lexplorer.Services
             _graphqlService = graphQLService;
         }
 
-        private ICSVFormatService getFormatService(string CSVFormat)
+        public ICSVFormatService getFormatService(string CSVFormat)
         {
-            //todo: make dynamic, register various formats etc.
-            return new TranscationExportDefaultCSVFormat();
+            return registeredExportServices[CSVFormat];
         }
-        public async Task<Stream> GenerateCSV(string CSVFormat, string accountId, DateTime startDate, DateTime endDate)
-        {
-            var format = getFormatService(CSVFormat);
 
+        public List<string> ExportFormats()
+        {
+            return registeredExportServices.Keys.ToList<string>();
+        }
+
+        public async Task<Stream> GenerateCSV(ICSVFormatService format, string accountId, DateTime startDate, DateTime endDate)
+        {
             var stream = new MemoryStream();
             using (var writer = new StreamWriter(stream, leaveOpen: true))
             {

@@ -6,10 +6,11 @@
     <DialogContent>
         <MudText>Please specify options for generating the CSV before downloading it.</MudText>
         <MudItem xs="12">
-            <MudSelect Disabled="true" T="string" @bind-Value="CSVType" Label="CSV type" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="@("Default")" />
-                <MudSelectItem Value="@("Koinly")" />
-                <MudSelectItem Value="@("Accointing")" />
+            <MudSelect T="string" @bind-Value="CSVType" Label="CSV type" AnchorOrigin="Origin.BottomCenter">
+                @foreach (string format in TransactionExportService.ExportFormats())
+                {
+                    <MudSelectItem Value="@format" />
+                }
             </MudSelect>
         </MudItem>
         <MudItem xs="12">
@@ -27,7 +28,7 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] 
+    [CascadingParameter]
     MudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
@@ -56,9 +57,16 @@
         try
         {
             //ensure start of day / end of day
-            var fileStream = await TransactionExportService.GenerateCSV(CSVType!, accountId, 
-                startDate!.Value.Date, endDate!.Value.Date.AddDays(1).AddTicks(-1));
+            DateTime myStart = startDate!.Value.Date;
+            DateTime myEnd = endDate!.Value.Date.AddDays(1).AddTicks(-1);
+
+            var format = TransactionExportService.getFormatService(CSVType!);
+
             var fileName = $"Transactions_{accountId}.txt";
+            format.SuggestFileName(ref fileName, accountId, myStart, myEnd);
+
+            var fileStream = await TransactionExportService.GenerateCSV(format, accountId,
+                myStart, myEnd);
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);
 

@@ -6,27 +6,39 @@ using Lexplorer.Helpers;
 
 namespace Lexplorer.Services
 {
-    public class TranscationExportDefaultCSVFormat : ICSVFormatService
+    public class TransactionExportDefaultCSVFormat : ICSVFormatService
     {
-        private readonly StringBuilder sb = new StringBuilder();
-        public void WriteHeader(CSVWriteLine writeLine)
+        protected readonly StringBuilder sb = new StringBuilder();
+
+        public virtual void SuggestFileName(ref string fileName, string accountId, DateTime startDate, DateTime endDate)
+        {
+            //leave fileName unchanged
+        }
+
+        public virtual void BuildLine(params string?[] columns)
+        {
+            sb.AppendJoin(Convert.ToChar(9), columns);
+        }
+
+        public virtual void WriteHeader(CSVWriteLine writeLine)
         {
             sb.Clear();
-            sb.AppendJoin(Convert.ToChar(9), "Tx-ID", "Timestamp", "Type", "From", "To", "Added", "Added Token", "Fee", "Fee Token", "Total", "Total Token");
+            BuildLine("Tx-ID", "Timestamp", "Type", "From", "To", "Added", "Added Token", "Fee", "Fee Token", "Total", "Total Token");
             writeLine(sb.ToString());
         }
 
-        private string? GetExportAmount(double amount, Token? token)
+        protected string? GetExportAmount(double amount, Token? token)
         {
             return TokenAmountConverter.ToString(amount, token?.decimals ?? 1, 1, "");
         }
 
-        //helper with default param values for more readable code
-        private void DoBuildLine(string? id, string? timestamp, string? type, string? from = null, string? to = null, 
+        protected virtual void DoBuildLine(string? id, string? timestamp, string? type, string? from = null, string? to = null, 
             string? added = null, string? addedToken = null, string? fee = null, string? feeToken = null, string? total = null, string? totalToken = null)
+        //helper with default param values for more readable code
         {
-            sb.AppendJoin(Convert.ToChar(9), id, timestamp, type, from, to, added, addedToken, fee, feeToken, total, totalToken);
+            BuildLine(id, timestamp, type, from, to, added, addedToken, fee, feeToken, total, totalToken);
         }
+
         private void WriteOrderBookTrade(OrderBookTrade orderBookTrade, string accountIdPerspective, CSVWriteLine writeLine)
         {
             bool areWeAccountA = orderBookTrade.accountA?.id == accountIdPerspective;
