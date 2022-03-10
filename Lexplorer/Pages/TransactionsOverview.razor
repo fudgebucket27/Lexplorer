@@ -17,7 +17,7 @@
         <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
         <MudSpacer />
-        <MudSelect T="string" Label="Filter by type">
+        <MudSelect @bind-Value="@filterTransaction" T="string" Label="Filter by type">
             <MudSelectItem Value="@("All")" />
             <MudSelectItem Value="@("Transfer")" />
             <MudSelectItem Value="@("Deposit")" />
@@ -53,8 +53,7 @@
         }
         set
         {
-            string URL = $"/transactions?pageNumber={value}";
-            NavigationManager.NavigateTo(URL);
+            navigateTo(value);
         }
     }
 
@@ -63,6 +62,30 @@
 
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? type { get; set; }
+
+    public string? filterTransaction
+    {
+        get
+        {
+            return type ?? "All";
+        }
+        set
+        {
+            type = (string.Equals(value ?? "All", "All", StringComparison.InvariantCultureIgnoreCase)) ? null : value;
+            navigateTo(gotoPage);
+        }
+    }
+
+    private void navigateTo(int page)
+    {
+        string URL = $"/transactions?pageNumber={page}";
+        if (type != null)
+            URL += $"&type={type}";
+        NavigationManager.NavigateTo(URL);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -73,13 +96,13 @@
             pageNumber = "1";
         }
 
-        string transactionCacheKey = $"transactions-page{pageNumber}";
+        string transactionCacheKey = $"transactions-page{pageNumber}-type{type}";
         var transactionsData = await AppCache.GetOrAddAsync(transactionCacheKey,
-            async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize),
+            async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, typeName: type),
             DateTimeOffset.UtcNow.AddMinutes(10));
         transactions = transactionsData?.data?.transactions;
         isLoading = false;
         StateHasChanged();
     }
 
-}
+    }
