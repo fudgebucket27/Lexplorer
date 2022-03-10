@@ -191,7 +191,7 @@
     private decimal? priceOfToken(Token token)
     {
         //find token.address in uniswapTokens and get most recent price; if not available, return 1.0 so no conversion
-        return uniswapTokens?.Where(c => c.address == @token?.address).First()?.data?.tokenDayDatas?[0].priceUSD;
+        return uniswapTokens?.Where(c => c.address == @token?.address).FirstOrDefault()?.data?.tokenDayDatas?[0].priceUSD;
     }
 
     private string? getVolumePair1(Pair pair, Boolean weekly = true)
