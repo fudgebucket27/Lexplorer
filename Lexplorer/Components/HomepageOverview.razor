@@ -145,7 +145,7 @@
                     <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
                     <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blockData?.data?.blocks?[0].timestamp)</MudTd>
@@ -268,19 +268,19 @@
 
     private void GoToBlockOverviewPage()
     {
-        string parameters = "blocks?pageNumber=0";
+        string parameters = "blocks";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPairOverviewPage()
     {
-        string parameters = "pairs?pageNumber=0";
+        string parameters = "pairs";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToTransactionOverviewPage()
     {
-        string parameters = "transactions?pageNumber=0";
+        string parameters = "transactions";
         NavigationManager.NavigateTo(parameters);
     }
 

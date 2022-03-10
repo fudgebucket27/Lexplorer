@@ -1,49 +1,127 @@
-﻿@page "/transactions/{transactionType}/{transactionId}"
+﻿@page "/transactions/{transactionId}"
 @using Lexplorer.Components;
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
 @inject IAppCache AppCache;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 
-<PageTitle>The Lexplorer - Transaction</PageTitle>
+<PageTitle>The Lexplorer - Transaction #@transactionId </PageTitle>
 
-@if(transaction is Swap)
-{
-    <SwapTransactionDetail SwapDetails=@(transaction as Swap) />
-}
-else if(transaction is Transfer)
-{
-    <TransferTransactionDetail TransferDetails=@(transaction as Transfer) />
-}
-else if(transaction is OrderBookTrade)
-{
-    <OrderbookTradeTransactionDetail TradeDetails=@(transaction as OrderBookTrade) />
-}
-else if(transaction is Deposit)
-{
-    <DepositTransactionDetail DepositDetails=@(transaction as Deposit) />
-}
-else
-{
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
+<MudText Typo="Typo.h6">Transaction #@transactionId</MudText>
+<MudSimpleTable Dense="true">
+    <tbody>
+        <tr>
+            <td>Block #</td>
+            <td>@LinkHelper.GetObjectLink(transaction?.block)</td>
+        </tr>
+        <tr>
+            <td>Verified At (UTC)</td>
+            <td>@transaction?.verifiedAt</td>
+        </tr>
+        <tr>
+            <td>Transaction Type</td>
+            <td>@transaction?.typeName</td>
+        </tr>
+        @if (swap != null)
+        {
+            <tr>
+                <td>User Account</td>
+                <td>@LinkHelper.CreateUserLink(swap.account, false)</td>
+            </tr>
+            <tr>
+                <td>Swap</td>
+                <td>@TokenAmountConverter.ToString(swap.fillSA, swap.tokenA?.decimals) @swap.tokenA?.symbol @swapSymbol @TokenAmountConverter.ToString(swap.fillSB, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td>@TokenAmountConverter.ToString(swap.feeA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+            </tr>
+            <tr>
+                <td>Pool</td>
+                <td>@LinkHelper.CreateUserLink(swap.pool, false)</td>
+            </tr>
+        }
+        @if (transfer != null)
+        {
+            <tr>
+                <td>From</td>
+                <td>@LinkHelper.CreateUserLink(transfer.fromAccount, false)</td>
+            </tr>
+            <tr>
+                <td>To</td>
+                <td>@LinkHelper.CreateUserLink(transfer.toAccount, false)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td>@TokenAmountConverter.ToString(transfer.amount, transfer.token?.decimals) @transfer.token?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td>@TokenAmountConverter.ToString(transfer.fee, transfer.feeToken?.decimals) @transfer.feeToken?.symbol</td>
+            </tr>
+        }
+        @if (orderBookTrade != null)
+        {
+            <tr>
+                <td>Account 1</td>
+                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false)</td>
+            </tr>
+            <tr>
+                <td>Account 2</td>
+                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountB, false)</td>
+            </tr>
+            <tr>
+                <td>Trade</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol @swapSymbol @TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                @if (orderBookTrade.feeA > 0)
+                {
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                }
+                else if (orderBookTrade.feeB > 0)
+                {
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                }
+            </tr>
+        }
+        @if (deposit != null)
+        {
+            <tr>
+                <td>Deposited From</td>
+                <td>@LinkHelper.CreateUserLink(deposit.toAccount, false)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td>@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
+            </tr>
+        }
+        <tr>
+            <td>Raw Data</td>
+            <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
+        </tr>
+    </tbody>
+</MudSimpleTable>
 
 @code {
-    private Models.Transaction? transaction;
-
-    [Parameter]
-    public string transactionType { get; set; } = "";
+    private Transaction? transaction;
+    private Swap? swap { get { return transaction as Swap; } }
+    private Transfer? transfer { get { return transaction as Transfer; } }
+    private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
+    private Deposit? deposit { get { return transaction as Deposit; } }
+    private const string swapSymbol = "<>";
 
     [Parameter]
     public string transactionId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
     {
-        string transactionCacheKey = $"transactionDetails-{transactionType}-{transactionId}";
-        if (transaction == null)
+        string transactionCacheKey = $"transactionDetail-{transactionId}";
+        if (transaction?.id != transactionId)
         {
             transaction = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
             StateHasChanged();
         }
     }
-}
+    }

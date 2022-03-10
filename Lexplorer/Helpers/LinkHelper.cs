@@ -26,19 +26,19 @@
             return new MarkupString(link);
         }
 
-        public static Tuple<string, string>? GetObjectLinkAddress(object linkedObject)
+        public static Tuple<string, string>? GetObjectLinkAddress(object? linkedObject)
         {
             if (linkedObject is Account)
                 return new Tuple<string, string>($"account/{((Account)linkedObject).id}", ((Account)linkedObject).id ?? "");
             else if (linkedObject is BlockDetail)
                 return new Tuple<string, string>($"blocks/{((BlockDetail)linkedObject).id}", ((BlockDetail)linkedObject).id ?? "");
             else if (linkedObject is Transaction)
-            return new Tuple<string, string>($"transactions/{((Transaction)linkedObject).typeName}/{((Transaction)linkedObject).id}", 
-                ((Transaction)linkedObject).id ?? "");
+                return new Tuple<string, string>($"transactions/{((Transaction)linkedObject).id}", 
+                    ((Transaction)linkedObject).id ?? "");
             else
                 return null;
         }
-        public static MarkupString GetObjectLink(object linkedObject)
+        public static MarkupString GetObjectLink(object? linkedObject)
         {
             Tuple<string, string>? adr = GetObjectLinkAddress(linkedObject);
             if (adr == null) return new MarkupString();
