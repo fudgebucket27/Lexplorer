@@ -63,27 +63,34 @@
         @if (orderBookTrade != null)
         {
             <tr>
-                <td>Account 1</td>
-                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false)</td>
+                <td></td>
+                <td>A</td>
+                <td>B</td>
             </tr>
             <tr>
-                <td>Account 2</td>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false)</td>
                 <td>@LinkHelper.CreateUserLink(orderBookTrade.accountB, false)</td>
             </tr>
             <tr>
                 <td>Trade</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol @swapSymbol @TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                <td>@(orderBookTrade.fillAmountBorSA ? "Buy" : "Sell")</td>
+                <td>@(orderBookTrade.fillAmountBorSB ? "Buy" : "Sell")</td>
+            </tr>
+            <tr>
+                <td>Sold</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+            </tr>
+            <tr>
+                <td>Bought</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.fillBA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.fillBB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
-                @if (orderBookTrade.feeA > 0)
-                {
-                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
-                }
-                else if (orderBookTrade.feeB > 0)
-                {
-                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
-                }
+                <td>@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                <td>@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
             </tr>
         }
         @if (deposit != null)
