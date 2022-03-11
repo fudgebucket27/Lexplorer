@@ -136,6 +136,11 @@ namespace Lexplorer.Models
         public string? publicKey { get; set; }
     }
 
+    public class ProtocolAccount : Account
+    {
+
+    }
+
     [JsonConverter(typeof(JsonSubtypes), "__typename")]
     public class Transaction
     {

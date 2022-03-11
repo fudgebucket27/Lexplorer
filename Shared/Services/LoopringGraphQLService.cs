@@ -227,6 +227,17 @@ namespace Lexplorer.Services
                     timestamp
                     transactionCount
                   }
+                  tokenBalances {
+                    id
+                    account {
+                      ...AccountFragment
+                    }
+                    balance
+                    token
+                    {
+                      ...TokenFragment
+                    }
+                  }
                   data
                   ...AddFragment
                   ...RemoveFragment

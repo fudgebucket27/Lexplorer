@@ -5,20 +5,23 @@
 
     public class LinkHelper
     {
-        public static MarkupString CreateUserLink(Account? account, string? ignoreId = null)
+        public static MarkupString CreateUserLink(Account? account, string? ignoreId = null, bool includeAccountId = false)
         {
-            return CreateUserLink(account?.id, account?.address, true, ignoreId);
+            return CreateUserLink(account?.id, account?.address, true, ignoreId, includeAccountId);
         }
-        public static MarkupString CreateUserLink(Account? account, bool shortenAddress = true)
+        public static MarkupString CreateUserLink(Account? account, bool shortenAddress = true, bool includeAccountId = false)
         {
-            return CreateUserLink(account?.id, account?.address, shortenAddress, null);
+            return CreateUserLink(account?.id, account?.address, shortenAddress, null, includeAccountId);
         }
 
-        public static MarkupString CreateUserLink(string? id, string? address, bool shortenAddress = true, string? ignoreId = null)
+        public static MarkupString CreateUserLink(string? id, string? address, bool shortenAddress = true, string?
+            ignoreId = null, bool includeAccountId = false)
         {
             if (address == null) return new MarkupString();
 
             String link = shortenAddress ? String.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
+            if (includeAccountId)
+                link += $" ({id})";
             if ((id != null) && ((ignoreId == null) || (id != ignoreId)))
             {
                 link = String.Format(@"<a Class=""mud-theme-primary"" href=""account/{0}"">{1}</a>", id, link);
