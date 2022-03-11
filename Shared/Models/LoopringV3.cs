@@ -92,7 +92,7 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
-        public List<AccountBalance>? balances { get; set; }
+        public List<AccountTokenBalance>? balances { get; set; }
         public Transaction? createdAtTransaction { get; set; }
     }
     public class Pool : Account
@@ -117,7 +117,7 @@ namespace Lexplorer.Models
         public string? symbol { get; set; }
     }
 
-    public class AccountBalance
+    public class AccountTokenBalance
     {
         public Double balance { get; set; }
         public string? id { get; set; }
@@ -163,7 +163,7 @@ namespace Lexplorer.Models
         public string? typeName { get; set; }
         public string? data { get; set; }
         public BlockDetail? block { get; set; }
-        public List<AccountBalance>? tokenBalances { get; set; }
+        public List<AccountTokenBalance>? tokenBalances { get; set; }
         public List<Account>? accounts { get; set; }
         public string? verifiedAt
         {

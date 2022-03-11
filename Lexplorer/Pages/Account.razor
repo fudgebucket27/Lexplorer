@@ -44,8 +44,8 @@
                 <MudText Typo="Typo.h6">Token balances</MudText>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<AccountBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
+                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>

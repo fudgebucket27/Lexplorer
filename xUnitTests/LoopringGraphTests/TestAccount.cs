@@ -34,7 +34,7 @@ namespace xUnitTests.LoopringGraphTests
         [Fact]
         public async void GetAccountBalances()
         {
-            List<AccountBalance>? balances = await service.GetAccountBalance(fixture.testAccountId);
+            List<AccountTokenBalance>? balances = await service.GetAccountBalance(fixture.testAccountId);
 
             Assert.NotEmpty(balances);
 

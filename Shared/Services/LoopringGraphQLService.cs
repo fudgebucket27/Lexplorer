@@ -507,7 +507,7 @@ namespace Lexplorer.Services
             }
 
         }
-        public async Task<List<AccountBalance>?> GetAccountBalance(string accountId)
+        public async Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId)
         {
             var balanceQuery = @"
             query accountBalances(
@@ -545,11 +545,11 @@ namespace Lexplorer.Services
             {
                 JObject jresponse = JObject.Parse(response.Content!);
                 IList<JToken> balanceTokens = jresponse["data"]!["account"]!["balances"]!.Children().ToList();
-                List<AccountBalance> balances = new List<AccountBalance>();
+                List<AccountTokenBalance> balances = new List<AccountTokenBalance>();
                 foreach (JToken result in balanceTokens)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    AccountBalance balance = result.ToObject<AccountBalance>()!;
+                    AccountTokenBalance balance = result.ToObject<AccountTokenBalance>()!;
                     balances.Add(balance);
                 }
                 return balances;
