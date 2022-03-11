@@ -29,7 +29,7 @@ namespace Lexplorer.Services
 
         protected string? GetExportAmount(double amount, Token? token)
         {
-            return TokenAmountConverter.ToString(amount, token?.decimals ?? 1, 1, "");
+            return TokenAmountConverter.ToDecimal(amount, token?.decimals).ToString("");
         }
 
         protected virtual void DoBuildLine(string? id, string? timestamp, string? type, string? from = null, string? to = null, 
@@ -136,7 +136,7 @@ namespace Lexplorer.Services
         {
             DoBuildLine(accountUpdate.id, accountUpdate.verifiedAt, accountUpdate.typeName, 
                 from: accountUpdate.user?.address, 
-                fee: TokenAmountConverter.ToString(accountUpdate.fee, accountUpdate.feeToken?.decimals ?? 1, 1, ""),
+                fee: GetExportAmount(accountUpdate.fee, accountUpdate.feeToken),
                 feeToken: accountUpdate.feeToken?.symbol);
         }
         private void WriteTransferNFT(TransferNFT transferNFT, string accountIdPerspective, CSVWriteLine writeLine)
@@ -146,7 +146,7 @@ namespace Lexplorer.Services
                 to: transferNFT.toAccount?.address,
                 added: (transferNFT.toAccount?.id == accountIdPerspective) ? transferNFT.amount.ToString() : null,
                 addedToken: (transferNFT.toAccount?.id == accountIdPerspective) ? "NFT" : null,
-                fee: TokenAmountConverter.ToString(transferNFT.fee, transferNFT.feeToken?.decimals ?? 1, 1, ""),
+                fee: GetExportAmount(transferNFT.fee, transferNFT.feeToken),
                 feeToken: transferNFT.feeToken?.symbol,
                 total: (transferNFT.fromAccount?.id == accountIdPerspective) ? transferNFT.amount.ToString() : null,
                 totalToken: (transferNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);

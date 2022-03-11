@@ -14,10 +14,19 @@ namespace Lexplorer.Helpers
             return (decimal)(((decimals ?? 0) > 0) ? balance / Math.Pow(10, (double)decimals!) : balance) * conversionRate;
         }
 
-        public static string ToString(Double? balance, int? decimals, decimal conversionRate = 1, string format = "N2")
+        public static string ToString(Double? balance, int? decimals, decimal conversionRate = 1)
         {
             if (balance == null) return "";
-            return ToDecimal(balance, decimals, conversionRate).ToString(format, Culture);
+
+            decimal floatBalance = ToDecimal(balance, decimals, conversionRate);
+            string format = "";
+            if (decimals != null)
+            {
+                //reduce digits, the larger balance is, i.e. exponent (never reduce digits, if sub zero)
+                int formatDecimals = Math.Max(decimals.Value - Math.Max((int)Math.Log10(Math.Abs((double)floatBalance)), 0), 0);
+                format = $"#,###0.{new string('#', formatDecimals)}";
+            }
+            return floatBalance.ToString(format, Culture);
         }
 
         public static decimal ToDecimalWithExponent(decimal amount, out string exponentPrefix)

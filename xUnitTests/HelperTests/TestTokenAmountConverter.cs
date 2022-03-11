@@ -29,22 +29,22 @@ namespace xUnitTests.HelperTests
         [Fact]
         public void TestConvertSimple()
         {
-            Assert.Equal("100.00", TokenAmountConverter.ToString(1E5, 3));
+            Assert.Equal("100", TokenAmountConverter.ToString(1E5, 3));
         }
         [Fact]
         public void TestConvertSimpleConversion()
         {
-            Assert.Equal("100.00", TokenAmountConverter.ToString(1E5 * 4, 3, (decimal)1/4));
+            Assert.Equal("100", TokenAmountConverter.ToString(1E5 * 4, 3, (decimal)1/4));
         }
         [Fact]
         public void TestConvertThousandSeparators()
         {
-            Assert.Equal("10,000.00", TokenAmountConverter.ToString(1E5, 1));
+            Assert.Equal("10,000", TokenAmountConverter.ToString(1E5, 1));
         }
         [Fact]
         public void TestConvertCustomFormat()
         {
-            Assert.Equal("1E+07", TokenAmountConverter.ToString(1E8, 1, 1, "G3"));
+            Assert.Equal("1E+07", TokenAmountConverter.ToDecimal(1E8, 1, 1).ToString("G3"));
         }
     }
 
