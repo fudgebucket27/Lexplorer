@@ -350,6 +350,7 @@
               ...NFTFragment
             }
             fee
+            amount
             __typename
           }";
 
