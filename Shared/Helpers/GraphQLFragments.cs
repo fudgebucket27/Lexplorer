@@ -149,6 +149,7 @@
             fillSA
             fillSB
             fillBA
+            fillBB
             protocolFeeA
             protocolFeeB
             feeA

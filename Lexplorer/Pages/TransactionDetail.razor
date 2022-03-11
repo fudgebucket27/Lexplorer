@@ -5,59 +5,67 @@
 @inject IAppCache AppCache;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 
-<PageTitle>The Lexplorer - Transaction #@transactionId </PageTitle>
+<PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 
-<MudText Typo="Typo.h6">Transaction #@transactionId</MudText>
+<MudText Typo="Typo.h6">@(transaction?.typeName ?? "Transaction") #@transactionId</MudText>
 <MudSimpleTable Dense="true">
     <tbody>
         <tr>
             <td>Block #</td>
             <td>@LinkHelper.GetObjectLink(transaction?.block)</td>
+            <td>&nbsp;</td>
         </tr>
         <tr>
             <td>Verified At (UTC)</td>
-            <td>@transaction?.verifiedAt</td>
-        </tr>
-        <tr>
-            <td>Transaction Type</td>
-            <td>@transaction?.typeName</td>
+            <td colspan="2">@transaction?.verifiedAt</td>
         </tr>
         @if (swap != null)
         {
             <tr>
-                <td>User Account</td>
-                <td>@LinkHelper.CreateUserLink(swap.account, false, true)</td>
+                <td> </td>
+                <td>User</td>
+                <td>Pool</td>
             </tr>
             <tr>
-                <td>Swap</td>
-                <td>@TokenAmountConverter.ToString(swap.fillSA, swap.tokenA?.decimals) @swap.tokenA?.symbol @swapSymbol @TokenAmountConverter.ToString(swap.fillSB, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(swap.account, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(swap.pool, false, true)</td>
+            </tr>
+            <tr>
+                <td>Sold</td>
+                <td>@TokenAmountConverter.ToString(swap.fillSA, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
+                <td>@TokenAmountConverter.ToString(swap.fillSB, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+            </tr>
+            <tr>
+                <td>Bought</td>
+                <td>@TokenAmountConverter.ToString(swap.fillBA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+                <td>@TokenAmountConverter.ToString(swap.fillBB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
                 <td>@TokenAmountConverter.ToString(swap.feeA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
-            </tr>
-            <tr>
-                <td>Pool</td>
-                <td>@LinkHelper.CreateUserLink(swap.pool, false, true)</td>
+                <td>@TokenAmountConverter.ToString(swap.feeB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
             </tr>
         }
         @if (transfer != null)
         {
             <tr>
+                <td> </td>
                 <td>From</td>
-                <td>@LinkHelper.CreateUserLink(transfer.fromAccount, false, true)</td>
+                <td>To</td>
             </tr>
             <tr>
-                <td>To</td>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(transfer.fromAccount, false, true)</td>
                 <td>@LinkHelper.CreateUserLink(transfer.toAccount, false, true)</td>
             </tr>
             <tr>
                 <td>Amount</td>
-                <td>@TokenAmountConverter.ToString(transfer.amount, transfer.token?.decimals) @transfer.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(transfer.amount, transfer.token?.decimals) @transfer.token?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
-                <td>@TokenAmountConverter.ToString(transfer.fee, transfer.feeToken?.decimals) @transfer.feeToken?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(transfer.fee, transfer.feeToken?.decimals) @transfer.feeToken?.symbol</td>
             </tr>
         }
         @if (orderBookTrade != null)
@@ -71,11 +79,6 @@
                 <td>Account</td>
                 <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false, true)</td>
                 <td>@LinkHelper.CreateUserLink(orderBookTrade.accountB, false, true)</td>
-            </tr>
-            <tr>
-                <td>Trade</td>
-                <td>@(orderBookTrade.fillAmountBorSA ? "Buy" : "Sell")</td>
-                <td>@(orderBookTrade.fillAmountBorSB ? "Buy" : "Sell")</td>
             </tr>
             <tr>
                 <td>Sold</td>
@@ -97,21 +100,26 @@
                 <td>1 @orderBookTrade.tokenA?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
                 <td>1 @orderBookTrade.tokenB?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
             </tr>
+            <tr>
+                <td>Fill amount</td>
+                <td>@(orderBookTrade.fillAmountBorSA ? "Buy" : "Sell")</td>
+                <td>@(orderBookTrade.fillAmountBorSB ? "Buy" : "Sell")</td>
+            </tr>
         }
         @if (deposit != null)
         {
             <tr>
-                <td>Deposited From</td>
-                <td>@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
+                <td>Deposited to</td>
+                <td colspan="2">@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
             </tr>
             <tr>
                 <td>Amount</td>
-                <td>@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
             </tr>
         }
         <tr>
             <td>Raw Data</td>
-            <td><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
+            <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
         </tr>
     </tbody>
 </MudSimpleTable>
