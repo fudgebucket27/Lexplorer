@@ -71,7 +71,24 @@
         @if (orderBookTrade != null)
         {
             <tr>
-                <td></td>
+                <td>Description</td>
+                <td>
+                    User @LinkHelper.GetObjectLink(orderBookTrade.accountA)
+                    sold @TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                    at @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                    and received @TokenAmountConverter.ToString(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                    @(orderBookTrade.feeA > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals)} {@orderBookTrade.tokenB?.symbol} in fees" : "")
+                </td>
+                <td>
+                    User @LinkHelper.GetObjectLink(orderBookTrade.accountB) sold
+                    @TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                    at @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                    and received @TokenAmountConverter.ToString(orderBookTrade.fillBB - orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                    @(orderBookTrade.feeB > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals)} {@orderBookTrade.tokenA?.symbol} in fees" : "")
+                </td>
+            </tr>
+            <tr>
+                <td>Details</td>
                 <td>A</td>
                 <td>B</td>
             </tr>
