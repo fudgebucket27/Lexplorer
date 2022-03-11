@@ -139,6 +139,24 @@ namespace Lexplorer.Models
     [JsonConverter(typeof(JsonSubtypes), "__typename")]
     public class Transaction
     {
+        public static readonly List<string> typeNames = new List<string> {
+            "Swap",
+            "MintNFT",
+            "OrderbookTrade",
+            "Deposit",
+            "Withdrawal",
+            "WithdrawalNFT",
+            "Transfer",
+            "TransferNFT",
+            "Add",
+            "Remove",
+            "TradeNFT",
+            "SwapNFT",
+            "AccountUpdate",
+            "AmmUpdate",
+            "SignatureVerification",
+            "DataNFT"};
+
         public string? id { get; set; }
         public string? internalID { get; set; }
         [JsonProperty(PropertyName = "__typename")]

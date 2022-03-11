@@ -19,8 +19,10 @@
         <MudSpacer />
         <MudSelect @bind-Value="@filterTransaction" T="string" Label="Filter by type">
             <MudSelectItem Value="@("All")" />
-            <MudSelectItem Value="@("Transfer")" />
-            <MudSelectItem Value="@("Deposit")" />
+            @foreach (var item in Transaction.typeNames)
+            {
+                <MudSelectItem Value="@item" />
+            }
         </MudSelect>
     </ToolBarContent>
     <HeaderContent>
