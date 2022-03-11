@@ -42,46 +42,29 @@ namespace Lexplorer.Services
         private void WriteOrderBookTrade(OrderBookTrade orderBookTrade, string accountIdPerspective, CSVWriteLine writeLine)
         {
             bool areWeAccountA = orderBookTrade.accountA?.id == accountIdPerspective;
-            bool buyOrSellForUs = areWeAccountA ? orderBookTrade.fillAmountBorSA : orderBookTrade.fillAmountBorSB;
             if (areWeAccountA)
             {
-                //for now we're only checking fillAmountBorSA, because we're A, but worst case would be all 4 combinations with fillAmoutBorSB!
-                if (orderBookTrade.fillAmountBorSA)
-                {
-                    throw new InvalidOperationException("OrderBookTrade with fillAmountBorSA = true has no implemented export for now");
-                }
-                else
-                {
-                    DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
-                        from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
-                        added: GetExportAmount(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB), //Amount of token B bought by Account A
-                        addedToken: orderBookTrade.tokenB?.symbol,
-                        fee: GetExportAmount(orderBookTrade.feeA, orderBookTrade.tokenB), //Fee paid by Account A with Token B
-                        feeToken: orderBookTrade.tokenB?.symbol,
-                        total: GetExportAmount(orderBookTrade.fillSA, orderBookTrade.tokenA), //Amount of token A sold by Account A
-                        totalToken: orderBookTrade.tokenA?.symbol
-                        );
-                }
+                DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
+                    from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
+                    added: GetExportAmount(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB), //Amount of token B bought by Account A
+                    addedToken: orderBookTrade.tokenB?.symbol,
+                    fee: GetExportAmount(orderBookTrade.feeA, orderBookTrade.tokenB), //Fee paid by Account A with Token B
+                    feeToken: orderBookTrade.tokenB?.symbol,
+                    total: GetExportAmount(orderBookTrade.fillSA, orderBookTrade.tokenA), //Amount of token A sold by Account A
+                    totalToken: orderBookTrade.tokenA?.symbol
+                    );
             }
             else
             {
-                //for now we're only checking fillAmountBorSB, because we're B, but worst case would be all 4 combinations with fillAmoutBorSA!
-                if (orderBookTrade.fillAmountBorSB)
-                {
-                    throw new InvalidOperationException("OrderBookTrade with fillAmountBorSB = true has no implemented export for now");
-                }
-                else
-                {
-                    DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
-                        from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
-                        added: GetExportAmount(orderBookTrade.fillBB, orderBookTrade.tokenA), //Amount of token A bought by Account B
-                        addedToken: orderBookTrade.tokenA?.symbol,
-                        fee: GetExportAmount(orderBookTrade.feeA, orderBookTrade.tokenB), //doc wrong: Fee paid by Account A with Token B
-                        feeToken: orderBookTrade.tokenB?.symbol,
-                        total: GetExportAmount(orderBookTrade.fillSB, orderBookTrade.tokenB), //Amount of token B sold by Account B
-                        totalToken: orderBookTrade.tokenB?.symbol
-                        );
-                }
+                DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
+                    from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
+                    added: GetExportAmount(orderBookTrade.fillBB, orderBookTrade.tokenA), //Amount of token A bought by Account B
+                    addedToken: orderBookTrade.tokenA?.symbol,
+                    fee: GetExportAmount(orderBookTrade.feeA, orderBookTrade.tokenB), //doc wrong: Fee paid by Account A with Token B
+                    feeToken: orderBookTrade.tokenB?.symbol,
+                    total: GetExportAmount(orderBookTrade.fillSB, orderBookTrade.tokenB), //Amount of token B sold by Account B
+                    totalToken: orderBookTrade.tokenB?.symbol
+                    );
             }
         }
         private void WriteSwap(Swap swap, string accountIdPerspective, CSVWriteLine writeLine)
