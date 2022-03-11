@@ -115,28 +115,6 @@
         </tr>
     </tbody>
 </MudSimpleTable>
-<br/>
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@transaction?.tokenBalances" Hover="true">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Token balances</MudText>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.account?.id ?? String.Empty)">Account</MudTableSortLabel></MudTh>
-        <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token?.name ?? String.Empty)">Token</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance)">Balance</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Account">@LinkHelper.GetObjectLink(context.account) (@context.account?.typeName)</MudTd>
-        <MudTd Style="text-align:right" DataLabel="Token">@context.token?.name</MudTd>
-        <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token?.decimals) @context.token?.symbol</MudTd>
-    </RowTemplate>
-    <PagerContent>
-        @if (transaction?.tokenBalances?.Count > 10)
-        {
-            <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left" />
-        }
-    </PagerContent>
-</MudTable>
 
 @code {
     private Transaction? transaction;

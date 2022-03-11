@@ -24,7 +24,6 @@ namespace xUnitTests.LoopringGraphTests
             Transaction? transaction = await service.GetTransaction(testID);
             Assert.NotNull(transaction);
             Assert.Equal(testID, transaction!.id);
-            Assert.NotNull(transaction.tokenBalances);
         }
     }
 }
