@@ -117,6 +117,21 @@
                 <td colspan="2">@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
             </tr>
         }
+        @if (withdrawal != null)
+        {
+            <tr>
+                <td>Withdrawn from</td>
+                <td colspan="2">@LinkHelper.CreateUserLink(withdrawal.fromAccount, false, true)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@TokenAmountConverter.ToString(withdrawal.amount, withdrawal.token?.decimals) @withdrawal.token?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
+            </tr>
+        }
         <tr>
             <td>Raw Data</td>
             <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
@@ -130,7 +145,7 @@
     private Transfer? transfer { get { return transaction as Transfer; } }
     private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
     private Deposit? deposit { get { return transaction as Deposit; } }
-    private const string swapSymbol = "<>";
+    private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
 
     [Parameter]
     public string transactionId { get; set; } = "";
