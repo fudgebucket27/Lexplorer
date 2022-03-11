@@ -2,53 +2,59 @@
 @using Lexplorer.Models;
 @using System.Globalization;
 
-@switch(TransactionData!.typeName)
+@switch (TransactionData!.typeName)
 {
     case "Deposit":
         <MudTd DataLabel="From Address"></MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(deposit!.amount, deposit!.token!.decimals) @deposit!.token!.symbol</MudTd>
-        <MudTd DataLabel="Fee"></MudTd>
+        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(deposit!.amount, deposit!.token!.decimals) @deposit!.token!.symbol</MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
         break;
     case "Withdrawal":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address"></MudTd>
-        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
-        <MudTd DataLabel="Fee"></MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.fee, withdrawal?.feeToken?.decimals) @withdrawal?.feeToken?.symbol</MudTd>
         break;
     case "OrderbookTrade":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(orderBookTrade!.accountA!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(orderBookTrade!.accountB!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(orderBookTrade!.fillBA, orderBookTrade!.tokenB!.decimals) @orderBookTrade.tokenB.symbol</MudTd>
-        @if(orderBookTrade!.feeA > 0)
+        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(orderBookTrade!.fillBA, orderBookTrade!.tokenB!.decimals) @orderBookTrade.tokenB.symbol</MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(orderBookTrade!.fillSA, orderBookTrade!.tokenA!.decimals) @orderBookTrade.tokenA.symbol</MudTd>
+        @if (orderBookTrade!.feeA > 0)
         {
-            <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(orderBookTrade!.feeA, orderBookTrade.tokenB!.decimals) @orderBookTrade!.tokenB!.symbol</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(orderBookTrade!.feeA, orderBookTrade.tokenB!.decimals) @orderBookTrade!.tokenB!.symbol</MudTd>
         }
-        else if(orderBookTrade!.feeB > 0)
+        else if (orderBookTrade!.feeB > 0)
         {
-            <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(orderBookTrade!.feeB, orderBookTrade.tokenA!.decimals) @orderBookTrade!.tokenA!.symbol</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(orderBookTrade!.feeB, orderBookTrade.tokenA!.decimals) @orderBookTrade!.tokenA!.symbol</MudTd>
         }
         break;
     case "Transfer":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(transfer!.fromAccount!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(transfer!.toAccount!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(transfer!.amount!, transfer.token!.decimals) @transfer!.token!.symbol</MudTd>
-        <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(transfer!.fee!, transfer.feeToken!.decimals) @transfer!.feeToken!.symbol</MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(transfer!.amount!, transfer.token!.decimals) @transfer!.token!.symbol</MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(transfer!.fee!, transfer.feeToken!.decimals) @transfer!.feeToken!.symbol</MudTd>
         break;
     case "Swap":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(swap!.account!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(swap!.pool!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(swap!.fillBA, swap.tokenB!.decimals) @swap.tokenB.symbol</MudTd>
+        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(swap!.fillBA, swap.tokenB!.decimals) @swap.tokenB.symbol</MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(swap!.fillSA, swap.tokenA!.decimals) @swap.tokenA.symbol</MudTd>
         if (swap!.feeA > 0)
         {
-            <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(swap!.feeA, swap.tokenB!.decimals) @swap.tokenB.symbol</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(swap!.feeA, swap.tokenB!.decimals) @swap.tokenB.symbol</MudTd>
         }
         else if (swap.feeB > 0)
         {
-            <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(swap!.feeB, swap.tokenA!.decimals) @swap.tokenA.symbol</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(swap!.feeB, swap.tokenA!.decimals) @swap.tokenA.symbol</MudTd>
         }
         break;
     default:
+        <MudTd></MudTd>
         <MudTd></MudTd>
         <MudTd></MudTd>
         <MudTd></MudTd>
