@@ -149,6 +149,31 @@
                 <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
             </tr>
         }
+        @if (mintNFT != null)
+        {
+            <tr>
+                <td> </td>
+                <td>Minter</td>
+                <td>Receiver</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(mintNFT.minter, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(mintNFT.receiver, false, true)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@mintNFT.amount.ToString() NFT</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(mintNFT.fee, mintNFT.feeToken?.decimals) @mintNFT.feeToken?.symbol</td>
+            </tr>
+            <tr>
+                <td>NFT type @mintNFT.nft?.nftType</td>
+                <td colspan="2">@mintNFT.nft?.id</td>
+            </tr>
+        }
         @if (transferNFT != null)
         {
             <tr>
@@ -191,6 +216,7 @@
     private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
     private Deposit? deposit { get { return transaction as Deposit; } }
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
+    private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
 
     [Parameter]

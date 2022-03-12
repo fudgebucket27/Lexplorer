@@ -76,6 +76,13 @@
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(swap?.feeA, swap?.tokenB?.decimals) @swap?.tokenB?.symbol</MudTd>
         }
         break;
+    case "MintNFT":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(mintNFT?.minter, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(mintNFT?.receiver, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="Bought" Style="text-align:right">@mintNFT?.amount.ToString() NFT</MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(mintNFT?.fee, mintNFT?.feeToken?.decimals) @mintNFT?.feeToken?.symbol</MudTd>
+        break;
     case "TransferNFT":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(transferNFT?.fromAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(transferNFT?.toAccount, ignoreUserIDForLink)</MudTd>
@@ -110,6 +117,7 @@
     public Transfer? transfer { get { return TransactionData as Transfer; } }
     public Deposit? deposit { get { return TransactionData as Deposit; } }
     public Withdrawal? withdrawal { get { return TransactionData as Withdrawal; } }
+    public MintNFT? mintNFT { get { return TransactionData as MintNFT; } }
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }

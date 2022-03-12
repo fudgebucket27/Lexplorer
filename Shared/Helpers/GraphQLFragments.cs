@@ -366,7 +366,7 @@
               id
             }
             nft {
-              id
+              ...NFTFragment
             }
             fee
             feeToken {
