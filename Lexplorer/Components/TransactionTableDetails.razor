@@ -100,6 +100,13 @@
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(transferNFT?.fee, transferNFT?.feeToken?.decimals) @transferNFT?.feeToken?.symbol</MudTd>
         }
         break;
+    case "WithdrawalNFT":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawalNFT?.fromAccount, ignoreUserIDForLink)</MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@withdrawalNFT?.amount.ToString() NFT</MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawalNFT?.fee, withdrawalNFT?.feeToken?.decimals) @withdrawalNFT?.feeToken?.symbol</MudTd>
+        break;
     default:
         <MudTd></MudTd>
         <MudTd></MudTd>
@@ -119,6 +126,8 @@
     public Withdrawal? withdrawal { get { return TransactionData as Withdrawal; } }
     public MintNFT? mintNFT { get { return TransactionData as MintNFT; } }
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }
+    public WithdrawalNFT? withdrawalNFT { get { return TransactionData as WithdrawalNFT; } }
+
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }
 }

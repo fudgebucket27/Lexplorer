@@ -332,6 +332,8 @@
             nfts {
               ...NFTFragment
             }
+            amount
+            valid
             __typename
           }";
 

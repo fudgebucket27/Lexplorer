@@ -202,6 +202,34 @@
                 </tr>
             }
         }
+        @if (withdrawalNFT != null)
+        {
+            <tr>
+                <td> </td>
+                <td>From</td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(withdrawalNFT.fromAccount, false, true)</td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@withdrawalNFT.amount.ToString() NFT</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(withdrawalNFT.fee, withdrawalNFT.feeToken?.decimals) @withdrawalNFT.feeToken?.symbol</td>
+            </tr>
+            @foreach ((NonFungibleToken nft, int index) in withdrawalNFT.nfts?.WithIndex()!)
+            {
+                <tr>
+                    <td>NFT @(index + 1) type @nft.nftType</td>
+                    <td colspan="2">@nft.id</td>
+                </tr>
+            }
+        }
         <tr>
             <td>Raw Data</td>
             <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
@@ -218,6 +246,7 @@
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
     private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
+    public WithdrawalNFT? withdrawalNFT { get { return transaction as WithdrawalNFT; } }
 
     [Parameter]
     public string transactionId { get; set; } = "";

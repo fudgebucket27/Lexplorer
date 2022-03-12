@@ -333,7 +333,8 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public string? extraData { get; set; }
     }
-    public class WithDrawalNFT : TransactionNFT
+
+    public class WithdrawalNFT : TransactionNFT
     {
         public Account? fromAccount { get; set; }
         public AccountNFTSlot? slot { get; set; }
@@ -342,6 +343,7 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public Double fee { get; set; }
     }
+
     public class TransferNFT : TransactionNFT
     {
         public Account? fromAccount { get; set; }
@@ -352,6 +354,7 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public Double fee { get; set; }
     }
+
     public class TradeNFT : TransactionNFT
     {
         public Account? accountSeller { get; set; }
