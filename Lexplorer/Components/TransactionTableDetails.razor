@@ -6,7 +6,7 @@
 @switch (TransactionData?.typeName)
 {
     case "Deposit":
-        <MudTd DataLabel="From Address"><L1AccountLink address="@deposit?.toAccount?.address"/></MudTd>
+        <MudTd DataLabel="From Address"><L1AccountLink address="@deposit?.toAccount?.address" /></MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(deposit?.amount, deposit?.token?.decimals) @deposit?.token?.symbol</MudTd>
         <MudTd></MudTd>
@@ -108,6 +108,22 @@
         <MudTd DataLabel="Sold" Style="text-align:right">@withdrawalNFT?.amount.ToString() NFT</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawalNFT?.fee, withdrawalNFT?.feeToken?.decimals) @withdrawalNFT?.feeToken?.symbol</MudTd>
         break;
+    case "TradeNFT":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(tradeNFT?.accountSeller, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(tradeNFT?.accountBuyer, ignoreUserIDForLink)</MudTd>
+        @if (ignoreUserIDForLink == tradeNFT?.accountBuyer?.id)
+        {
+            <MudTd DataLabel="Bought" Style="text-align:right">@tradeNFT?.fillBB.ToString() NFT</MudTd>
+            <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeBuyer, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
+            <MudTd DataLabel="Sold" Style="text-align:right">@tradeNFT?.fillSA.ToString() NFT</MudTd>
+            <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeSeller, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
+        }
+        break;
     default:
         <MudTd></MudTd>
         <MudTd></MudTd>
@@ -128,6 +144,7 @@
     public MintNFT? mintNFT { get { return TransactionData as MintNFT; } }
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return TransactionData as WithdrawalNFT; } }
+    public TradeNFT? tradeNFT { get { return TransactionData as TradeNFT; } }
 
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }

@@ -242,6 +242,58 @@
                 </tr>
             }
         }
+        @if (tradeNFT != null)
+        {
+            <tr>
+                <td>Description</td>
+                <td>
+                    User @LinkHelper.GetObjectLink(tradeNFT.accountBuyer)
+                    bought @tradeNFT.fillBB.ToString() NFT
+                    at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and paid @TokenAmountConverter.ToString(tradeNFT.fillSB + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    @(tradeNFT.feeBuyer > 0 ? $" including {@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} fees" : "")
+                </td>
+                <td>
+                    User @LinkHelper.GetObjectLink(tradeNFT.accountSeller)
+                    sold @tradeNFT.fillSA.ToString() NFT
+                    at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and received @TokenAmountConverter.ToString(tradeNFT.fillBA - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    @(tradeNFT.feeSeller > 0 ? $" paying {@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} in fees" : "")
+                </td>
+            </tr>
+            <tr>
+                <td>Details</td>
+                <td>Buyer</td>
+                <td>Seller</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(tradeNFT.accountBuyer, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(tradeNFT.accountSeller, false, true)</td>
+            </tr>
+            <tr>
+                <td>Bought</td>
+                <td>@tradeNFT.fillBB.ToString() NFT</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.fillBA, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+            </tr>
+            <tr>
+                <td>Sold</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.fillSB, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@tradeNFT.fillSA.ToString() NFT</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+            </tr>
+            @foreach ((NonFungibleToken nft, int index) in tradeNFT.nfts?.WithIndex()!)
+            {
+                <tr>
+                    <td>NFT @(index + 1) type @nft.nftType</td>
+                    <td colspan="2">@nft.id</td>
+                </tr>
+            }
+        }
         <tr>
             <td>Raw Data</td>
             <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
@@ -259,6 +311,7 @@
     private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return transaction as WithdrawalNFT; } }
+    public TradeNFT? tradeNFT { get { return transaction as TradeNFT; } }
 
     [Parameter]
     public string transactionId { get; set; } = "";

@@ -302,6 +302,11 @@
             }
             realizedNFTPrice
             feeBuyer
+            feeSeller
+            fillSA
+            fillBA
+            fillSB
+            fillBB
             protocolFeeBuyer
             __typename
           }";
