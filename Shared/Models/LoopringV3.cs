@@ -3,11 +3,22 @@ using Lexplorer.Helpers;
 using JsonSubTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 //source: https://thegraph.com/hosted-service/subgraph/loopring/loopring
 
 namespace Lexplorer.Models
 {
+    public static class EnumerableExtension
+    {
+        //extension to get index with foreach
+        //https://thomaslevesque.com/2019/11/18/using-foreach-with-index-in-c/
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source)
+        {
+            return source.Select((item, index) => (item, index));
+        }
+    }
+
     public class BlockDetail
     {
         [JsonProperty("__typename")]
@@ -289,6 +300,7 @@ namespace Lexplorer.Models
         public Account? minter { get; set; }
         public string? token { get; set; }
         public string? nftID { get; set; }
+        public int nftType { get; set; }
         public List<AccountNFTSlot>? slots { get; set; }
         public List<TransactionNFT>? transactions { get; set; }
     }

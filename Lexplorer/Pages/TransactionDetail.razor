@@ -149,6 +149,34 @@
                 <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
             </tr>
         }
+        @if (transferNFT != null)
+        {
+            <tr>
+                <td> </td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(transferNFT.fromAccount, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(transferNFT.toAccount, false, true)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@transferNFT.amount.ToString() NFT</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(transferNFT.fee, transferNFT.feeToken?.decimals) @transferNFT.feeToken?.symbol</td>
+            </tr>
+            @foreach ((NonFungibleToken nft, int index) in transferNFT.nfts?.WithIndex()!)
+            {
+                <tr>
+                    <td>NFT @(index + 1) type @nft.nftType</td>
+                    <td colspan="2">@nft.id</td>
+                </tr>
+            }
+        }
         <tr>
             <td>Raw Data</td>
             <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
@@ -163,6 +191,7 @@
     private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
     private Deposit? deposit { get { return transaction as Deposit; } }
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
+    private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
 
     [Parameter]
     public string transactionId { get; set; } = "";
