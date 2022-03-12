@@ -1,6 +1,7 @@
 ﻿@page "/blocks"
 @using Lexplorer.Models
 @using Lexplorer.Helpers
+@using Lexplorer.Components
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 
@@ -19,8 +20,8 @@
                     <MudTh>Verified At(UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash!.Substring(0,15)...</a></MudTd>
+                    <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id">@context.id</a></MudTd>
+                    <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
                     <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
                     <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
                 </RowTemplate>

@@ -1,11 +1,12 @@
 ﻿@using Lexplorer.Helpers;
 @using Lexplorer.Models;
+@using Lexplorer.Components;
 @using System.Globalization;
 
 @switch (TransactionData?.typeName)
 {
     case "Deposit":
-        <MudTd DataLabel="From Address"></MudTd>
+        <MudTd DataLabel="From Address"><L1AccountLink address="@deposit?.toAccount?.address"/></MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(deposit?.amount, deposit?.token?.decimals) @deposit?.token?.symbol</MudTd>
         <MudTd></MudTd>
@@ -13,7 +14,7 @@
         break;
     case "Withdrawal":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="To Address"></MudTd>
+        <MudTd DataLabel="To Address"><L1AccountLink address="@withdrawal?.fromAccount?.address" /></MudTd>
         <MudTd></MudTd>
         <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.fee, withdrawal?.feeToken?.decimals) @withdrawal?.feeToken?.symbol</MudTd>
@@ -102,7 +103,7 @@
         break;
     case "WithdrawalNFT":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawalNFT?.fromAccount, ignoreUserIDForLink)</MudTd>
-        <MudTd></MudTd>
+        <MudTd DataLabel="To Address"><L1AccountLink address="@withdrawalNFT?.fromAccount?.address" /></MudTd>
         <MudTd></MudTd>
         <MudTd DataLabel="Sold" Style="text-align:right">@withdrawalNFT?.amount.ToString() NFT</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawalNFT?.fee, withdrawalNFT?.feeToken?.decimals) @withdrawalNFT?.feeToken?.symbol</MudTd>

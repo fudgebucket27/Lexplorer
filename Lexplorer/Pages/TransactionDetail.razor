@@ -126,8 +126,14 @@
         @if (deposit != null)
         {
             <tr>
-                <td>Deposited to</td>
-                <td colspan="2">@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
+                <td> </td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td><L1AccountLink address="@deposit.toAccount?.address" shortenAddress="false" /></td>
+                <td>@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
             </tr>
             <tr>
                 <td>Amount</td>
@@ -137,8 +143,14 @@
         @if (withdrawal != null)
         {
             <tr>
-                <td>Withdrawn from</td>
-                <td colspan="2">@LinkHelper.CreateUserLink(withdrawal.fromAccount, false, true)</td>
+                <td> </td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(withdrawal.fromAccount, false, true)</td>
+                <td><L1AccountLink address="@withdrawal.fromAccount?.address" shortenAddress="false" /></td>
             </tr>
             <tr>
                 <td>Amount</td>
@@ -207,12 +219,12 @@
             <tr>
                 <td> </td>
                 <td>From</td>
-                <td> </td>
+                <td>To</td>
             </tr>
             <tr>
                 <td>Account</td>
                 <td>@LinkHelper.CreateUserLink(withdrawalNFT.fromAccount, false, true)</td>
-                <td> </td>
+                <td><L1AccountLink address="@withdrawalNFT.fromAccount?.address" shortenAddress="false" /></td>
             </tr>
             <tr>
                 <td>Amount</td>

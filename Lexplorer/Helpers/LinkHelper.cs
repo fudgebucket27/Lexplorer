@@ -41,6 +41,7 @@
             else
                 return null;
         }
+
         public static MarkupString GetObjectLink(object? linkedObject)
         {
             Tuple<string, string>? adr = GetObjectLinkAddress(linkedObject);

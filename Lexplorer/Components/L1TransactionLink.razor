@@ -1,0 +1,23 @@
+﻿<a Class="mud-theme-primary" href="@LinkURL" target="_blank">
+    @DisplayText
+</a>
+<MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to etherscan.io" Size="Size.Small"/>
+
+
+@code {
+    [Parameter]
+    public string? txHash { get; set; }
+
+    [Parameter]
+    public Boolean shortenHash { get; set; } = true;
+
+    private string LinkURL { get { return $"https://etherscan.io/tx/{txHash}"; } }
+    private string? DisplayText
+    {
+        get
+        {
+            return shortenHash ? String.Format("{0}...{1}", txHash?.Substring(0, 5), txHash?.Substring(txHash.Length - 6, 6)) : txHash;
+        }
+    }
+}
+
