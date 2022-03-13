@@ -16,7 +16,7 @@
     {
         get
         {
-            return shortenAddress ? String.Format("{0}...{1}", address?.Substring(0, 5), address?.Substring(address.Length - 6, 6)) : address;
+            return (shortenAddress) && (address?.Length > 6) ? String.Format("{0}...{1}", address?.Substring(0, 5), address?.Substring(address.Length - 6, 6)) : address;
         }
     }
 }

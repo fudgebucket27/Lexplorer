@@ -16,7 +16,7 @@
     {
         get
         {
-            return shortenHash ? String.Format("{0}...{1}", txHash?.Substring(0, 5), txHash?.Substring(txHash.Length - 6, 6)) : txHash;
+            return (shortenHash && (txHash?.Length > 6) )? String.Format("{0}...{1}", txHash?.Substring(0, 5), txHash?.Substring(txHash.Length - 6, 6)) : txHash;
         }
     }
 }

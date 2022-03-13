@@ -19,7 +19,7 @@
         {
             if (address == null) return new MarkupString();
 
-            String link = shortenAddress ? String.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
+            String link = (shortenAddress && (address.Length > 6)) ? String.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
             if (includeAccountId)
                 link += $" ({id})";
             if ((id != null) && ((ignoreId == null) || (id != ignoreId)))
