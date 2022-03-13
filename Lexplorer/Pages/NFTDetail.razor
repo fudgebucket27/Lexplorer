@@ -1,0 +1,121 @@
+﻿@page "/nfts/{nftId}"
+@using Lexplorer.Components;
+@using Lexplorer.Helpers;
+@using Lexplorer.Models;
+@inject IAppCache AppCache;
+@inject NavigationManager NavigationManager;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+
+<PageTitle>The Lexplorer - NFT) #@nft?.nftID </PageTitle>
+
+<MudSimpleTable Dense="true" Striped="true" Bordered="true">
+    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+        <MudText Typo="Typo.h6">NFT #@nft?.nftID</MudText>
+    </div>
+    <tbody>
+        <tr>
+            <td>Minter</td>
+            <td>@LinkHelper.CreateUserLink(nft?.minter, false, true) </td>
+        </tr>
+        <tr>
+            <td>Minted at</td>
+            <td>@LinkHelper.GetObjectLink(nft?.mintedAtTransaction) </td>
+        </tr>
+        <tr>
+            <td>Token address</td>
+            <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
+        </tr>
+    </tbody>
+</MudSimpleTable>
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Transactions</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Tx Id</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>From</MudTh>
+        <MudTh>To</MudTh>
+        <MudTh Style="text-align:right">Bought</MudTh>
+        <MudTh Style="text-align:right">Sold</MudTh>
+        <MudTh Style="text-align:right">Fee</MudTh>
+        <MudTh>Verified At (UTC)</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+        <MudTd DataLabel="Type">@context.typeName</MudTd>
+        <TransactionTableDetails TransactionData=@context />
+        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<br />
+
+
+@code {
+    [Parameter]
+    public string nftId { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    private NonFungibleToken? nft;
+    private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
+    public bool isLoading = true;
+    public readonly int pageSize = 25;
+
+    public int gotoPage
+    {
+        get
+        {
+            return Int32.Parse(pageNumber ?? "1");
+        }
+        set
+        {
+            string URL = $"/nfts/{nftId}?pageNumber={value}";
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        if (nft != null && nft.id != nftId) //did we change to another NFT?
+        {
+            nft = null;
+            transactions = new List<Transaction>();
+            pageNumber = "1";
+            StateHasChanged();
+        }
+        if (nftId == null) return;
+        if (nft == null)
+        {
+            string nftCacheKey = $"nft-{nftId}";
+            nft = await AppCache.GetOrAddAsync(nftCacheKey, async () => await LoopringGraphQLService.GetNFT(nftId));
+            if (nft == null) return;
+            StateHasChanged();
+        }
+        if (String.IsNullOrEmpty(pageNumber))
+        {
+            pageNumber = "1";
+        }
+
+        string nftTransactionCacheKey = $"nft{nftId}-transactions-page{pageNumber}";
+        transactions = await AppCache.GetOrAddAsync(nftTransactionCacheKey,
+            async () => await LoopringGraphQLService.GetNFTTransactions((gotoPage - 1) * pageSize, pageSize, nftId),
+            DateTimeOffset.UtcNow.AddMinutes(10));
+        isLoading = false;
+        StateHasChanged();
+    }
+
+}
+

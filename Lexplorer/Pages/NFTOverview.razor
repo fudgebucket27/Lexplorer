@@ -1,0 +1,79 @@
+﻿@page "/nfts"
+@using Lexplorer.Models
+@using Lexplorer.Helpers
+@using Lexplorer.Components
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject NavigationManager NavigationManager;
+@inject IAppCache AppCache;
+
+<PageTitle>The Lexplorer - NFTs</PageTitle>
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@nfts" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Latest NFTs</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(nfts?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>NFT</MudTh>
+        <MudTh>Minted At</MudTh>
+        <MudTh>Minted By</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="NFT">@LinkHelper.GetObjectLink(context)</MudTd>
+        <MudTd DataLabel="MintedAt">@LinkHelper.GetObjectLink(context.mintedAtTransaction)</MudTd>
+        <MudTd DataLabel="MintedBy">@LinkHelper.GetObjectLink(context.mintedAtTransaction?.minter)</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    public int gotoPage
+    {
+        get
+        {
+            return Int32.Parse(pageNumber ?? "1");
+        }
+        set
+        {
+            navigateTo(value);
+        }
+    }
+
+    public bool isLoading = true;
+    public readonly int pageSize = 25;
+
+    private IList<NonFungibleToken>? nfts { get; set; } = new List<NonFungibleToken>();
+
+    private void navigateTo(int page)
+    {
+        string URL = $"/nfts?pageNumber={page}";
+        NavigationManager.NavigateTo(URL);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+
+        if (String.IsNullOrEmpty(pageNumber))
+        {
+            pageNumber = "1";
+        }
+
+        string nftsCacheKey = $"nfts-page{pageNumber}";
+        nfts = await AppCache.GetOrAddAsync(nftsCacheKey,
+            async () => await LoopringGraphQLService.GetNFTs((gotoPage - 1) * pageSize, pageSize),
+            DateTimeOffset.UtcNow.AddMinutes(10));
+        isLoading = false;
+        StateHasChanged();
+    }
+
+}
+

@@ -240,7 +240,7 @@
             </tr>
             <tr>
                 <td>NFT type @mintNFT.nft?.nftType</td>
-                <td colspan="2">@mintNFT.nft?.id</td>
+                <td colspan="2">@LinkHelper.GetObjectLink(@mintNFT.nft)</td>
             </tr>
         }
         @if (transferNFT != null)
@@ -267,7 +267,7 @@
             {
                 <tr>
                     <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@nft.id</td>
+                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
                 </tr>
             }
         }
@@ -295,7 +295,7 @@
             {
                 <tr>
                     <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@nft.id</td>
+                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
                 </tr>
             }
         }
@@ -347,7 +347,7 @@
             {
                 <tr>
                     <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@nft.id</td>
+                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
                 </tr>
             }
         }

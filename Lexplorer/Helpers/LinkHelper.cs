@@ -38,6 +38,9 @@
             else if (linkedObject is Transaction)
                 return new Tuple<string, string>($"transactions/{((Transaction)linkedObject).id}", 
                     ((Transaction)linkedObject).id ?? "");
+            else if (linkedObject is NonFungibleToken)
+                return new Tuple<string, string>($"nfts/{((NonFungibleToken)linkedObject).id}",
+                    ((NonFungibleToken)linkedObject).nftID ?? "");
             else
                 return null;
         }
