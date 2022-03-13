@@ -22,7 +22,7 @@ namespace xUnitTests.LoopringGraphTests
         public void TestExport(JArray transactionsJArray)
         {
             IList<Transaction> transactions = transactionsJArray.ToObject<IList<Transaction>>()!;
-            TranscationExportDefaultCSVFormat exporter = new TranscationExportDefaultCSVFormat();
+            TransactionExportDefaultCSVFormat exporter = new TransactionExportDefaultCSVFormat();
             foreach (Transaction transaction in transactions)
             {
                 exporter.WriteTransaction(transaction, fixture.testAccountId, (string line) =>

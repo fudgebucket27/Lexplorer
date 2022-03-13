@@ -151,7 +151,14 @@ namespace Lexplorer.Models
             {
                 if (block == null) return string.Empty;
 
-                return TimestampToUTCConverter.Convert(block.timestamp);
+                return TimestampConverter.ToUTCString(block.timestamp);
+            }
+        }
+        public DateTime? verifiedAtDateTime
+        {
+            get
+            {
+                return TimestampConverter.ToUTCDateTime(block?.timestamp);
             }
         }
     }
@@ -295,8 +302,8 @@ namespace Lexplorer.Models
         public AccountNFTSlot? slot { get; set; }
         public Token? feeToken { get; set; }
         public Boolean valid { get; set; }
-        public Double? amount { get; set; }
-        public Double? fee { get; set; }
+        public Double amount { get; set; }
+        public Double fee { get; set; }
     }
     public class TransferNFT : TransactionNFT
     {
@@ -305,8 +312,8 @@ namespace Lexplorer.Models
         public AccountNFTSlot? fromSlot { get; set; }
         public AccountNFTSlot? toSlot { get; set; }
         public Token? feeToken { get; set; }
-        public Double? amount { get; set; }
-        public Double? fee { get; set; }
+        public Double amount { get; set; }
+        public Double fee { get; set; }
     }
     public class TradeNFT : TransactionNFT
     {

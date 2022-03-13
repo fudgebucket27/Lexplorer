@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using RestSharp.Serializers;
 
 namespace Lexplorer.Services
 {
@@ -24,7 +25,8 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<Blocks?> GetBlocks(int skip, int first)
+        public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID", 
+            string orderDirection = "desc", string? blockTimestamp = null, Boolean gte = true)
         {
             var blocksQuery = @"
             query blocks(
@@ -32,6 +34,7 @@ namespace Lexplorer.Services
                 $first: Int
                 $orderBy: Block_orderBy
                 $orderDirection: OrderDirection
+                $where: Block_filter
               ) {
                 proxy(id: 0) {
                   blockCount
@@ -42,6 +45,7 @@ namespace Lexplorer.Services
                   first: $first
                   orderBy: $orderBy
                   orderDirection: $orderDirection
+                  where: $where
                 ) {
                   ...BlockFragment
                   transactionCount
@@ -53,20 +57,97 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(new
+            JObject jObject = JObject.FromObject(new
             {
                 query = blocksQuery,
                 variables = new
                 {
                     skip = skip,
                     first = first,
-                    orderBy = "internalID",
-                    orderDirection = "desc"
+                    orderBy = orderBy,
+                    orderDirection = orderDirection,
+                    where = new
+                    {
+                    }
                 }
             });
-            var response = await _client.PostAsync(request);
-            var data = JsonConvert.DeserializeObject<Blocks>(response.Content!);
-            return data;
+            if (blockTimestamp != null)
+            {
+                JObject where = (jObject["variables"]!["where"] as JObject)!;
+                where.Add(gte
+                    ? new JProperty("timestamp_gte", blockTimestamp)
+                    : new JProperty("timestamp_lte", blockTimestamp));
+            }
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Blocks>(response.Content!);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Tuple<Double, Double>?> GetBlockDateRange(DateTime startDateUTC, DateTime endDateUTC)
+        {
+            var blockQuery = @"
+            query swap (
+              $timeStampgte: BigInt
+              $timeStamplte: BigInt
+              )
+              {
+                firstblock:blocks (first: 1,
+                  orderBy: internalID
+                  orderDirection: asc
+                  where: {
+                    timestamp_gte: $timeStampgte
+                })
+                 {
+                  id
+                  timestamp
+                  }
+                lastblock:blocks (first: 1,
+                  orderBy: internalID
+                  orderDirection: desc
+                  where: {
+                    timestamp_lte: $timeStamplte
+                })
+                 {
+                  id
+                  timestamp
+                  }
+                }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = blockQuery,
+                variables = new
+                {
+                    timeStampgte = TimestampConverter.ToTimeStamp(startDateUTC),
+                    timeStamplte = TimestampConverter.ToTimeStamp(endDateUTC)
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JToken token = JToken.Parse(response.Content!);
+                return new Tuple<Double, Double>(
+                    (double)token["data"]!["firstblock"]![0]!["id"]!,
+                    (double)token["data"]!["lastblock"]![0]!["id"]!);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+
         }
 
         public async Task<Block?> GetBlockDetails(int blockId)
@@ -464,7 +545,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
-            DateTime? startDate = null, DateTime? endDate = null)
+            Double? firstBlockId = null, Double? lastBlockId = null)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -483,12 +564,11 @@ namespace Lexplorer.Services
                     first: $first
                     orderBy: $orderBy
                     orderDirection: $orderDirection
+                    where: $where
                   ) {
                     id
                     __typename
-                    block (
-                      where: $where
-                    ) {
+                    block {
                       id
                       blockHash
                       timestamp
@@ -539,45 +619,28 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            /*if ((startDate != null) && (endDate != null))
+            JObject jObject = JObject.FromObject(new
             {
-                Int64 startDateUx = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
-                Int64 endDateUx = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
-                request.AddJsonBody(new
+                query = accountQuery,
+                variables = new
                 {
-                    query = accountQuery,
-                    variables = new
+                    skip = skip,
+                    first = first,
+                    accountId = int.Parse(accountId),
+                    orderBy = "internalID",
+                    orderDirection = "desc",
+                    where = new
                     {
-                        skip = skip,
-                        first = first,
-                        accountId = int.Parse(accountId),
-                        orderBy = "internalID",
-                        orderDirection = "desc",
-                        where = new
-                        { 
-                            startDateUx = startDateUx, 
-                            endDateUx = endDateUx 
-                        },
-                        //todo: add where but how?
-                        //account.transaction.block.timestamp
-                    }
-                });
-            }
-            else*/
+                    },
+                }
+            });
+            if (firstBlockId.HasValue && lastBlockId.HasValue)
             {
-                request.AddJsonBody(new
-                {
-                    query = accountQuery,
-                    variables = new
-                    {
-                        skip = skip,
-                        first = first,
-                        accountId = int.Parse(accountId),
-                        orderBy = "internalID",
-                        orderDirection = "desc"
-                    }
-                });
+                JObject where = (jObject["variables"]!["where"] as JObject)!;
+                where.Add(new JProperty("block_gte", firstBlockId.ToString()));
+                where.Add(new JProperty("block_lte", lastBlockId.ToString()));
             }
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
                 var response = await _client.PostAsync(request);
@@ -591,11 +654,11 @@ namespace Lexplorer.Services
         }
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
-            DateTime? startDate = null, DateTime? endDate = null)
+            Double? firstBlockId = null, Double? lastBlockId = null)
         { 
             try
             {
-                string? response = await GetAccountTransactionsResponse(skip, first, accountId, startDate, endDate);
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
                 return token!.ToObject<IList<Transaction>>(); 

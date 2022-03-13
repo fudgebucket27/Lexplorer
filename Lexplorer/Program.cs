@@ -15,6 +15,11 @@ builder.Services.AddSingleton<UniswapGraphQLService>();
 builder.Services.AddSingleton<TransactionExportService>();
 builder.Services.AddLazyCache();
 
+//registration of CSV export formats, no automatic registration possible
+//out of the box and extra framework seems overkill
+TransactionExportService.RegisterExportService("Default", new TransactionExportDefaultCSVFormat());
+TransactionExportService.RegisterExportService("Cointracking", new TransactionExportCointracking());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
