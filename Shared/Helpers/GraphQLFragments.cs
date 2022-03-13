@@ -267,13 +267,6 @@
             tokenWeight
             nonce
             balance
-            tokenBalances {
-              id
-              balance
-              token {
-                ...TokenFragment
-              }
-            }
             __typename
           }";
 

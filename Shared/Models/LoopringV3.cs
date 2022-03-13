@@ -283,6 +283,13 @@ namespace Lexplorer.Models
         public Double fee { get; set; }
         public Double amount { get; set; }
     }
+    public class AmmUpdate : Transaction
+    {
+        public Pool? pool { get; set; }
+        public Double tokenWeight { get; set; }
+        public String? tokenID { get; set; }
+        public Double balance { get; set; }
+    }
     public class AccountUpdate : Transaction
     {
         public User? user { get; set; }

@@ -161,6 +161,63 @@
                 <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
             </tr>
         }
+        @if (add != null)
+        {
+            <tr>
+                <td> </td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(add.account, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(add.pool, false, true)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@TokenAmountConverter.ToString(add.amount, add.token?.decimals) @add.token?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(add.fee, add.feeToken?.decimals) @add.feeToken?.symbol</td>
+            </tr>
+        }
+        @if (remove != null)
+        {
+            <tr>
+                <td> </td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+            <tr>
+                <td>Account</td>
+                <td>@LinkHelper.CreateUserLink(remove.pool, false, true)</td>
+                <td>@LinkHelper.CreateUserLink(remove.account, false, true)</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, remove.token?.decimals) @remove.token?.symbol</td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td colspan="2">@TokenAmountConverter.ToString(remove.fee, remove.feeToken?.decimals) @remove.feeToken?.symbol</td>
+            </tr>
+        }
+        @if (ammUpdate != null)
+        {
+            <tr>
+                <td>Pool</td>
+                <td colspan="2">@LinkHelper.CreateUserLink(ammUpdate.pool, false, true)</td>
+            </tr>
+            <tr>
+                <td>Balance</td>
+                <td colspan="2">@ammUpdate.balance</td>
+            </tr>
+            <tr>
+                <td>Token weight</td>
+                <td colspan="2">@ammUpdate.tokenWeight</td>
+            </tr>
+        }
         @if (mintNFT != null)
         {
             <tr>
@@ -308,6 +365,9 @@
     private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
     private Deposit? deposit { get { return transaction as Deposit; } }
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
+    private Add? add { get { return transaction as Add; } }
+    private Remove? remove { get { return transaction as Remove; } }
+    private AmmUpdate? ammUpdate { get { return transaction as AmmUpdate; } }
     private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return transaction as WithdrawalNFT; } }

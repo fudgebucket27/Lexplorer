@@ -124,6 +124,27 @@
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeSeller, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         break;
+    case "Add":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(add?.account, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(add?.pool, ignoreUserIDForLink)</MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(add?.amount, add?.token?.decimals) @add?.token?.symbol</MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(add?.fee, add?.feeToken?.decimals) @add?.feeToken?.symbol</MudTd>
+        break;
+    case "Remove":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(remove?.pool, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(remove?.account, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(remove?.amount, remove?.token?.decimals) @remove?.token?.symbol</MudTd>
+        <MudTd></MudTd>
+        <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(remove?.fee, remove?.feeToken?.decimals) @remove?.feeToken?.symbol</MudTd>
+        break;
+    case "AmmUpdate":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(ammUpdate?.pool, ignoreUserIDForLink)</MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        break;
     default:
         <MudTd></MudTd>
         <MudTd></MudTd>
@@ -141,6 +162,9 @@
     public Transfer? transfer { get { return TransactionData as Transfer; } }
     public Deposit? deposit { get { return TransactionData as Deposit; } }
     public Withdrawal? withdrawal { get { return TransactionData as Withdrawal; } }
+    private Add? add { get { return TransactionData as Add; } }
+    private Remove? remove { get { return TransactionData as Remove; } }
+    private AmmUpdate? ammUpdate { get { return TransactionData as AmmUpdate; } }
     public MintNFT? mintNFT { get { return TransactionData as MintNFT; } }
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return TransactionData as WithdrawalNFT; } }
