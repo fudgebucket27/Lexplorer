@@ -39,6 +39,23 @@ namespace Lexplorer.Services
                 proxy(id: 0) {
                   blockCount
                   userCount
+                  transactionCount
+                  depositCount
+                  withdrawalCount
+                  transferCount
+                  addCount
+                  removeCount
+                  orderbookTradeCount
+                  swapCount
+                  accountUpdateCount
+                  ammUpdateCount
+                  signatureVerificationCount
+                  tradeNFTCount
+                  swapNFTCount
+                  withdrawalNFTCount
+                  transferNFTCount
+                  nftMintCount
+                  nftDataCount
                 }
                 blocks(
                   skip: $skip
@@ -731,6 +748,74 @@ namespace Lexplorer.Services
                 var response = await _client.PostAsync(request);
                 var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
                 return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<string, Type> resultCategories
+            = new Dictionary<string, Type>
+        {
+                { "accounts", typeof(Account) },
+                { "blocks", typeof(BlockDetail) },
+                { "transactions", typeof(Transaction) }
+        };
+        public async Task<IList<object>?> Search(string searchTerm)
+        {
+            var searchQuery = @"
+             query search(
+                $searchTerm: String
+              ) {
+                accounts(
+                  where: {id: $searchTerm}
+                ) {
+                  id
+                  __typename
+                }
+                blocks(
+                  where: {id: $searchTerm}
+                ) {
+                  id
+                  __typename
+                }
+                transactions(
+                  where: {id: $searchTerm}
+                ) {
+                  id
+                  __typename
+                }
+              }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = searchQuery,
+                variables = new
+                {
+                    searchTerm = searchTerm
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                List<object> results = new List<object>();
+                JObject responseData = JObject.Parse(response.Content!);
+                foreach (var item in resultCategories)
+                {
+                    JToken? token = responseData["data"]?[item.Key];
+                    if (token == null) continue;
+                    IList<JToken> resultsPerCategory = token.Children().ToList();
+                    foreach (JToken result in resultsPerCategory)
+                    {
+                        results.Add(result.ToObject(item.Value)!);
+                    }
+                }
+                return results;
             }
             catch (Exception ex)
             {

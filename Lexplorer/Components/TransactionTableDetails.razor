@@ -6,19 +6,19 @@
 {
     case "Deposit":
         <MudTd DataLabel="From Address"></MudTd>
-        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(deposit?.toAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(deposit!.amount, deposit!.token!.decimals) @deposit!.token!.symbol</MudTd>
         <MudTd DataLabel="Fee"></MudTd>
         break;
     case "Withdrawal":
-        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address"></MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
         <MudTd DataLabel="Fee"></MudTd>
         break;
     case "OrderbookTrade":
-        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(orderBookTrade!.accountA!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(orderBookTrade!.accountB!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(orderBookTrade!.accountA!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(orderBookTrade!.accountB!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(orderBookTrade!.fillBA, orderBookTrade!.tokenB!.decimals) @orderBookTrade.tokenB.symbol</MudTd>
         @if(orderBookTrade!.feeA > 0)
         {
@@ -30,14 +30,14 @@
         }
         break;
     case "Transfer":
-        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(transfer!.fromAccount!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(transfer!.toAccount!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(transfer!.fromAccount!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(transfer!.toAccount!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(transfer!.amount!, transfer.token!.decimals) @transfer!.token!.symbol</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right" >@TokenAmountConverter.ToString(transfer!.fee!, transfer.feeToken!.decimals) @transfer!.feeToken!.symbol</MudTd>
         break;
     case "Swap":
-        <MudTd DataLabel="From Address">@AccountLinkHelper.CreateUserLink(swap!.account!, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="To Address">@AccountLinkHelper.CreateUserLink(swap!.pool!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(swap!.account!, ignoreUserIDForLink)</MudTd>
+        <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(swap!.pool!, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="Amount" Style="text-align:right" >@TokenAmountConverter.ToString(swap!.fillBA, swap.tokenB!.decimals) @swap.tokenB.symbol</MudTd>
         if (swap!.feeA > 0)
         {
