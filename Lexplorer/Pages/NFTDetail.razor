@@ -121,7 +121,7 @@
             if (nft == null) return;
             StateHasChanged();
             string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
-            string nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
+            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
             if(!String.IsNullOrEmpty(nftMetadataLink))
             {
                 string nftMetadataCacheKey = $"nftMetadata1-{nftId}";
@@ -131,7 +131,7 @@
                     string nftMetadata2CacheKey = $"nftMetadata2-{nftId}";
                     nftMetadata = await AppCache.GetOrAddAsync(nftMetadata2CacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink + "/metadata.json"));
                 }
-                if(nftMetadata != null)
+                if(nftMetadata?.image != null)
                 {
                     ipfsGateway += nftMetadata.image.Remove(0,7);
                 }

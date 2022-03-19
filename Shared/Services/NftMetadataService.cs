@@ -20,30 +20,26 @@ namespace Lexplorer.Services
             _client = new RestClient(BaseUrl);
         }
 
-        public async Task<NftMetadata> GetMetadata(string link)
-        {
-            var request = new RestRequest(link);
-            try
-            {
-                var response = await _client.GetAsync(request);
-                return JsonConvert.DeserializeObject<NftMetadata>(response.Content);
-            }
-            catch (System.Net.Sockets.SocketException sex)
-            {
-                Trace.WriteLine(sex.StackTrace + "\n" + sex.Message);
-            }
-            catch (JsonReaderException e)
-            {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-            }
-            return null;
-            ;
-        }
-
         public void Dispose()
         {
             _client?.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public async Task<NftMetadata?> GetMetadata(string link)
+        {
+            var request = new RestRequest(link);
+            try
+            {
+                var response = await _client.GetAsync(request);
+                return JsonConvert.DeserializeObject<NftMetadata>(response.Content!);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
     }
 }
