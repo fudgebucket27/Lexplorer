@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.Diagnostics;
 using Lexplorer.Models;
+using System.Threading.Tasks;
 
 namespace Lexplorer.Services
 {
