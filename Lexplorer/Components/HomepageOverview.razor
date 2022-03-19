@@ -123,7 +123,7 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><a Class="mud-theme-primary" href="https://etherscan.io/tx/@context.txHash" target="_blank">@context.txHash!.Substring(0,15)...</a></MudTd>
+                    <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
                     <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
                     <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
                 </RowTemplate>
@@ -140,12 +140,13 @@
                     <MudTh>Type</MudTh>
                     <MudTh>From</MudTh>
                     <MudTh>To</MudTh>
-                    <MudTh Style="text-align:right">Amount</MudTh>
+                    <MudTh Style="text-align:right">Bought</MudTh>
+                    <MudTh Style="text-align:right">Sold</MudTh>
                     <MudTh Style="text-align:right">Fee</MudTh>
                     <MudTh>Verified At (UTC)</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Transaction Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!)>@context.id</a></MudTd>
+                    <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
                     <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blockData?.data?.blocks?[0].timestamp)</MudTd>
@@ -268,19 +269,19 @@
 
     private void GoToBlockOverviewPage()
     {
-        string parameters = "blocks?pageNumber=0";
+        string parameters = "blocks";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPairOverviewPage()
     {
-        string parameters = "pairs?pageNumber=0";
+        string parameters = "pairs";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToTransactionOverviewPage()
     {
-        string parameters = "transactions?pageNumber=0";
+        string parameters = "transactions";
         NavigationManager.NavigateTo(parameters);
     }
 

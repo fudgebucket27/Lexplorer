@@ -149,6 +149,7 @@
             fillSA
             fillSB
             fillBA
+            fillBB
             protocolFeeA
             protocolFeeB
             feeA
@@ -208,6 +209,7 @@
 
         public static string WithdrawalFragment = @"
           fragment WithdrawalFragment on Withdrawal {
+            id
             fromAccount {
               ...AccountFragment
             }
@@ -224,6 +226,7 @@
 
         public static string TransferFragment = @"
          fragment TransferFragment on Transfer {
+            id
             fromAccount {
               ...AccountFragment
             }
@@ -243,6 +246,7 @@
 
         public static string AccountUpdateFragment = @"
           fragment AccountUpdateFragment on AccountUpdate {
+            id
             user {
               id
               address
@@ -258,6 +262,7 @@
 
         public static string AmmUpdateFragment = @"
           fragment AmmUpdateFragment on AmmUpdate {
+            id
             pool {
               ...PoolFragment
             }
@@ -266,18 +271,12 @@
             tokenWeight
             nonce
             balance
-            tokenBalances {
-              id
-              balance
-              token {
-                ...TokenFragment
-              }
-            }
             __typename
           }";
 
         public static string SignatureVerificationFragment = @"
           fragment SignatureVerificationFragment on SignatureVerification {
+            id
             account {
               ...AccountFragment
             }
@@ -287,6 +286,7 @@
 
         public static string TradeNFTFragment = @"
           fragment TradeNFTFragment on TradeNFT {
+            id
             accountSeller {
               ...AccountFragment
             }
@@ -301,12 +301,18 @@
             }
             realizedNFTPrice
             feeBuyer
+            feeSeller
+            fillSA
+            fillBA
+            fillSB
+            fillBB
             protocolFeeBuyer
             __typename
           }";
 
         public static string SwapNFTFragment = @"
          fragment SwapNFTFragment on SwapNFT {
+            id
             accountA {
               ...AccountFragment
             }
@@ -321,6 +327,7 @@
 
         public static string WithdrawalNFTFragment = @"
           fragment WithdrawalNFTFragment on WithdrawalNFT {
+            id
             fromAccount {
               ...AccountFragment
             }
@@ -331,11 +338,14 @@
             nfts {
               ...NFTFragment
             }
+            amount
+            valid
             __typename
           }";
 
         public static string TransferNFTFragment = @"
           fragment TransferNFTFragment on TransferNFT {
+            id
             fromAccount {
               ...AccountFragment
             }
@@ -349,11 +359,13 @@
               ...NFTFragment
             }
             fee
+            amount
             __typename
           }";
 
         public static string MintNFTFragment = @"
           fragment MintNFTFragment on MintNFT {
+            id
             minter {
               ...AccountFragment
             }
@@ -364,6 +376,26 @@
               id
             }
             nft {
+              ...NFTFragment
+            }
+            fee
+            feeToken {
+              ...TokenFragment
+            }
+            amount
+            __typename
+          }";
+
+        public static string MintNFTFragmentWithoutNFT = @"
+          fragment MintNFTFragmentWithoutNFT on MintNFT {
+            id
+            minter {
+              ...AccountFragment
+            }
+            receiver {
+              ...AccountFragment
+            }
+            receiverSlot {
               id
             }
             fee

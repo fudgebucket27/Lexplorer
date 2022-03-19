@@ -1,0 +1,23 @@
+﻿<a Class="mud-theme-primary" href="@LinkURL" target="_blank">
+    @DisplayText
+</a>
+<MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to etherscan.io" Size="Size.Small" />
+
+
+@code {
+    [Parameter]
+    public string? address { get; set; }
+
+    [Parameter]
+    public Boolean shortenAddress { get; set; } = true;
+
+    private string LinkURL { get { return $"https://etherscan.io/address/{address}"; } }
+    private string? DisplayText
+    {
+        get
+        {
+            return (shortenAddress) && (address?.Length > 6) ? String.Format("{0}...{1}", address?.Substring(0, 5), address?.Substring(address.Length - 6, 6)) : address;
+        }
+    }
+}
+

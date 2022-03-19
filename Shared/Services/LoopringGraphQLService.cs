@@ -507,7 +507,7 @@ namespace Lexplorer.Services
             }
 
         }
-        public async Task<List<AccountBalance>?> GetAccountBalance(string accountId)
+        public async Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId)
         {
             var balanceQuery = @"
             query accountBalances(
@@ -545,11 +545,11 @@ namespace Lexplorer.Services
             {
                 JObject jresponse = JObject.Parse(response.Content!);
                 IList<JToken> balanceTokens = jresponse["data"]!["account"]!["balances"]!.Children().ToList();
-                List<AccountBalance> balances = new List<AccountBalance>();
+                List<AccountTokenBalance> balances = new List<AccountTokenBalance>();
                 foreach (JToken result in balanceTokens)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    AccountBalance balance = result.ToObject<AccountBalance>()!;
+                    AccountTokenBalance balance = result.ToObject<AccountTokenBalance>()!;
                     balances.Add(balance);
                 }
                 return balances;
@@ -687,7 +687,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Pairs?> GetPairs(int skip = 0, int first = 10 , string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
+        public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"
              query pairs(
@@ -823,5 +823,188 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+
+        public async Task<IList<NonFungibleToken>?> GetNFTs(int skip = 0, int first = 10, string orderBy = "id", string orderDirection = "desc")
+        {
+            var nonFungibleTokensQuery = @"
+             query nonFungibleTokensQuery(
+                $skip: Int
+                $first: Int
+                $orderBy: NonFungibleToken_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                nonFungibleTokens(
+                  skip: $skip
+                  first: $first
+                  orderBy: $orderBy
+                  orderDirection: $orderDirection
+                ) {
+                  ...NFTFragment
+                  mintedAtTransaction {
+                    ...MintNFTFragmentWithoutNFT
+                  }
+                }
+              }
+            "
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.MintNFTFragmentWithoutNFT
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = nonFungibleTokensQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["nonFungibleTokens"];
+                return token!.ToObject<IList<NonFungibleToken>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<NonFungibleToken?> GetNFT(string NFTId)
+        {
+            var NFTQuery = @"
+              query nonFungibleTokenQuery($id: ID!) {
+                nonFungibleToken(id: $id) {
+                  id
+                  mintedAtTransaction {
+                    ...MintNFTFragmentWithoutNFT
+                  }
+                  ...NFTFragment
+                }
+              }
+            "
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.MintNFTFragmentWithoutNFT
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddJsonBody(new
+            {
+                query = NFTQuery,
+                variables = new
+                {
+                    id = NFTId
+                }
+            });
+
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["nonFungibleToken"]!;
+                return result.ToObject<NonFungibleToken>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetNFTTransactionsResponse(int skip, int first, string nftId)
+        {
+            var nftQuery = @"
+            query nftTransactions(
+                $skip: Int
+                $first: Int
+                $nftId: String
+                $orderBy: Transaction_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                nonFungibleToken(
+                  id: $nftId
+                ) {
+                  transactions(
+                    skip: $skip
+                    first: $first
+                    orderBy: $orderBy
+                    orderDirection: $orderDirection
+                  ) {
+                    id
+                    __typename
+                    ...TradeNFTFragment
+                    ...SwapNFTFragment
+                    ...WithdrawalNFTFragment
+                    ...TransferNFTFragment
+                    ...MintNFTFragmentWithoutNFT
+                    ...DataNFTFragment
+                  }
+                }
+             }
+            "
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.TradeNFTFragment
+              + GraphQLFragments.SwapNFTFragment
+              + GraphQLFragments.WithdrawalNFTFragment
+              + GraphQLFragments.TransferNFTFragment
+              + GraphQLFragments.MintNFTFragmentWithoutNFT
+              + GraphQLFragments.DataNFTFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = nftQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    nftId = nftId,
+                    orderBy = "internalID",
+                    orderDirection = "desc"
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request);
+                return response.Content;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<IList<Transaction>?> GetNFTTransactions(int skip, int first, string nftId)
+        {
+            try
+            {
+                string? response = await GetNFTTransactionsResponse(skip, first, nftId);
+                JObject jresponse = JObject.Parse(response!);
+                JToken? token = jresponse["data"]!["nonFungibleToken"]!["transactions"];
+                return token!.ToObject<IList<Transaction>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return new List<Transaction>();
+            }
+        }
+
     }
 }

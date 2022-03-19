@@ -38,7 +38,7 @@
                             </tr>
                             <tr>
                                 <td>L1 Transaction Hash</td>
-                                <td><a Class="mud-theme-primary" href="https://etherscan.io/tx/@block.data.block.txHash" target="_blank">@block.data.block.txHash</a></td>
+                                <td><L1TransactionLink txHash="@block.data.block.txHash" shortenHash="false"></L1TransactionLink></td>
                             </tr>
                             <tr>
                                 <td>Verified At (UTC)</td>
@@ -69,12 +69,13 @@ else
                                     <MudTh>Type</MudTh>
                                     <MudTh>From</MudTh>
                                     <MudTh>To</MudTh>
-                                    <MudTh>Amount</MudTh>
-                                    <MudTh>Fee</MudTh>
+                                    <MudTh Style="text-align:right">Bought</MudTh>
+                                    <MudTh Style="text-align:right">Sold</MudTh>
+                                    <MudTh Style="text-align:right">Fee</MudTh>
                                     <MudTh>Time(UTC)</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd DataLabel="Tx Id"><a Class="mud-theme-primary" href=@ParameterHelper.ConvertToTransactionLink(@context.typeName!, @context.id!, @pageNumber, "blockDetails")>@context.id</a></MudTd>
+                                    <MudTd DataLabel="Tx Id">@LinkHelper.GetObjectLink(context)</MudTd>
                                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                                     <TransactionTableDetails TransactionData=@context />
                                     <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block.data!.block!.timestamp!)</MudTd>

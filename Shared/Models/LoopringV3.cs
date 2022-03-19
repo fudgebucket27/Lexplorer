@@ -3,11 +3,22 @@ using Lexplorer.Helpers;
 using JsonSubTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 //source: https://thegraph.com/hosted-service/subgraph/loopring/loopring
 
 namespace Lexplorer.Models
 {
+    public static class EnumerableExtension
+    {
+        //extension to get index with foreach
+        //https://thomaslevesque.com/2019/11/18/using-foreach-with-index-in-c/
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source)
+        {
+            return source.Select((item, index) => (item, index));
+        }
+    }
+
     public class BlockDetail
     {
         [JsonProperty("__typename")]
@@ -92,7 +103,7 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
-        public List<AccountBalance>? balances { get; set; }
+        public List<AccountTokenBalance>? balances { get; set; }
         public Transaction? createdAtTransaction { get; set; }
     }
     public class Pool : Account
@@ -117,7 +128,7 @@ namespace Lexplorer.Models
         public string? symbol { get; set; }
     }
 
-    public class AccountBalance
+    public class AccountTokenBalance
     {
         public Double balance { get; set; }
         public string? id { get; set; }
@@ -136,16 +147,39 @@ namespace Lexplorer.Models
         public string? publicKey { get; set; }
     }
 
+    public class ProtocolAccount : Account
+    {
+
+    }
+
     [JsonConverter(typeof(JsonSubtypes), "__typename")]
     public class Transaction
     {
+        public static readonly List<string> typeNames = new List<string> {
+            "Swap",
+            "MintNFT",
+            "OrderbookTrade",
+            "Deposit",
+            "Withdrawal",
+            "WithdrawalNFT",
+            "Transfer",
+            "TransferNFT",
+            "Add",
+            "Remove",
+            "TradeNFT",
+            "SwapNFT",
+            "AccountUpdate",
+            "AmmUpdate",
+            "SignatureVerification",
+            "DataNFT"};
+
         public string? id { get; set; }
         public string? internalID { get; set; }
         [JsonProperty(PropertyName = "__typename")]
         public string? typeName { get; set; }
         public string? data { get; set; }
         public BlockDetail? block { get; set; }
-        public List<AccountBalance>? tokenBalances { get; set; }
+        public List<AccountTokenBalance>? tokenBalances { get; set; }
         public List<Account>? accounts { get; set; }
         public string? verifiedAt
         {
@@ -249,6 +283,13 @@ namespace Lexplorer.Models
         public Double fee { get; set; }
         public Double amount { get; set; }
     }
+    public class AmmUpdate : Transaction
+    {
+        public Pool? pool { get; set; }
+        public Double tokenWeight { get; set; }
+        public String? tokenID { get; set; }
+        public Double balance { get; set; }
+    }
     public class AccountUpdate : Transaction
     {
         public User? user { get; set; }
@@ -266,6 +307,7 @@ namespace Lexplorer.Models
         public Account? minter { get; set; }
         public string? token { get; set; }
         public string? nftID { get; set; }
+        public int nftType { get; set; }
         public List<AccountNFTSlot>? slots { get; set; }
         public List<TransactionNFT>? transactions { get; set; }
     }
@@ -298,7 +340,8 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public string? extraData { get; set; }
     }
-    public class WithDrawalNFT : TransactionNFT
+
+    public class WithdrawalNFT : TransactionNFT
     {
         public Account? fromAccount { get; set; }
         public AccountNFTSlot? slot { get; set; }
@@ -307,6 +350,7 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public Double fee { get; set; }
     }
+
     public class TransferNFT : TransactionNFT
     {
         public Account? fromAccount { get; set; }
@@ -317,6 +361,7 @@ namespace Lexplorer.Models
         public Double amount { get; set; }
         public Double fee { get; set; }
     }
+
     public class TradeNFT : TransactionNFT
     {
         public Account? accountSeller { get; set; }
