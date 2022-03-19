@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Diagnostics;
-using Shared.Models;
+using Lexplorer.Models;
 
 namespace Lexplorer.Services
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Shared.Models
+namespace Lexplorer.Models
 {
     public class NftMetadata
     {
