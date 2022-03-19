@@ -13,8 +13,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TimestampConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TokenAmountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\LoopringV3.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\NftMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\UniswapV2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\EthereumService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringGraphQLService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\NftMetadataService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportDefaultCSVFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\UniswapGraphQLService.cs" />

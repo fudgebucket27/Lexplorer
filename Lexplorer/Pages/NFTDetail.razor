@@ -5,14 +5,28 @@
 @inject IAppCache AppCache;
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject Lexplorer.Services.EthereumService EthereumService;
+@inject Lexplorer.Services.NftMetadataService NftMetadataService;
 
-<PageTitle>The Lexplorer - NFT) #@nft?.nftID </PageTitle>
+<PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudText Typo="Typo.h6">NFT #@nft?.nftID</MudText>
+        <MudText Typo="Typo.h6">NFT @(@nftMetadata?.name ?? nft?.nftID)</MudText>
     </div>
     <tbody>
+        <tr>
+            <td>Description</td>
+            <td>@nftMetadata?.description</td>
+        </tr>
+        <tr>
+            <td>Royalty percentage</td>
+            <td>@nftMetadata?.royalty_percentage.ToString("0.# %")</td>
+        </tr>
+        <tr>
+            <td>nftID</td>
+            <td>@nft?.nftID</td>
+        </tr>
         <tr>
             <td>Minter</td>
             <td>@LinkHelper.CreateUserLink(nft?.minter, false, true) </td>
@@ -25,8 +39,13 @@
             <td>Token address</td>
             <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
+        <tr>
+            <td colspan="2"><img src="@nftMetadata?.imageURL" Width="512" Height="512" /></td>
+        </tr>
     </tbody>
 </MudSimpleTable>
+
+<br />
 
 <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
     <ToolBarContent>
@@ -56,8 +75,6 @@
     </RowTemplate>
 </MudTable>
 
-<br />
-
 
 @code {
     [Parameter]
@@ -71,6 +88,8 @@
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
     public bool isLoading = true;
     public readonly int pageSize = 25;
+
+    private NftMetadata? nftMetadata;
 
     public int gotoPage
     {
@@ -99,9 +118,20 @@
         if (nftId == null) return;
         if (nft == null)
         {
+            nftMetadata = null;
             string nftCacheKey = $"nft-{nftId}";
             nft = await AppCache.GetOrAddAsync(nftCacheKey, async () => await LoopringGraphQLService.GetNFT(nftId));
             if (nft == null) return;
+            StateHasChanged();
+        }
+        if (nftMetadata == null)
+        {
+            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
+            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
+            if (String.IsNullOrEmpty(nftMetadataLink)) return;
+
+            string nftMetadataCacheKey = $"nftMetadata-{nftId}";
+            nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
             StateHasChanged();
         }
         if (String.IsNullOrEmpty(pageNumber))

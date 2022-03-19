@@ -13,6 +13,8 @@ builder.Services.AddMudServices();
 builder.Services.AddSingleton<LoopringGraphQLService>();
 builder.Services.AddSingleton<UniswapGraphQLService>();
 builder.Services.AddSingleton<TransactionExportService>();
+builder.Services.AddSingleton<EthereumService>();
+builder.Services.AddSingleton<NftMetadataService>();
 builder.Services.AddLazyCache();
 
 //registration of CSV export formats, no automatic registration possible
