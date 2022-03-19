@@ -10,7 +10,7 @@ using System;
 
 namespace Lexplorer.Services
 {
-    public class UniswapGraphQLService
+    public class UniswapGraphQLService : IDisposable
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
 
@@ -58,6 +58,12 @@ namespace Lexplorer.Services
                 Debug.WriteLine(ex.Message);
                 return null;
             }
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
