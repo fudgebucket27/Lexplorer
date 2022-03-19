@@ -14,7 +14,7 @@ using RestSharp.Serializers;
 
 namespace Lexplorer.Services
 {
-    public class LoopringGraphQLService
+    public class LoopringGraphQLService : IDisposable
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/loopring/loopring";
 
@@ -1004,6 +1004,12 @@ namespace Lexplorer.Services
                 Debug.WriteLine(ex.Message);
                 return new List<Transaction>();
             }
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
     }
