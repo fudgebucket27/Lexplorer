@@ -74,6 +74,7 @@
             minter {
               ...AccountFragment
             }
+            __typename
             nftID
             nftType
             token
