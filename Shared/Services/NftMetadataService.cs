@@ -28,7 +28,18 @@ namespace Lexplorer.Services
 
         public async Task<NftMetadata?> GetMetadata(string link)
         {
-            var request = new RestRequest(link);
+            //there is a fallback for if the metadata fails on the first try because
+            //loopring deployed two different contracts for the nfts so some
+            //metadata.json needs to be referenced directly while others are in a folder in ipfs
+            NftMetadata? nmd = await GetMetadataFromURL(link);
+            if (nmd == null)
+                nmd = await GetMetadataFromURL(link + "/metadata.json");
+            return nmd;
+        }
+
+        private async Task<NftMetadata?> GetMetadataFromURL(string URL)
+        {
+            var request = new RestRequest(URL);
             try
             {
                 var response = await _client.GetAsync(request);
