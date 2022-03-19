@@ -17,13 +17,13 @@ namespace xUnitTests.LoopringGraphTests
 
         public GraphQLTestsFixture()
         {
-            // Do "global" initialization here; Only called once.
             LGS = new LoopringGraphQLService();
         }
 
         public void Dispose()
         {
-            // Do "global" teardown here; Only called once.
+            LGS.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 
