@@ -24,6 +24,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="NFTMetaDataTests\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NFTMetaDataTests\" />
+  </ItemGroup>
   <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 
 </Project>
