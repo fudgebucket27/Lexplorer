@@ -2,9 +2,12 @@
 @using Lexplorer.Components;
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
+@using global::Shared.Models
 @inject IAppCache AppCache;
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject Lexplorer.Services.EthereumService EthereumService;
+@inject Lexplorer.Services.NftMetadataService NftMetadataService;
 
 <PageTitle>The Lexplorer - NFT) #@nft?.nftID </PageTitle>
 
@@ -56,6 +59,18 @@
     </RowTemplate>
 </MudTable>
 
+@if(nftMetadata != null)
+{
+    <MudCard>
+        <MudCardContent>
+            <img src="@ipfsGateway" Width="512" Height="512"/>
+            <MudText Typo="Typo.body2">Name: @nftMetadata.name</MudText>
+            <MudText Typo="Typo.body2">Description: @nftMetadata.description</MudText>
+            <MudText Typo="Typo.body2">Royalty Percentange: @nftMetadata.royalty_percentage</MudText>
+        </MudCardContent>
+    </MudCard>
+}
+
 <br />
 
 
@@ -71,6 +86,9 @@
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
     public bool isLoading = true;
     public readonly int pageSize = 25;
+
+    private string ipfsGateway = "https://fudgey.mypinata.cloud/ipfs/";
+    private NftMetadata? nftMetadata;
 
     public int gotoPage
     {
@@ -102,6 +120,23 @@
             string nftCacheKey = $"nft-{nftId}";
             nft = await AppCache.GetOrAddAsync(nftCacheKey, async () => await LoopringGraphQLService.GetNFT(nftId));
             if (nft == null) return;
+            StateHasChanged();
+            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
+            string nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
+            if(!String.IsNullOrEmpty(nftMetadataLink))
+            {
+                string nftMetadataCacheKey = $"nftMetadata1-{nftId}";
+                nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
+                if(nftMetadata == null) // try appending metadata.json to the end
+                {
+                    string nftMetadata2CacheKey = $"nftMetadata2-{nftId}";
+                    nftMetadata = await AppCache.GetOrAddAsync(nftMetadata2CacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink + "/metadata.json"));
+                }
+                if(nftMetadata != null)
+                {
+                    ipfsGateway += nftMetadata.image.Remove(0,7);
+                }
+            }
             StateHasChanged();
         }
         if (String.IsNullOrEmpty(pageNumber))
