@@ -12,7 +12,7 @@
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudText Typo="Typo.h6">NFT @(@nftMetadata?.name ?? nft?.nftID)</MudText>
+        <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
     </div>
     <tbody>
         <tr>
@@ -124,16 +124,7 @@
             if (nft == null) return;
             StateHasChanged();
         }
-        if (nftMetadata == null)
-        {
-            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
-            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
-            if (String.IsNullOrEmpty(nftMetadataLink)) return;
 
-            string nftMetadataCacheKey = $"nftMetadata-{nftId}";
-            nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
-            StateHasChanged();
-        }
         if (String.IsNullOrEmpty(pageNumber))
         {
             pageNumber = "1";
@@ -145,6 +136,19 @@
             DateTimeOffset.UtcNow.AddMinutes(10));
         isLoading = false;
         StateHasChanged();
+
+        //load the NFT metadata last - it might actually take the longest and other services are queried etc.
+        if (nftMetadata == null)
+        {
+            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
+            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
+            if (String.IsNullOrEmpty(nftMetadataLink)) return;
+
+            string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
+            nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
+            StateHasChanged();
+        }
+
     }
 
 }
