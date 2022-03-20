@@ -8,7 +8,7 @@ namespace Lexplorer.Services
 
     public class EthereumService
     {
-        public readonly string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+        public const string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
 
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
         {
