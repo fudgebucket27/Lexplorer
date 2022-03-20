@@ -943,6 +943,10 @@ namespace Lexplorer.Services
                   ) {
                     id
                     __typename
+                    block {
+                        id
+                        timestamp
+                    }
                     ...TradeNFTFragment
                     ...SwapNFTFragment
                     ...WithdrawalNFTFragment
