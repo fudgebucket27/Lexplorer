@@ -687,6 +687,70 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<IList<AccountNFTSlot>?> GetAccountNFTs(int skip, int first, string accountId)
+        {
+            var accountNFTQuery = @"
+            query accountNFTSlotsQuery(
+                $skip: Int
+                $first: Int
+                $orderBy: AccountNFTSlot_orderBy
+                $orderDirection: OrderDirection
+                $where: AccountNFTSlot_filter
+              ) {
+                accountNFTSlots(
+                    skip: $skip
+                    first: $first
+                    orderBy: $orderBy
+                    orderDirection: $orderDirection
+                    where: $where
+                  ) {
+                    id
+                    __typename
+                    balance
+                    nft {
+                      id
+                      ...NFTFragment
+                    }
+                }
+             }
+            "
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.TokenFragment
+              + GraphQLFragments.NFTFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = accountNFTQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    orderBy = "lastUpdatedAt",
+                    orderDirection = "desc",
+                    where = new
+                    {
+                        account = accountId,
+                        nft_not = ""
+                    },
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["accountNFTSlots"];
+                return token!.ToObject<IList<AccountNFTSlot>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"

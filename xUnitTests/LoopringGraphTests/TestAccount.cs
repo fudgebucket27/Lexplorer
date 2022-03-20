@@ -40,5 +40,16 @@ namespace xUnitTests.LoopringGraphTests
 
             Assert.Null(balances![0].account);
         }
+
+        [Fact]
+        public async void GetAccountNFTSlots()
+        {
+            IList<AccountNFTSlot>? slots = await service.GetAccountNFTs(0, 10, "32933");
+            Assert.NotEmpty(slots);
+            foreach (var slot in slots!)
+            {
+                Assert.NotNull(slot.nft);
+            }
+        }
     }
 }
