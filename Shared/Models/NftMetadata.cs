@@ -14,7 +14,7 @@ namespace Lexplorer.Models
             {
                 if (image == null) return null;
                 //remove the ipfs:// when concatenating with mypinata URL
-                return string.Concat("https://fudgey.mypinata.cloud/ipfs/", image?.Remove(0, 7));
+                return image.StartsWith("ipfs://") ? string.Concat("https://fudgey.mypinata.cloud/ipfs/", image?.Remove(0, 7)) : image;
             }
         }
         public string? name { get; set; }
