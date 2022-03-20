@@ -11,7 +11,7 @@ namespace Lexplorer.Services
         {
             if (tokenId == null) return null;
             String? metadataLink =nftType == 0 ? await GetMetadataLink(tokenId, tokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri") 
-                : metadataLink = await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI"); //call erc1155 or erc 721 contract depending on type 
+                : await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI"); //call erc1155 or erc 721 contract depending on type 
             if (metadataLink == null)
                 metadataLink = await GetMetadataLink(tokenId, "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d", "function uri(uint256 id) external view returns (string memory)", "uri"); //call counterfactual nft contract
 
