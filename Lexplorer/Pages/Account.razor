@@ -43,7 +43,7 @@
 
 <MudTabs>
     <MudTabPanel Text="Token balances">
-        <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoadíng>
+        <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading>
             <HeaderContent>
                 <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
@@ -161,7 +161,7 @@
         }
     }
 
-    public bool balancesLoadíng;
+    public bool balancesLoading;
     public bool isLoading = true;
     public readonly int pageSize = 25;
     public readonly int nftPageSize = 10;
@@ -185,12 +185,12 @@
         if (accountId == null) return;
         if (account == null)
         {
-            balancesLoadíng = true;
+            balancesLoading = true;
             account = await LoopringGraphQLService.GetAccount(accountId);
             if (account == null) return;
             StateHasChanged();
             account!.balances = await LoopringGraphQLService.GetAccountBalance(accountId);
-            balancesLoadíng = false;
+            balancesLoading = false;
             StateHasChanged();
         }
         if (String.IsNullOrEmpty(pageNumber))
