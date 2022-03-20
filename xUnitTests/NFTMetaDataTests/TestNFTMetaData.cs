@@ -20,7 +20,7 @@ namespace xUnitTests.NFTMetaDataTests
 		//[InlineData("0x01346618000000000000000002386f26fc10000000000000000000000000028d")] //loophead #653
 		public async void TestGetMetadata(string nftID)
         {
-			var link = await fixture.EthS.GetMetadataLink(nftID);
+			var link = await fixture.EthS.GetMetadataLink(nftID, "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d");
 			Assert.NotNull(link);
 
 			var meta = await fixture.NMS.GetMetadata(link!);
