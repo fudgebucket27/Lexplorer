@@ -141,7 +141,7 @@
         if (nftMetadata == null)
         {
             string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
-            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID));
+            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID, nft?.token));
             if (String.IsNullOrEmpty(nftMetadataLink)) return;
 
             string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
