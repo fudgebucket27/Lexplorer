@@ -42,7 +42,7 @@ namespace Lexplorer.Services
             var request = new RestRequest(URL);
             try
             {
-                request.Timeout = 1000; //we can't afford to wait forever here, 1s must be enough
+                request.Timeout = 5000; //we can't afford to wait forever here, 5s must be enough
                 var response = await _client.GetAsync(request);
                 return JsonConvert.DeserializeObject<NftMetadata>(response.Content!);
             }
