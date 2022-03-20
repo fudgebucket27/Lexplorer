@@ -5,15 +5,20 @@ using System.Threading.Tasks;
 
 namespace Lexplorer.Services
 {
+
     public class EthereumService
     {
+        public readonly string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
         {
             if (tokenId == null) return null;
-            String? metadataLink =nftType == 0 ? await GetMetadataLink(tokenId, tokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri") 
-                : await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI"); //call erc1155 or erc 721 contract depending on type 
+            //call erc1155 or erc 721 contract depending on type 
+            string? metadataLink = nftType == 0
+                ? await GetMetadataLink(tokenId, tokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri") 
+                : await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI");
             if (metadataLink == null)
-                metadataLink = await GetMetadataLink(tokenId, "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d", "function uri(uint256 id) external view returns (string memory)", "uri"); //call counterfactual nft contract
+                metadataLink = await GetMetadataLink(tokenId, CF_NFTTokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri"); //call counterfactual nft contract
 
             return metadataLink;
         }
@@ -28,8 +33,7 @@ namespace Lexplorer.Services
                 var function = contract.GetFunction(functionName);
                 object[] parameters = new object[1] { tokenId! };
                 var uri = await function.CallAsync<string>(parameters);
-                if (uri == null) return null;
-                return uri.Remove(0, 7); //remove the ipfs portion
+                return uri?.Remove(0, 7); //remove the ipfs portion
             }
             catch (Exception e)
             {
