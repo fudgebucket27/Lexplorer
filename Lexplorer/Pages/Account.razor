@@ -68,6 +68,14 @@
         else
         {
             <MudGrid>
+                <MudItem xs="12" Class="d-flex justify-center">
+                    <MudToolBar>
+                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
+                        <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
+                    </MudToolBar>
+                </MudItem>
                 @foreach (var slot in accountNFTSlots)
                     {
                     var metaData = GetMetadata(slot.nft?.nftID);
@@ -77,7 +85,7 @@
                                 <CardHeaderContent>
                                     <MudText Typo="Typo.body1">@metaData?.name</MudText>
                                     <MudText Typo="Typo.body2">@metaData?.description</MudText>
-                                    <MudText Typo="Typo.body2">Amount: @slot.balance.ToString("#,##0")</MudText>
+                                    <MudText Typo="Typo.body2">Balance: @slot.balance.ToString("#,##0")</MudText>
                                 </CardHeaderContent>
                                 <CardHeaderActions>
                                     <MudIconButton Icon="@Icons.Material.Filled.Link" Color="Color.Default" Link=@LinkHelper.GetObjectLinkAddress(slot.nft)?.Item1 />
@@ -135,7 +143,7 @@
     {
         get
         {
-            return Int32.Parse(pageNumber ?? "1");
+            return Int32.TryParse(pageNumber, out int np) ? np : 1;
         }
         set
         {
@@ -152,7 +160,7 @@
     {
         get
         {
-            return Int32.Parse(nftPageNumber ?? "1");
+            return Int32.TryParse(nftPageNumber, out int np) ? np : 1;
         }
         set
         {
@@ -164,7 +172,7 @@
     public bool balancesLoading;
     public bool isLoading = true;
     public readonly int pageSize = 25;
-    public readonly int nftPageSize = 10;
+    public readonly int nftPageSize = 12; //6 per row
 
     private Lexplorer.Models.Account? account { get; set; }
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
@@ -179,7 +187,9 @@
         {
             account = null;
             transactions = new List<Transaction>();
+            accountNFTSlots = null;
             pageNumber = "1";
+            nftPageNumber = "1";
             StateHasChanged();
         }
         if (accountId == null) return;
@@ -204,7 +214,7 @@
             DateTimeOffset.UtcNow.AddMinutes(10));
         StateHasChanged();
 
-        string nftCacheKey = $"account{accountId}-nftSlots-page{pageNumber}";
+        string nftCacheKey = $"account{accountId}-nftSlots-page{nftPageNumber}";
         accountNFTSlots = await AppCache.GetOrAddAsync(nftCacheKey,
             async () => await LoopringGraphQLService.GetAccountNFTs((gotoNFTPage - 1) * nftPageSize, nftPageSize, accountId),
             DateTimeOffset.UtcNow.AddMinutes(10));
