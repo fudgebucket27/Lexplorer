@@ -824,7 +824,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<NonFungibleToken>?> GetNFTs(int skip = 0, int first = 10, string orderBy = "id", string orderDirection = "desc")
+        public async Task<IList<NonFungibleToken>?> GetNFTs(int skip = 0, int first = 10, string orderBy = "mintedAt", string orderDirection = "desc")
         {
             var nonFungibleTokensQuery = @"
              query nonFungibleTokensQuery(
