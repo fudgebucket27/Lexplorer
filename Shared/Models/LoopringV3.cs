@@ -321,6 +321,7 @@ namespace Lexplorer.Models
         public Transaction? createdAtTransaction { get; set; }
         public Transaction? lastUpdatedAtTransaction { get; set; }
         public List<Transaction>? transactions { get; set; }
+        public NonFungibleToken? nft { get; set; }
     }
 
     public class TransactionNFT : Transaction
