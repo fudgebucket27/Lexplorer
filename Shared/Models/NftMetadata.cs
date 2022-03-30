@@ -19,5 +19,17 @@ namespace Lexplorer.Models
         }
         public string? name { get; set; }
         public int royalty_percentage { get; set; }
+
+        public string? animation_url { get; set; }
+
+        public string? animationURL
+        {
+            get
+            {
+                if (animation_url == null) return null;
+                //remove the ipfs:// when concatenating with mypinata URL
+                return animation_url.StartsWith("ipfs://") ? string.Concat("https://fudgey.mypinata.cloud/ipfs/", animation_url.Remove(0, 7)) : animation_url;
+            }
+        }
     }
 }
