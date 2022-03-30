@@ -40,7 +40,19 @@
             <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
         <tr>
-            <td colspan="2"><img src="@nftMetadata?.imageURL" Width="512" Height="512" /></td>
+            <td colspan="2">
+                @if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL) //Only show if animation url is not the same as the image url and is not empty
+                {
+                    <video width="512" height="512" controls>
+                      <source src="@nftMetadata?.animationURL" >
+                    Your browser does not support the video tag.
+                    </video>
+                }
+                else //Does not have video
+                {
+                    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
+                }
+            </td>
         </tr>
     </tbody>
 </MudSimpleTable>
