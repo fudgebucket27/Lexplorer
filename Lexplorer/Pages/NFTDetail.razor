@@ -61,7 +61,7 @@
                 {
                     <img src="@nftMetadata?.animationURL" Width="512" Height="512" />
                 }
-                else if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("model")) ) //Show full resolution image
+                else if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("model")) ) //Show 3d model
                 {
                     <style>
                     model-viewer {
