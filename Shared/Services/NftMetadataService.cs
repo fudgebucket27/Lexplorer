@@ -43,13 +43,39 @@ namespace Lexplorer.Services
             try
             {
                 request.Timeout = 5000; //we can't afford to wait forever here, 5s must be enough
-                var response = await _client.GetAsync(request);
+                var response = await _client.GetAsync(request);   
                 return JsonConvert.DeserializeObject<NftMetadata>(response.Content!);
             }
             catch (Exception e)
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
                 return null;
+            }
+        }
+
+        public async Task<string> GetContentTypeFromURL(string link)
+        {
+            var request = new RestRequest(link, Method.Head);
+            try
+            {
+                request.Timeout = 5000; //we can't afford to wait forever here, 5s must be enough
+                var response = await _client.HeadAsync(request); //Send head request so we only get header not the content
+                Dictionary<string, string> contentHeaders = new Dictionary<string, string>();
+                foreach(var item in response.ContentHeaders!)
+                {
+                    contentHeaders.Add(item.Name!, item!.Value!.ToString()!);
+                }
+                string contentType = "";
+                if(!contentHeaders.TryGetValue("Content-Type", out contentType!))
+                {
+                    //the key doesn't exist
+                }
+                return contentType!;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null!;
             }
         }
 
