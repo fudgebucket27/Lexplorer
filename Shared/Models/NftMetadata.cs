@@ -31,5 +31,7 @@ namespace Lexplorer.Models
                 return animation_url.StartsWith("ipfs://") ? string.Concat("https://fudgey.mypinata.cloud/ipfs/", animation_url.Remove(0, 7)) : animation_url;
             }
         }
+
+        public string? contentType { get; set; }
     }
 }

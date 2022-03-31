@@ -27,6 +27,62 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
         }
+
+		[Theory]
+		[InlineData("0x4de8f2002b80be98ccab8746c6569850a36b9f5de85b2900f846fa6134bfc8b7", EthereumService.CF_NFTTokenAddress, 0)]
+		public async void TestGetMetadataVideoContentType(string nftID, string nftTokenAddress, int nftType)
+		{
+			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
+			Assert.NotNull(link);
+
+			var meta = await fixture.NMS.GetMetadata(link!);
+			Assert.NotNull(meta);
+
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			Assert.Equal("video/mp4", contentType);
+		}
+
+		[Theory]
+		[InlineData("0x2b5c4503e39e88154bcafe015fafbaf61955a88d3e65ab2f3aad28e37124c74c", EthereumService.CF_NFTTokenAddress, 0)]
+		public async void TestGetMetadataImageContentType(string nftID, string nftTokenAddress, int nftType)
+		{
+			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
+			Assert.NotNull(link);
+
+			var meta = await fixture.NMS.GetMetadata(link!);
+			Assert.NotNull(meta);
+
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			Assert.Equal("image/jpeg", contentType);
+		}
+
+		[Theory]
+		[InlineData("0x11b2e47f2c1d8cd2e22da989f2f0dde99a8d0a22a42381cfce9a5020fe7bd413", EthereumService.CF_NFTTokenAddress, 0)]
+		public async void TestGetMetadataAudioContentType(string nftID, string nftTokenAddress, int nftType)
+		{
+			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
+			Assert.NotNull(link);
+
+			var meta = await fixture.NMS.GetMetadata(link!);
+			Assert.NotNull(meta);
+
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			Assert.Equal("audio/mpeg", contentType);
+		}
+
+		[Theory]
+		[InlineData("0xf11780791dfef9ca79a07f046e98ef0efdebecfaa763b24eb61ccaaca3132d32", EthereumService.CF_NFTTokenAddress, 0)]
+		public async void TestGetMetadataModelContentType(string nftID, string nftTokenAddress, int nftType)
+		{
+			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
+			Assert.NotNull(link);
+
+			var meta = await fixture.NMS.GetMetadata(link!);
+			Assert.NotNull(meta);
+
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			Assert.Equal("model/gltf-binary", contentType);
+		}
 	}
 }
 
