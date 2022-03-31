@@ -69,6 +69,20 @@ namespace xUnitTests.NFTMetaDataTests
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
 			Assert.Equal("audio/mpeg", contentType);
 		}
+
+		[Theory]
+		[InlineData("0xf11780791dfef9ca79a07f046e98ef0efdebecfaa763b24eb61ccaaca3132d32", EthereumService.CF_NFTTokenAddress, 0)]
+		public async void TestGetMetadataModelContentType(string nftID, string nftTokenAddress, int nftType)
+		{
+			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
+			Assert.NotNull(link);
+
+			var meta = await fixture.NMS.GetMetadata(link!);
+			Assert.NotNull(meta);
+
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			Assert.Equal("model/gltf-binary", contentType);
+		}
 	}
 }
 
