@@ -10,27 +10,6 @@
         <MudItem sm="12">
             <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/></p>
         </MudItem>
-        <MudItem sm="12">
-            <MudTextField @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnAdornmentClick="DoSearch" />
-        </MudItem>
-        <MudItem sm="12">
-            <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
-        </MudItem>
-        <MudItem sm="12">
-            <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Found</MudTh>
-                    <MudTh>Type</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
-                    <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
-                </RowTemplate>
-            </MudTable>
-        </MudItem>
         <MudItem sm="4">
             <MudCard>
                 <MudCardContent>
@@ -284,32 +263,4 @@
         string parameters = "transactions";
         NavigationManager.NavigateTo(parameters);
     }
-
-    private IList<object>? searchResults;
-    private Boolean searching = false;
-    private string? _searchTerm;
-    private string? searchTerm { get { return _searchTerm; } 
-        set
-        {
-            _searchTerm = value;
-            DoSearch();
-        }
-    }
-    private async void DoSearch()
-    {
-        if (searchTerm == null) return;
-        searching = true;
-        searchResults = null;
-        StateHasChanged();
-        searchResults = await LoopringGraphQLService.Search(searchTerm);
-        if (searchResults?.Count == 1)
-        {
-            Tuple<string, string>? adr = LinkHelper.GetObjectLinkAddress(searchResults[0]);
-            if (!string.IsNullOrEmpty(adr?.Item1))
-                NavigationManager.NavigateTo(adr.Item1);
-        }
-        searching = false;
-        StateHasChanged();
-    }
-
 }
