@@ -25,21 +25,21 @@
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-0 pt-0">
             <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
-            @if(searchResults?.Count > 0)
+            @if (searchResults?.Count > 0)
             {
-                <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Found</MudTh>
-                        <MudTh>Type</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
-                        <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
-                    </RowTemplate>
-                </MudTable>
+                        <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Found</MudTh>
+                                <MudTh>Type</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
+                                <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
+                            </RowTemplate>
+                        </MudTable>
             }
             @Body
         </MudContainer>
@@ -74,11 +74,18 @@
         searching = true;
         searchResults = null;
         StateHasChanged();
-        if(searchTerm.Contains(".eth"))
+        if (searchTerm.Contains(".eth"))
         {
             hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm); //search for eth hex address from ens
-            searchTerm = String.IsNullOrEmpty(hexAddress) ? searchTerm : hexAddress; //only set search term if we return something
+            searchTerm = String.IsNullOrEmpty(hexAddress) ? null : hexAddress; //only set search term to hex address if we return a hex address otherwise set to null
+            if (searchTerm == null)//just return straight away no point searching further
+            {
+                searching = false;
+                StateHasChanged();
+                return;
+            }
         }
+
         searchResults = await LoopringGraphQLService.Search(searchTerm);
         if (searchResults?.Count == 1)
         {
