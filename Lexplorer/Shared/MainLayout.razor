@@ -2,6 +2,7 @@
 @using Lexplorer.Helpers
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
+@inject Lexplorer.Services.EthereumService EthereumService;
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -51,13 +52,16 @@
     private IList<object>? searchResults;
     private Boolean searching = false;
     private string? _searchTerm;
-    private string? searchTerm { get { return _searchTerm; } 
+    private string? searchTerm
+    {
+        get { return _searchTerm; }
         set
         {
             _searchTerm = value;
             DoSearch();
         }
     }
+    private string? hexAddress;
 
     void DrawerToggle()
     {
@@ -70,6 +74,11 @@
         searching = true;
         searchResults = null;
         StateHasChanged();
+        if(searchTerm.Contains(".eth"))
+        {
+            hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm); //search for eth hex address from ens
+            searchTerm = String.IsNullOrEmpty(hexAddress) ? searchTerm : hexAddress; //only set search term if we return something
+        }
         searchResults = await LoopringGraphQLService.Search(searchTerm);
         if (searchResults?.Count == 1)
         {
