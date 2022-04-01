@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Nethereum.ENS;
 
 namespace Lexplorer.Services
 {
@@ -34,6 +35,24 @@ namespace Lexplorer.Services
                 object[] parameters = new object[1] { tokenId! };
                 var uri = await function.CallAsync<string>(parameters);
                 return uri?.Remove(0, 7); //remove the ipfs portion
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetEthAddressFromEns(string? ens)
+        {
+
+            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
+            var ensService = new ENSService(web3);
+           
+            try
+            {
+                string address = await ensService.ResolveAddressAsync(ens);
+                return address; //remove the ipfs portion
             }
             catch (Exception e)
             {

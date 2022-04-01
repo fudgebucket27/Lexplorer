@@ -25,7 +25,7 @@ namespace Lexplorer.Services
             _client = new RestClient(_baseUrl);
         }
 
-        public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID", 
+        public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID",
             string orderDirection = "desc", string? blockTimestamp = null, Boolean gte = true)
         {
             var blocksQuery = @"
@@ -419,7 +419,7 @@ namespace Lexplorer.Services
                     }
                 });
             }
-            else if(typeName != null)
+            else if (typeName != null)
             {
                 request.AddJsonBody(new
                 {
@@ -454,7 +454,7 @@ namespace Lexplorer.Services
             }
 
             try
-            { 
+            {
                 var response = await _client.PostAsync(request);
                 var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
                 return data;
@@ -672,13 +672,13 @@ namespace Lexplorer.Services
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
             Double? firstBlockId = null, Double? lastBlockId = null)
-        { 
+        {
             try
             {
                 string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
-                return token!.ToObject<IList<Transaction>>(); 
+                return token!.ToObject<IList<Transaction>>();
             }
             catch (Exception ex)
             {
@@ -829,24 +829,24 @@ namespace Lexplorer.Services
         };
         public async Task<IList<object>?> Search(string searchTerm)
         {
-            var searchQuery = @"
+            var searchFullQuery = @"
              query search(
-                $searchTerm: String
+                $where: Account_filter
               ) {
                 accounts(
-                  where: {id: $searchTerm}
+                  where: $where
                 ) {
                   id
                   __typename
                 }
                 blocks(
-                  where: {id: $searchTerm}
+                  where: $where
                 ) {
                   id
                   __typename
                 }
                 transactions(
-                  where: {id: $searchTerm}
+                  where: $where
                 ) {
                   id
                   __typename
@@ -854,16 +854,50 @@ namespace Lexplorer.Services
               }
             ";
 
+            var searchAccountQuery = @"
+             query search(
+                $where: Account_filter
+              ) {
+                accounts(
+                  where: $where
+                ) {
+                  id
+                  ...AccountFragment
+                  __typename
+                }
+              }
+            " + GraphQLFragments.AccountFragment;
+
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(new
+            if (searchTerm.StartsWith("0x")) //Search by hex address
             {
-                query = searchQuery,
-                variables = new
+                request.AddJsonBody(new
                 {
-                    searchTerm = searchTerm
-                }
-            });
+                    query = searchAccountQuery,
+                    variables = new {
+                            where = new
+                            {
+                                address = searchTerm
+                            }
+                        }
+                });
+            }
+            else
+            {
+                request.AddJsonBody(new
+                {
+                    query = searchFullQuery,
+                    variables = new
+                    {
+                        where = new
+                        {
+                            id = searchTerm
+                        }
+                    }
+                });
+            }
+
             try
             {
                 var response = await _client.PostAsync(request);

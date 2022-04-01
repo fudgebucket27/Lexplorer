@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
-
+@using Lexplorer.Helpers
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject NavigationManager NavigationManager;
+@inject Lexplorer.Services.EthereumService EthereumService;
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -8,6 +11,8 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6">The Lexplorer</MudText>
+        <MudSpacer />
+        <MudTextField Style="background-color:white;" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/fudgebucket27/Lexplorer" Target="_blank" />
     </MudAppBar>
@@ -19,6 +24,23 @@
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-0 pt-0">
+            <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+            @if (searchResults?.Count > 0)
+            {
+                        <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Found</MudTh>
+                                <MudTh>Type</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
+                                <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
+                            </RowTemplate>
+                        </MudTable>
+            }
             @Body
         </MudContainer>
     </MudMainContent>
@@ -27,8 +49,52 @@
 @code {
     bool _drawerOpen = true;
 
+    private IList<object>? searchResults;
+    private Boolean searching = false;
+    private string? _searchTerm;
+    private string? searchTerm
+    {
+        get { return _searchTerm; }
+        set
+        {
+            _searchTerm = value;
+            DoSearch();
+        }
+    }
+    private string? hexAddress;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private async void DoSearch()
+    {
+        if (searchTerm == null) return;
+        searching = true;
+        searchResults = null;
+        StateHasChanged();
+        if (searchTerm.Contains(".eth"))
+        {
+            hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm); //search for eth hex address from ens
+            searchTerm = String.IsNullOrEmpty(hexAddress) ? null : hexAddress; //only set search term to hex address if we return a hex address otherwise set to null
+            if (searchTerm == null)//just return straight away no point searching further
+            {
+                searching = false;
+                StateHasChanged();
+                return;
+            }
+        }
+
+        searchResults = await LoopringGraphQLService.Search(searchTerm);
+        if (searchResults?.Count == 1)
+        {
+            Tuple<string, string>? adr = LinkHelper.GetObjectLinkAddress(searchResults[0]);
+            if (!string.IsNullOrEmpty(adr?.Item1))
+                NavigationManager.NavigateTo(adr.Item1);
+        }
+        searching = false;
+        StateHasChanged();
+        searchResults?.Clear(); //Clear out the search results table so it doesnt stay on screen
     }
 }
