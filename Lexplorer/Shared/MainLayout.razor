@@ -61,7 +61,6 @@
             DoSearch();
         }
     }
-    private string? hexAddress;
 
     void DrawerToggle()
     {
@@ -76,14 +75,14 @@
         StateHasChanged();
         if (searchTerm.Contains(".eth"))
         {
-            hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm); //search for eth hex address from ens
-            searchTerm = String.IsNullOrEmpty(hexAddress) ? null : hexAddress; //only set search term to hex address if we return a hex address otherwise set to null
-            if (searchTerm == null)//just return straight away no point searching further
+            string? hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm);
+            if (String.IsNullOrEmpty(hexAddress))
             {
-                searching = false;
+                searching = false; //nothing found
                 StateHasChanged();
                 return;
             }
+            _searchTerm = hexAddress; //carry on searching with the found address
         }
 
         searchResults = await LoopringGraphQLService.Search(searchTerm);
