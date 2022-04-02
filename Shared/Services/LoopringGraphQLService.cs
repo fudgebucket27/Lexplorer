@@ -829,24 +829,24 @@ namespace Lexplorer.Services
         };
         public async Task<IList<object>?> Search(string searchTerm)
         {
-            var searchFullQuery = @"
+            var searchQuery = @"
              query search(
-                $where: Account_filter
+                $searchTerm: String
               ) {
                 accounts(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
                 }
                 blocks(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
                 }
                 transactions(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
@@ -854,50 +854,16 @@ namespace Lexplorer.Services
               }
             ";
 
-            var searchAccountQuery = @"
-             query search(
-                $where: Account_filter
-              ) {
-                accounts(
-                  where: $where
-                ) {
-                  id
-                  ...AccountFragment
-                  __typename
-                }
-              }
-            " + GraphQLFragments.AccountFragment;
-
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            if (searchTerm.StartsWith("0x")) //Search by hex address
+            request.AddJsonBody(new
             {
-                request.AddJsonBody(new
+                query = searchQuery,
+                variables = new
                 {
-                    query = searchAccountQuery,
-                    variables = new {
-                            where = new
-                            {
-                                address = searchTerm
-                            }
-                        }
-                });
-            }
-            else
-            {
-                request.AddJsonBody(new
-                {
-                    query = searchFullQuery,
-                    variables = new
-                    {
-                        where = new
-                        {
-                            id = searchTerm
-                        }
-                    }
-                });
-            }
-
+                    searchTerm = searchTerm
+                }
+            });
             try
             {
                 var response = await _client.PostAsync(request);
