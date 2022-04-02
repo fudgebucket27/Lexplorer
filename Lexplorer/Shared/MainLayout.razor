@@ -67,6 +67,19 @@
         _drawerOpen = !_drawerOpen;
     }
 
+    void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if ((_searchTerm == null) && (searchResults == null)) return;
+        searchTerm = null;
+        searchResults = null;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
     private async void DoSearch()
     {
         if (searchTerm == null) return;
@@ -94,6 +107,5 @@
         }
         searching = false;
         StateHasChanged();
-        searchResults?.Clear(); //Clear out the search results table so it doesnt stay on screen
     }
 }
