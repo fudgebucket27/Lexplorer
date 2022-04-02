@@ -39,5 +39,15 @@ namespace xUnitTests.LoopringGraphTests
             Assert.Equal(1, searchResult!.Count);
             Assert.IsType<Add>(searchResult[0]);
         }
+
+        [Theory]
+        [InlineData("8d785aabf440e369aae5e63bed8a0f1f560b4caf")]
+        public async void SearchL1Address(string address)
+        {
+            var searchResult = await service.Search(address);
+            Assert.NotEmpty(searchResult);
+            Assert.IsType<User>(searchResult![0]);
+            Assert.Contains(address, (searchResult![0] as User)!.address);
+        }
     }
 }

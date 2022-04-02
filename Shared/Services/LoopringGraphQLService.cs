@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using RestSharp.Serializers;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Lexplorer.Services
 {
@@ -824,6 +826,7 @@ namespace Lexplorer.Services
             = new Dictionary<string, Type>
         {
                 { "accounts", typeof(Account) },
+                { "accountsByAddress", typeof(Account) },
                 { "blocks", typeof(BlockDetail) },
                 { "transactions", typeof(Transaction) }
         };
@@ -832,11 +835,19 @@ namespace Lexplorer.Services
             var searchQuery = @"
              query search(
                 $searchTerm: String
+                $searchTermBytes: Bytes
               ) {
                 accounts(
                   where: {id: $searchTerm}
                 ) {
                   id
+                  __typename
+                }
+                accountsByAddress: accounts(
+                  where: {address: $searchTermBytes}
+                ) {
+                  id
+                  address
                   __typename
                 }
                 blocks(
@@ -854,6 +865,12 @@ namespace Lexplorer.Services
               }
             ";
 
+            //avoid query errors with search strings that cannot be converted to bytes
+            //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
+            //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
+            string searchTermBytes = searchTerm.StartsWith("0x") ? searchTerm : "0x" + searchTerm;
+            if (!Regex.Match(searchTermBytes, "0x([a-fA-F0-9]{2})+$").Success)
+                searchTermBytes = "";
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
@@ -861,7 +878,8 @@ namespace Lexplorer.Services
                 query = searchQuery,
                 variables = new
                 {
-                    searchTerm = searchTerm
+                    searchTerm = searchTerm,
+                    searchTermBytes = searchTermBytes
                 }
             });
             try
