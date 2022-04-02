@@ -12,7 +12,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6">The Lexplorer</MudText>
         <MudSpacer />
-        <MudTextField Style="background-color:white;" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" />
+        <MudTextField Style="background-color:white;" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense"/>
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/fudgebucket27/Lexplorer" Target="_blank" />
     </MudAppBar>
@@ -61,11 +61,23 @@
             DoSearch();
         }
     }
-    private string? hexAddress;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if ((_searchTerm == null) && (searchResults == null)) return;
+        searchTerm = null;
+        searchResults = null;
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     private async void DoSearch()
@@ -76,14 +88,14 @@
         StateHasChanged();
         if (searchTerm.Contains(".eth"))
         {
-            hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm); //search for eth hex address from ens
-            searchTerm = String.IsNullOrEmpty(hexAddress) ? null : hexAddress; //only set search term to hex address if we return a hex address otherwise set to null
-            if (searchTerm == null)//just return straight away no point searching further
+            string? hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm);
+            if (String.IsNullOrEmpty(hexAddress))
             {
-                searching = false;
+                searching = false; //nothing found
                 StateHasChanged();
                 return;
             }
+            _searchTerm = hexAddress; //carry on searching with the found address
         }
 
         searchResults = await LoopringGraphQLService.Search(searchTerm);
@@ -95,6 +107,5 @@
         }
         searching = false;
         StateHasChanged();
-        searchResults?.Clear(); //Clear out the search results table so it doesnt stay on screen
     }
 }

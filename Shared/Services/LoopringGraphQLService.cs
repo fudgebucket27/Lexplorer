@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using RestSharp.Serializers;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Lexplorer.Services
 {
@@ -824,80 +826,78 @@ namespace Lexplorer.Services
             = new Dictionary<string, Type>
         {
                 { "accounts", typeof(Account) },
+                { "accountsByAddress", typeof(Account) },
                 { "blocks", typeof(BlockDetail) },
-                { "transactions", typeof(Transaction) }
+                { "transactions", typeof(Transaction) },
+                { "nonFungibleTokens", typeof(NonFungibleToken) },
+                { "nonFungibleTokensBynftID", typeof(NonFungibleToken) },
         };
         public async Task<IList<object>?> Search(string searchTerm)
         {
-            var searchFullQuery = @"
+            var searchQuery = @"
              query search(
-                $where: Account_filter
+                $searchTerm: String
+                $searchTermBytes: Bytes
               ) {
                 accounts(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
                 }
+                accountsByAddress: accounts(
+                  where: {address: $searchTermBytes}
+                ) {
+                  id
+                  address
+                  __typename
+                }
                 blocks(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
                 }
                 transactions(
-                  where: $where
+                  where: {id: $searchTerm}
                 ) {
                   id
                   __typename
+                }
+                nonFungibleTokens(
+                  where: {id: $searchTerm}
+                ) {
+                  id
+                  __typename
+                  nftID
+                }
+                nonFungibleTokensBynftID: nonFungibleTokens(
+                  where: {nftID: $searchTermBytes}
+                ) {
+                  id
+                  __typename
+                  nftID
                 }
               }
             ";
 
-            var searchAccountQuery = @"
-             query search(
-                $where: Account_filter
-              ) {
-                accounts(
-                  where: $where
-                ) {
-                  id
-                  ...AccountFragment
-                  __typename
-                }
-              }
-            " + GraphQLFragments.AccountFragment;
-
+            //avoid query errors with search strings that cannot be converted to bytes
+            //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
+            //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
+            string searchTermBytes = searchTerm.StartsWith("0x") ? searchTerm : "0x" + searchTerm;
+            if (!Regex.Match(searchTermBytes, "0x([a-fA-F0-9]{2})+$").Success)
+                searchTermBytes = "";
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            if (searchTerm.StartsWith("0x")) //Search by hex address
+            request.AddJsonBody(new
             {
-                request.AddJsonBody(new
+                query = searchQuery,
+                variables = new
                 {
-                    query = searchAccountQuery,
-                    variables = new {
-                            where = new
-                            {
-                                address = searchTerm
-                            }
-                        }
-                });
-            }
-            else
-            {
-                request.AddJsonBody(new
-                {
-                    query = searchFullQuery,
-                    variables = new
-                    {
-                        where = new
-                        {
-                            id = searchTerm
-                        }
-                    }
-                });
-            }
-
+                    searchTerm = searchTerm,
+                    searchTermBytes = searchTermBytes
+                }
+            });
             try
             {
                 var response = await _client.PostAsync(request);

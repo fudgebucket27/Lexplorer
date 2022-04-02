@@ -39,5 +39,26 @@ namespace xUnitTests.LoopringGraphTests
             Assert.Equal(1, searchResult!.Count);
             Assert.IsType<Add>(searchResult[0]);
         }
+
+        [Theory]
+        [InlineData("8d785aabf440e369aae5e63bed8a0f1f560b4caf")]
+        public async void SearchL1Address(string address)
+        {
+            var searchResult = await service.Search(address);
+            Assert.NotEmpty(searchResult);
+            Assert.IsType<User>(searchResult![0]);
+            Assert.Contains(address, (searchResult![0] as User)!.address);
+        }
+
+        [Theory]
+        [InlineData("4baf35a6982a81402fbe5882a47a75add97a01cc69fc418b5fc545026751f08a")]
+        [InlineData("0x010a8144e644ace657426f10d35a2a3bee1d098e-0-0xdec45f94c65a79278b7a779a0f5e09a361672e5d-0x4baf35a6982a81402fbe5882a47a75add97a01cc69fc418b5fc545026751f08a-0")]
+        public async void SearchNFT(string nftid)
+        {
+            var searchResult = await service.Search(nftid);
+            Assert.NotEmpty(searchResult);
+            Assert.IsType<NonFungibleToken>(searchResult![0]);
+            Assert.Contains(nftid, (searchResult![0] as NonFungibleToken)!.id);
+        }
     }
 }
