@@ -828,7 +828,9 @@ namespace Lexplorer.Services
                 { "accounts", typeof(Account) },
                 { "accountsByAddress", typeof(Account) },
                 { "blocks", typeof(BlockDetail) },
-                { "transactions", typeof(Transaction) }
+                { "transactions", typeof(Transaction) },
+                { "nonFungibleTokens", typeof(NonFungibleToken) },
+                { "nonFungibleTokensBynftID", typeof(NonFungibleToken) },
         };
         public async Task<IList<object>?> Search(string searchTerm)
         {
@@ -861,6 +863,20 @@ namespace Lexplorer.Services
                 ) {
                   id
                   __typename
+                }
+                nonFungibleTokens(
+                  where: {id: $searchTerm}
+                ) {
+                  id
+                  __typename
+                  nftID
+                }
+                nonFungibleTokensBynftID: nonFungibleTokens(
+                  where: {nftID: $searchTermBytes}
+                ) {
+                  id
+                  __typename
+                  nftID
                 }
               }
             ";
