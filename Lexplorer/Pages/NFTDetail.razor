@@ -40,41 +40,16 @@
             <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
         <tr>
+            <td>Image URL</td>
+            <td>@nftMetadata?.image</td>
+        </tr>
+        <tr>
+            <td>Animation URL</td>
+            <td>@nftMetadata?.animation_url</td>
+        </tr>
+        <tr>
             <td colspan="2">
-                @if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("video")) ) //Show video
-                {
-                    <video width="512" height="512" controls>
-                      <source src="@nftMetadata?.animationURL" >
-                    Your browser does not support the video tag.
-                    </video>
-                }
-                else if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("audio")) ) //Show audio
-                {
-                    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
-                    <br />
-                    <audio controls>
-                      <source src="@nftMetadata?.animationURL">
-                    Your browser does not support the audio element.
-                    </audio>
-                }
-                else if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("image")) ) //Show full resolution image
-                {
-                    <img src="@nftMetadata?.animationURL" Width="512" Height="512" />
-                }
-                else if(!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("model")) ) //Show 3d model
-                {
-                    <style>
-                    model-viewer {
-                      width: 512px;
-                      height: 512px;
-                    }
-                    </style>
-                    <model-viewer  bounds="tight" enable-pan src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look" camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"></model-viewer>
-                }
-                else //Does not have video,audio,3d or a full resolution image
-                {
-                    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
-                }
+                <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
     </tbody>
