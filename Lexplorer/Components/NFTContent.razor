@@ -2,12 +2,12 @@
 
 @if (showImageSource())
 {
-    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
+    <img src="@nftMetadata?.imageURL" Width="@width" Height="@height" />
 }
 
 @if (hasAnimationContent("video"))
 {
-    <video width="512" height="512" controls>
+    <video width="@width" height="@height" controls>
         <source src="@nftMetadata?.animationURL">
         Your browser does not support the video tag.
     </video>
@@ -22,16 +22,16 @@ else if (hasAnimationContent("audio"))
 }
 else if (hasAnimationContent("image"))
 {
-    <img src="@nftMetadata?.animationURL" Width="512" Height="512" />
+    <img src="@nftMetadata?.animationURL" Width="@width" Height="@height" />
 }
 else if (hasAnimationContent("model"))
 {
-    <style>
+<style>
         model-viewer {
-            width: 512px;
-            height: 512px;
+            width: @ToPx(width);
+            height: @ToPx(height);
         }
-    </style>
+</style>
     <model-viewer bounds="tight" enable-pan src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
                   camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
 }
@@ -40,6 +40,17 @@ else if (hasAnimationContent("model"))
 @code {
     [Parameter]
     public NftMetadata? nftMetadata { get; set; }
+
+    [Parameter]
+    public int width { get; set; } = 512;
+
+    [Parameter]
+    public int height { get; set; } = 512;
+
+    private string ToPx(int size)
+    {
+        return size.ToString() + "px";
+    }
 
     private bool showImageSource()
     {
