@@ -1,26 +1,30 @@
 ﻿@using Lexplorer.Models;
 
-@if (!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("video"))) //Show video
+@if (showImageSource())
+{
+    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
+}
+
+@if (hasAnimationContent("video"))
 {
     <video width="512" height="512" controls>
         <source src="@nftMetadata?.animationURL">
         Your browser does not support the video tag.
     </video>
 }
-else if (!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("audio"))) //Show audio
+else if (hasAnimationContent("audio"))
 {
-    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
     <br />
     <audio controls>
         <source src="@nftMetadata?.animationURL">
         Your browser does not support the audio element.
     </audio>
 }
-else if (!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("image"))) //Show full resolution image
+else if (hasAnimationContent("image"))
 {
     <img src="@nftMetadata?.animationURL" Width="512" Height="512" />
 }
-else if (!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animationURL != nftMetadata?.imageURL && (!String.IsNullOrEmpty(nftMetadata?.contentType) && nftMetadata.contentType.Contains("model"))) //Show 3d model
+else if (hasAnimationContent("model"))
 {
     <style>
         model-viewer {
@@ -28,17 +32,31 @@ else if (!String.IsNullOrEmpty(nftMetadata?.animationURL) && nftMetadata?.animat
             height: 512px;
         }
     </style>
-    <model-viewer bounds="tight" enable-pan src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look" camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"></model-viewer>
-}
-else //Does not have video,audio,3d or a full resolution image
-{
-    <img src="@nftMetadata?.imageURL" Width="512" Height="512" />
+    <model-viewer bounds="tight" enable-pan src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
+                  camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
 }
 
 
 @code {
     [Parameter]
     public NftMetadata? nftMetadata { get; set; }
+
+    private bool showImageSource()
+    {
+        //we show the image as long as there is no explicit animation URL - except for audio
+        return (!hasAnimationURL()) || (nftMetadata?.contentType?.Contains("audio") ?? false);
+    }
+
+    private bool hasAnimationURL()
+    {
+        if (String.IsNullOrEmpty(nftMetadata?.animation_url)) return false;
+        return nftMetadata?.image != nftMetadata?.animation_url;
+    }
+
+    private bool hasAnimationContent(string ContentTypeContains)
+    {
+        return (hasAnimationURL()) && (nftMetadata?.contentType?.Contains(ContentTypeContains) ?? false);
+    }
 
 }
 
