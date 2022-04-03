@@ -181,11 +181,11 @@
 
             string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
             nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
-            string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
             if (!String.IsNullOrEmpty(nftMetadata?.animation_url))
             {
-                nftMetadata!.contentType = await AppCache.GetOrAddAsync(nftMetadataContentTypeCacheKey, async () => 
-                await NftMetadataService.GetContentTypeFromURL(nftMetadata!.animation_url!.StartsWith("ipfs://") ? nftMetadata!.animation_url.Remove(0,7):nftMetadata!.animation_url));
+                string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
+                nftMetadata!.contentType = await AppCache.GetOrAddAsync(nftMetadataContentTypeCacheKey,
+                    async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animationURL!));
             }
             StateHasChanged();
         }
