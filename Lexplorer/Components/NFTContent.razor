@@ -32,7 +32,7 @@ else if (hasAnimationContent("model"))
             height: @ToPx(height);
         }
 </style>
-    <model-viewer bounds="tight" enable-pan src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
+    <model-viewer bounds="tight" enable-pan autoplay src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
                   camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
 }
 
