@@ -78,7 +78,7 @@
                 </MudItem>
                 @foreach (var slot in accountNFTSlots)
                     {
-                    var metaData = GetMetadata(slot.nft?.nftID);
+                    var metaData = GetMetadata(slot.nft?.id);
                     <MudItem xs="2">
                         <MudCard>
                             <MudCardHeader>
@@ -233,7 +233,7 @@
                 var nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
                 if (nftMetadata == null) continue;
 
-                NFTdata.Add(slot.nft!.nftID!, nftMetadata);
+                NFTdata.Add(slot.nft!.id!, nftMetadata);
                 StateHasChanged();
             }
         }
