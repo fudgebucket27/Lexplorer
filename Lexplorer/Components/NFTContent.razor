@@ -35,6 +35,10 @@ else if (hasAnimationContent("model"))
     <model-viewer bounds="tight" enable-pan autoplay src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
                   camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
 }
+else if(hasAnimationContent("html"))
+{
+    <iframe allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" height="100%" sandbox="allow-scripts" src="@nftMetadata?.animationURL" width="100%" style="min-height: 680px;"></iframe>
+}
 
 
 @code {
