@@ -37,7 +37,7 @@ else if (hasAnimationContent("model"))
 }
 else if(hasAnimationContent("html"))
 {
-    <iframe allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" height="100%" sandbox="allow-scripts" src="@nftMetadata?.animationURL" width="100%" style="min-height: 512px;"></iframe>
+    <iframe allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" height="100%" sandbox="allow-scripts" src="@nftMetadata?.animationURL" width="100%" style="min-height: @ToPx(height)"></iframe>
 }
 
 
