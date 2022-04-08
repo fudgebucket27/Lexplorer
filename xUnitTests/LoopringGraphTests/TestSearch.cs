@@ -59,7 +59,7 @@ namespace xUnitTests.LoopringGraphTests
             var searchResult = await service.Search(nftid);
             Assert.NotEmpty(searchResult);
             Assert.IsType<NonFungibleToken>(searchResult![0]);
-            Assert.Contains(nftid.ToLower(), (searchResult![0] as NonFungibleToken)!.id);
+            Assert.Contains(nftid, (searchResult![0] as NonFungibleToken)!.id, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

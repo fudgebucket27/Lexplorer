@@ -884,8 +884,8 @@ namespace Lexplorer.Services
             //avoid query errors with search strings that cannot be converted to bytes
             //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
             //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
-            string searchTermBytes = searchTerm.ToLower().StartsWith("0x") ? searchTerm.ToLower() : "0x" + searchTerm.ToLower();
-            if (!Regex.Match(searchTermBytes, "0x([a-fA-F0-9]{2})+$").Success)
+            string searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
+            if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
                 searchTermBytes = "";
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
