@@ -86,7 +86,7 @@
         searching = true;
         searchResults = null;
         StateHasChanged();
-        if (searchTerm.Contains(".eth"))
+        if (searchTerm.Contains(".eth", StringComparison.InvariantCultureIgnoreCase))
         {
             string? hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm);
             if (String.IsNullOrEmpty(hexAddress))
