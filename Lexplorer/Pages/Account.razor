@@ -62,7 +62,7 @@
         </MudTable>
     </MudTabPanel>
     <MudTabPanel Text="NFTs">
-        @if (accountNFTSlots == null)
+        @if ((accountNFTSlots?.Count ?? 0) > 0)
         {
             <MudText>No NFTs</MudText>
         }
@@ -77,7 +77,7 @@
                         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
                     </MudToolBar>
                 </MudItem>
-                @foreach (var slot in accountNFTSlots)
+                @foreach (var slot in accountNFTSlots!)
                 {
                     var metaData = GetMetadata(slot.nft?.id);
                     <MudItem xs="2">
