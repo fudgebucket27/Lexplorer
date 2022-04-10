@@ -223,14 +223,14 @@
                 }
 
                 string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
-                transactions = await AppCache.GetOrAddAsync(transactionCacheKey,
+                transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
                     async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 localCTS.Token.ThrowIfCancellationRequested();
                 StateHasChanged();
 
                 string nftCacheKey = $"account{accountId}-nftSlots-page{nftPageNumber}";
-                accountNFTSlots = await AppCache.GetOrAddAsync(nftCacheKey,
+                accountNFTSlots = await AppCache.GetOrAddAsyncNonNull(nftCacheKey,
                     async () => await LoopringGraphQLService.GetAccountNFTs((gotoNFTPage - 1) * nftPageSize, nftPageSize, accountId, localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 localCTS.Token.ThrowIfCancellationRequested();
@@ -244,12 +244,15 @@
                     foreach (var slot in accountNFTSlots!)
                     {
                         string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nft!.nftID}";
-                        string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey,
-                            async () => await EthereumService.GetMetadataLink(slot.nft?.nftID, slot.nft?.token, slot.nft?.nftType));
+                        string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
+                            async () => await EthereumService.GetMetadataLink(slot.nft?.nftID, slot.nft?.token, slot.nft?.nftType),
+                            DateTimeOffset.UtcNow.AddHours(1));
                         if (String.IsNullOrEmpty(nftMetadataLink)) continue;
 
                         string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
-                        var nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token));
+                        var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
+                            async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token),
+                            DateTimeOffset.UtcNow.AddHours(1));
                         localCTS.Token.ThrowIfCancellationRequested();
                         if (nftMetadata == null) continue;
 
@@ -292,4 +295,4 @@
 
         DialogService.Show<TransactionExportDialog>("Export", parameters, options);
     }
-    }
+}
