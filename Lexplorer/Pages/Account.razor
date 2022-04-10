@@ -2,6 +2,7 @@
 @using Lexplorer.Models
 @using Lexplorer.Helpers
 @using Lexplorer.Components
+@using System.Diagnostics
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject Lexplorer.Services.EthereumService EthereumService;
 @inject Lexplorer.Services.NftMetadataService NftMetadataService;
@@ -62,7 +63,7 @@
         </MudTable>
     </MudTabPanel>
     <MudTabPanel Text="NFTs">
-        @if ((accountNFTSlots?.Count ?? 0) > 0)
+        @if ((accountNFTSlots?.Count ?? 0) < 1)
         {
             <MudText>No NFTs</MudText>
         }
@@ -267,6 +268,13 @@
         }
         catch (OperationCanceledException)
         {
+        }
+        catch (ObjectDisposedException)
+        { //occurs if the previous cts has already been disposed while an action is still running
+        }
+        catch (Exception e)
+        {
+            Trace.WriteLine(e.StackTrace + "\n" + e.Message);
         }
     }
 
