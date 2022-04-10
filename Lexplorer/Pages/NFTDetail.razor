@@ -130,7 +130,7 @@
         {
             nftMetadata = null;
             string nftCacheKey = $"nft-{nftId}";
-            nft = await AppCache.GetOrAddAsync(nftCacheKey, async () => await LoopringGraphQLService.GetNFT(nftId));
+            nft = await AppCache.GetOrAddAsyncNonNull(nftCacheKey, async () => await LoopringGraphQLService.GetNFT(nftId));
             if (nft == null) return;
             StateHasChanged();
         }
@@ -141,7 +141,7 @@
         }
 
         string nftTransactionCacheKey = $"nft{nftId}-transactions-page{pageNumber}";
-        transactions = await AppCache.GetOrAddAsync(nftTransactionCacheKey,
+        transactions = await AppCache.GetOrAddAsyncNonNull(nftTransactionCacheKey,
             async () => await LoopringGraphQLService.GetNFTTransactions((gotoPage - 1) * pageSize, pageSize, nftId),
             DateTimeOffset.UtcNow.AddMinutes(10));
         isLoading = false;
@@ -151,15 +151,15 @@
         if (nftMetadata == null)
         {
             string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
-            string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID, nft?.token, nft?.nftType));
+            string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID, nft?.token, nft?.nftType));
             if (String.IsNullOrEmpty(nftMetadataLink)) return;
 
             string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
-            nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
+            nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
             if (!String.IsNullOrEmpty(nftMetadata?.animation_url))
             {
                 string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
-                nftMetadata!.contentType = await AppCache.GetOrAddAsync(nftMetadataContentTypeCacheKey,
+                nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
                     async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animationURL!));
             }
             StateHasChanged();

@@ -2,6 +2,7 @@
 @using Lexplorer.Models
 @using Lexplorer.Helpers
 @using Lexplorer.Components
+@using System.Diagnostics
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject Lexplorer.Services.EthereumService EthereumService;
 @inject Lexplorer.Services.NftMetadataService NftMetadataService;
@@ -18,7 +19,7 @@
     <tbody>
         <tr>
             <td>L1 Address</td>
-            <td><L1AccountLink address="@account?.address" shortenAddress="false"/></td>
+            <td><L1AccountLink address="@account?.address" shortenAddress="false" /></td>
         </tr>
         <tr>
             <td>Account Type</td>
@@ -61,7 +62,7 @@
         </MudTable>
     </MudTabPanel>
     <MudTabPanel Text="NFTs">
-        @if (accountNFTSlots == null)
+        @if ((accountNFTSlots?.Count ?? 0) < 1)
         {
             <MudText>No NFTs</MudText>
         }
@@ -76,8 +77,8 @@
                         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
                     </MudToolBar>
                 </MudItem>
-                @foreach (var slot in accountNFTSlots)
-                    {
+                @foreach (var slot in accountNFTSlots!)
+                {
                     var metaData = GetMetadata(slot.nft?.id);
                     <MudItem xs="2">
                         <MudCard>
@@ -178,67 +179,101 @@
     private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
+    private CancellationTokenSource? cts;
 
     protected override async Task OnParametersSetAsync()
     {
-        isLoading = true;
-        //did the account change?
-        if (account != null && account.id != accountId)
-        {
-            account = null;
-            transactions = new List<Transaction>();
-            accountNFTSlots = null;
-            pageNumber = "1";
-            nftPageNumber = "1";
-            StateHasChanged();
-        }
-        if (accountId == null) return;
-        if (account == null)
-        {
-            balancesLoading = true;
-            account = await LoopringGraphQLService.GetAccount(accountId);
-            if (account == null) return;
-            StateHasChanged();
-            account!.balances = await LoopringGraphQLService.GetAccountBalance(accountId);
-            balancesLoading = false;
-            StateHasChanged();
-        }
-        if (String.IsNullOrEmpty(pageNumber))
-        {
-            pageNumber = "1";
-        }
+        //cancel any previous OnParametersSetAsync which might still be running
+        cts?.Cancel();
 
-        string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
-        transactions = await AppCache.GetOrAddAsync(transactionCacheKey,
-            async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId),
-            DateTimeOffset.UtcNow.AddMinutes(10));
-        StateHasChanged();
-
-        string nftCacheKey = $"account{accountId}-nftSlots-page{nftPageNumber}";
-        accountNFTSlots = await AppCache.GetOrAddAsync(nftCacheKey,
-            async () => await LoopringGraphQLService.GetAccountNFTs((gotoNFTPage - 1) * nftPageSize, nftPageSize, accountId),
-            DateTimeOffset.UtcNow.AddMinutes(10));
-        NFTdata = new Dictionary<string, NftMetadata>();
-        if (accountNFTSlots != null)
+        using (CancellationTokenSource localCTS = new CancellationTokenSource())
         {
-            StateHasChanged();
-            foreach (var slot in accountNFTSlots!)
+            //give future calls a chance to cancel us; it is now safe to replace
+            //any previous value of cts, since we already cancelled it above
+            cts = localCTS;
+            try
             {
-                string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nft!.nftID}";
-                string? nftMetadataLink = await AppCache.GetOrAddAsync(nftMetadataLinkCacheKey,
-                    async () => await EthereumService.GetMetadataLink(slot.nft?.nftID, slot.nft?.token, slot.nft?.nftType));
-                if (String.IsNullOrEmpty(nftMetadataLink)) continue;
+                isLoading = true;
+                //did the account change?
+                if (account != null && account.id != accountId)
+                {
+                    account = null;
+                    transactions = new List<Transaction>();
+                    accountNFTSlots = null;
+                    pageNumber = "1";
+                    nftPageNumber = "1";
+                    StateHasChanged();
+                }
+                if (accountId == null) return;
+                if (account == null)
+                {
+                    balancesLoading = true;
+                    account = await LoopringGraphQLService.GetAccount(accountId, localCTS.Token);
+                    localCTS.Token.ThrowIfCancellationRequested();
+                    if (account == null) return;
+                    StateHasChanged();
+                    account!.balances = await LoopringGraphQLService.GetAccountBalance(accountId, localCTS.Token);
+                    localCTS.Token.ThrowIfCancellationRequested();
+                    balancesLoading = false;
+                    StateHasChanged();
+                }
+                if (String.IsNullOrEmpty(pageNumber))
+                {
+                    pageNumber = "1";
+                }
 
-                string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
-                var nftMetadata = await AppCache.GetOrAddAsync(nftMetadataCacheKey, async () => await NftMetadataService.GetMetadata(nftMetadataLink));
-                if (nftMetadata == null) continue;
+                string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
+                transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
+                    async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                localCTS.Token.ThrowIfCancellationRequested();
+                StateHasChanged();
 
-                NFTdata.Add(slot.nft!.id!, nftMetadata);
+                string nftCacheKey = $"account{accountId}-nftSlots-page{nftPageNumber}";
+                accountNFTSlots = await AppCache.GetOrAddAsyncNonNull(nftCacheKey,
+                    async () => await LoopringGraphQLService.GetAccountNFTs((gotoNFTPage - 1) * nftPageSize, nftPageSize, accountId, localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                localCTS.Token.ThrowIfCancellationRequested();
+
+                Dictionary<string, NftMetadata> localNFTdata = new Dictionary<string, NftMetadata>();
+                NFTdata = localNFTdata;
+
+                if (accountNFTSlots != null)
+                {
+                    StateHasChanged();
+                    foreach (var slot in accountNFTSlots!)
+                    {
+                        string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nft!.nftID}";
+                        string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
+                            async () => await EthereumService.GetMetadataLink(slot.nft?.nftID, slot.nft?.token, slot.nft?.nftType),
+                            DateTimeOffset.UtcNow.AddHours(1));
+                        if (String.IsNullOrEmpty(nftMetadataLink)) continue;
+
+                        string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
+                        var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
+                            async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token),
+                            DateTimeOffset.UtcNow.AddHours(1));
+                        localCTS.Token.ThrowIfCancellationRequested();
+                        if (nftMetadata == null) continue;
+
+                        localNFTdata.Add(slot.nft!.id!, nftMetadata);
+                        StateHasChanged();
+                    }
+                }
+                isLoading = false;
                 StateHasChanged();
             }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            }
+            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+            //otherwise a new call has already replaced cts with it's own localCTS
+            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
         }
-        isLoading = false;
-        StateHasChanged();
     }
 
     private NftMetadata? GetMetadata(string? nftID)

@@ -13,6 +13,7 @@ using System.Linq;
 using RestSharp.Serializers;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Lexplorer.Services
 {
@@ -467,7 +468,7 @@ namespace Lexplorer.Services
                 return null;
             }
         }
-        public async Task<Account?> GetAccount(string accountId)
+        public async Task<Account?> GetAccount(string accountId, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"
             query account(
@@ -497,7 +498,7 @@ namespace Lexplorer.Services
             });
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["account"]!;
                 return result.ToObject<Account>()!;
@@ -509,7 +510,7 @@ namespace Lexplorer.Services
             }
 
         }
-        public async Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId)
+        public async Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId, CancellationToken cancellationToken = default)
         {
             var balanceQuery = @"
             query accountBalances(
@@ -542,7 +543,7 @@ namespace Lexplorer.Services
                     accountId = Int32.Parse(accountId)
                 }
             });
-            var response = await _client.PostAsync(request);
+            var response = await _client.PostAsync(request, cancellationToken);
             try
             {
                 JObject jresponse = JObject.Parse(response.Content!);
@@ -564,7 +565,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
-            Double? firstBlockId = null, Double? lastBlockId = null)
+            Double? firstBlockId = null, Double? lastBlockId = null, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -662,7 +663,7 @@ namespace Lexplorer.Services
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 return response.Content;
             }
             catch (Exception ex)
@@ -673,11 +674,11 @@ namespace Lexplorer.Services
         }
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
-            Double? firstBlockId = null, Double? lastBlockId = null)
+            Double? firstBlockId = null, Double? lastBlockId = null, CancellationToken cancellationToken = default)
         {
             try
             {
-                string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId);
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId, cancellationToken);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
                 return token!.ToObject<IList<Transaction>>();
@@ -689,7 +690,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<AccountNFTSlot>?> GetAccountNFTs(int skip, int first, string accountId)
+        public async Task<IList<AccountNFTSlot>?> GetAccountNFTs(int skip, int first, string accountId, CancellationToken cancellationToken = default)
         {
             var accountNFTQuery = @"
             query accountNFTSlotsQuery(
@@ -741,7 +742,7 @@ namespace Lexplorer.Services
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken? token = jresponse["data"]!["accountNFTSlots"];
                 return token!.ToObject<IList<AccountNFTSlot>>();
