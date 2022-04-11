@@ -34,7 +34,14 @@ namespace Lexplorer.Services
                 var function = contract.GetFunction(functionName);
                 object[] parameters = new object[1] { tokenId! };
                 var uri = await function.CallAsync<string>(parameters);
-                return uri?.Remove(0, 7); //remove the ipfs portion
+                if (!String.IsNullOrEmpty(uri) && uri.Contains("ipfs://"))
+                {
+                    return uri?.Remove(0, 7);
+                }
+                else
+                {
+                    return uri;
+                }
             }
             catch (Exception e)
             {
