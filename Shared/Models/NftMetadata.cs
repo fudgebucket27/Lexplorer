@@ -33,5 +33,13 @@ namespace Lexplorer.Models
         }
 
         public string? contentType { get; set; }
+
+        public List<Trait>? attributes { get; set; }
+    }
+
+    public class Trait
+    {
+        public string? trait_type { get; set; }
+        public object? value { get; set; } //value can be either string or int
     }
 }
