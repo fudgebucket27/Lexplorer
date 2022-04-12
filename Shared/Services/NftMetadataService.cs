@@ -43,7 +43,7 @@ namespace Lexplorer.Services
             var request = new RestRequest(URL);
             try
             {
-                request.Timeout = 5000; //we can't afford to wait forever here, 5s must be enough
+                request.Timeout = 10000; //we can't afford to wait forever here, 10s must be enough
                 var response = await _client.GetAsync(request, cancellationToken);
                 return JsonConvert.DeserializeObject<NftMetadata>(response.Content!);
             }
@@ -59,7 +59,7 @@ namespace Lexplorer.Services
             var request = new RestRequest(link, Method.Head);
             try
             {
-                request.Timeout = 5000; //we can't afford to wait forever here, 5s must be enough
+                request.Timeout = 20000; //we can't afford to wait forever here, 20s must be enough
                 var response = await _client.HeadAsync(request, cancellationToken); //Send head request so we only get header not the content
                 Dictionary<string, string> contentHeaders = new Dictionary<string, string>();
                 foreach(var item in response.ContentHeaders!)

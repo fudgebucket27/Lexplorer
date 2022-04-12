@@ -19,6 +19,8 @@ namespace xUnitTests.NFTMetaDataTests
 		[InlineData("0x78cc3ebffd8628722aaf29681b45d6a342e4ae11520c1d507894cc0c86049075", EthereumService.CF_NFTTokenAddress, 0)]
 		[InlineData("0x01346618000000000000000002386f26fc1000000000000000000000000003a1", "0x1cacc96e5f01e2849e6036f25531a9a064d2fb5f", 0)] //loophead #929
 		[InlineData("0x01346618000000000000000002386f26fc10000000000000000000000000028d", "0x1cacc96e5f01e2849e6036f25531a9a064d2fb5f", 0)] //loophead #653
+		[InlineData("0x0000000000000000000000000000000000000000000000000000000000000006", "0x6a7ab7711adcfe67141df82ae853787ca93a7797", 0)] //metadata on arweave
+
 		public async void TestGetMetadata(string nftID, string nftTokenAddress, int nftType)
         {
 			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
@@ -81,7 +83,7 @@ namespace xUnitTests.NFTMetaDataTests
 			Assert.NotNull(meta);
 
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
-			Assert.Equal("model/gltf-binary", contentType);
+			Assert.Equal("application/octet-stream", contentType);
 		}
 
 		[Theory]
