@@ -34,10 +34,10 @@ namespace Lexplorer.Models
 
         public string? contentType { get; set; }
 
-        public List<Trait>? attributes { get; set; }
+        public List<NftAttribute>? attributes { get; set; }
     }
 
-    public class Trait
+    public class NftAttribute
     {
         public string? trait_type { get; set; }
         public object? value { get; set; } //value can be either string or int
