@@ -47,6 +47,18 @@
             <td>Animation URL</td>
             <td>@nftMetadata?.animation_url</td>
         </tr>
+        @if(nftMetadata?.attributes?.Count > 0)
+        {
+            <tr>
+                <td>Traits</td>
+                <td>
+                    @foreach(var trait in nftMetadata?.attributes!)
+                    {
+                        <p>@trait.trait_type:@trait.value</p>
+                    }
+                </td>
+            </tr>
+        }
         <tr>
             <td colspan="2">
                 <NFTContent nftMetadata="@nftMetadata" />
