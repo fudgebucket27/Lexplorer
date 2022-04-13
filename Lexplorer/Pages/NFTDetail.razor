@@ -47,7 +47,7 @@
             <td>Animation URL</td>
             <td>@nftMetadata?.animation_url</td>
         </tr>
-        @if(nftMetadata?.attributes != null && nftMetadata?.attributes!.Count > 0)
+        @if(nftMetadata?.attributes?.Count > 0)
         {
             <tr>
                 <td>Traits</td>
