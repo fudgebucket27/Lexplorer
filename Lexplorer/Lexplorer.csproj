@@ -10,7 +10,7 @@
     <PackageReference Include="JsonSubTypes" Version="1.8.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
-    <PackageReference Include="MudBlazor" Version="6.0.2" />
+    <PackageReference Include="MudBlazor" Version="6.0.9" />
     <PackageReference Include="Nethereum.ENS" Version="4.2.0" />
     <PackageReference Include="Nethereum.Web3" Version="4.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
