@@ -1,6 +1,7 @@
 ﻿using System;
 using Xunit;
 using Lexplorer.Services;
+using System.Collections.Generic;
 
 namespace xUnitTests.NFTMetaDataTests
 {
@@ -83,7 +84,7 @@ namespace xUnitTests.NFTMetaDataTests
 			Assert.NotNull(meta);
 
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
-			Assert.Equal("application/octet-stream", contentType);
+			Assert.True(new List<string> { "application/octet-stream", "model/gltf-binary" }.Contains(contentType), $"unexpected contentType \"{contentType}\"");
 		}
 
 		[Theory]
