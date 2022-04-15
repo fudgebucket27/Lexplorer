@@ -162,7 +162,7 @@
         //load the NFT metadata last - it might actually take the longest and other services are queried etc.
         if (nftMetadata == null)
         {
-            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nftId}";
+            string nftMetadataLinkCacheKey = $"nftMetadataLink-{nft?.nftID}";
             string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey, async () => await EthereumService.GetMetadataLink(nft?.nftID, nft?.token, nft?.nftType));
             if (String.IsNullOrEmpty(nftMetadataLink)) return;
 
