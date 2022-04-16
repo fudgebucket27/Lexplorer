@@ -3,7 +3,8 @@
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.EthereumService EthereumService;
-<MudThemeProvider />
+
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -12,8 +13,11 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6">The Lexplorer</MudText>
         <MudSpacer />
-        <MudTextField Style="background-color:white;" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense"/>
+        <MudTextField Style="@($"background:var(--mud-palette-background);")" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense" />
         <MudSpacer />
+        <MudToggleIconButton @bind-Toggled="@_isDarkMode"
+                             Icon="@Icons.Filled.DarkMode" Color="Color.Inherit" Title="DarkMode"
+                             ToggledIcon="@Icons.Filled.LightMode" ToggledTitle="LightMode" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/fudgebucket27/Lexplorer" Target="_blank" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
@@ -24,22 +28,22 @@
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-0 pt-0">
-            <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+            <p hidden="@(!searching)"><MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7" /></p>
             @if (searchResults?.Count > 0)
             {
-                        <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
-                            <ToolBarContent>
-                                <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
-                            </ToolBarContent>
-                            <HeaderContent>
-                                <MudTh>Found</MudTh>
-                                <MudTh>Type</MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
-                                <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>                
-                            </RowTemplate>
-                        </MudTable>
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@searchResults" Hover="true">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Search results for "@searchTerm"</MudText>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Found</MudTh>
+                        <MudTh>Type</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Found">@LinkHelper.GetObjectLink(context)</MudTd>
+                        <MudTd DataLabel="Type">@(context.GetType()?.GetProperty("typeName")?.GetValue(context, null))</MudTd>
+                    </RowTemplate>
+                </MudTable>
             }
             @Body
         </MudContainer>
@@ -61,6 +65,9 @@
             DoSearch();
         }
     }
+
+    private MudTheme _theme = new();
+    private bool _isDarkMode = false;
 
     void DrawerToggle()
     {
