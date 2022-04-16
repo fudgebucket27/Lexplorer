@@ -47,15 +47,25 @@
             <td>Animation URL</td>
             <td>@nftMetadata?.animation_url</td>
         </tr>
-        @if(nftMetadata?.attributes?.Count > 0)
+        @if (nftMetadata?.attributes?.Count > 0)
         {
             <tr>
-                <td>Traits</td>
-                <td>
-                    @foreach(var trait in nftMetadata?.attributes!)
-                    {
-                        <p>@trait.trait_type:@trait.value</p>
-                    }
+                <td colspan="2">
+                    <MudExpansionPanels>
+                        <MudExpansionPanel Text="Traits">
+                            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                                <tbody>
+                                    @foreach (var trait in nftMetadata?.attributes!)
+                                    {
+                                        <tr>
+                                            <td>@trait.trait_type</td>
+                                            <td>@trait.value</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        </MudExpansionPanel>
+                    </MudExpansionPanels>
                 </td>
             </tr>
         }
