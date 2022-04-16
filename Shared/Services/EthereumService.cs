@@ -51,8 +51,7 @@ namespace Lexplorer.Services
            
             try
             {
-                string address = await ensService.ResolveAddressAsync(ens);
-                return address; //remove the ipfs portion
+                return await ensService.ResolveAddressAsync(ens);
             }
             catch (Exception e)
             {
