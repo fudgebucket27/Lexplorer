@@ -83,7 +83,7 @@ namespace xUnitTests.NFTMetaDataTests
 			Assert.NotNull(meta);
 
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
-			Assert.Equal("application/octet-stream", contentType);
+			Assert.Equal("model/gltf-binary", contentType);
 		}
 
 		[Theory]
