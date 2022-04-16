@@ -84,7 +84,7 @@ namespace xUnitTests.NFTMetaDataTests
 			Assert.NotNull(meta);
 
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
-			Assert.True(new List<string> { "application/octet-stream", "model/gltf-binary" }.Contains(contentType), $"unexpected contentType \"{contentType}\"");
+			Assert.True(new List<string> { "application/octet-stream", "model/gltf-binary" }.Contains(contentType!), $"unexpected contentType \"{contentType}\"");
 		}
 
 		[Theory]

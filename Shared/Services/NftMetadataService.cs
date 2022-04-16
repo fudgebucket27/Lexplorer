@@ -60,7 +60,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<string> GetContentTypeFromURL(string link, CancellationToken cancellationToken = default)
+        public async Task<string?> GetContentTypeFromURL(string link, CancellationToken cancellationToken = default)
         {
             link = makeAbsolutelink(link);
             var request = new RestRequest(link, Method.Head);
@@ -68,22 +68,12 @@ namespace Lexplorer.Services
             {
                 request.Timeout = 20000; //we can't afford to wait forever here, 20s must be enough
                 var response = await _client.HeadAsync(request, cancellationToken); //Send head request so we only get header not the content
-                Dictionary<string, string> contentHeaders = new Dictionary<string, string>();
-                foreach(var item in response.ContentHeaders!)
-                {
-                    contentHeaders.Add(item.Name!, item!.Value!.ToString()!);
-                }
-                string contentType = "";
-                if(!contentHeaders.TryGetValue("Content-Type", out contentType!))
-                {
-                    //the key doesn't exist
-                }
-                return contentType!;
+                return response?.ContentType;
             }
             catch (Exception e)
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-                return null!;
+                return null;
             }
         }
 
