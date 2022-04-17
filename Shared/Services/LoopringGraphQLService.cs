@@ -170,7 +170,7 @@ namespace Lexplorer.Services
 
         }
 
-        public async Task<Block?> GetBlockDetails(int blockId)
+        public async Task<Block?> GetBlockDetails(int blockId, CancellationToken cancellationToken = default)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -213,7 +213,7 @@ namespace Lexplorer.Services
                     id = blockId
                 }
             });
-            var response = await _client.PostAsync(request);
+            var response = await _client.PostAsync(request, cancellationToken);
             var data = JsonConvert.DeserializeObject<Block>(response.Content!);
             return data;
         }
@@ -298,7 +298,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default)
         {
             var transactionsQuery = @"
               query transactions(
@@ -458,7 +458,7 @@ namespace Lexplorer.Services
 
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
                 return data;
             }
@@ -977,7 +977,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<NonFungibleToken?> GetNFT(string NFTId)
+        public async Task<NonFungibleToken?> GetNFT(string NFTId, CancellationToken cancellationToken = default)
         {
             var NFTQuery = @"
               query nonFungibleTokenQuery($id: ID!) {
@@ -1009,7 +1009,7 @@ namespace Lexplorer.Services
 
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["nonFungibleToken"]!;
                 return result.ToObject<NonFungibleToken>();
@@ -1021,7 +1021,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<string?> GetNFTTransactionsResponse(int skip, int first, string nftId)
+        public async Task<string?> GetNFTTransactionsResponse(int skip, int first, string nftId, CancellationToken cancellationToken = default)
         {
             var nftQuery = @"
             query nftTransactions(
@@ -1083,7 +1083,7 @@ namespace Lexplorer.Services
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 return response.Content;
             }
             catch (Exception ex)
@@ -1093,11 +1093,11 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<Transaction>?> GetNFTTransactions(int skip, int first, string nftId)
+        public async Task<IList<Transaction>?> GetNFTTransactions(int skip, int first, string nftId, CancellationToken cancellationToken = default)
         {
             try
             {
-                string? response = await GetNFTTransactionsResponse(skip, first, nftId);
+                string? response = await GetNFTTransactionsResponse(skip, first, nftId, cancellationToken);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["nonFungibleToken"]!["transactions"];
                 return token!.ToObject<IList<Transaction>>();

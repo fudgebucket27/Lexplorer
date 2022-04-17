@@ -79,12 +79,12 @@ else
         }
         isLoading = true;
         string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
-        pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
+        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
         int pairCount = 0;
         foreach (var pair in pairsData!.data!.pairs!)
         {
             string uniswapTokenCacheKey = $"pairsOverview-token-{pair!.token1!.address!}-pageNumber{pageNumber}";
-            var uniswapToken = await AppCache.GetOrAddAsync(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
+            var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
             if(uniswapToken != null && pairCount == 0)
             {
                 uniswapTokens = new List<UniswapToken>();

@@ -381,7 +381,7 @@
         string transactionCacheKey = $"transactionDetail-{transactionId}";
         if (transaction?.id != transactionId)
         {
-            transaction = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
+            transaction = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
             StateHasChanged();
         }
     }

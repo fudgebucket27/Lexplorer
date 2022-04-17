@@ -68,7 +68,7 @@
         }
 
         string nftsCacheKey = $"nfts-page{pageNumber}";
-        nfts = await AppCache.GetOrAddAsync(nftsCacheKey,
+        nfts = await AppCache.GetOrAddAsyncNonNull(nftsCacheKey,
             async () => await LoopringGraphQLService.GetNFTs((gotoPage - 1) * pageSize, pageSize),
             DateTimeOffset.UtcNow.AddMinutes(10));
         isLoading = false;
