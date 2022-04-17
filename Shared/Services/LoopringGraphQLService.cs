@@ -170,7 +170,7 @@ namespace Lexplorer.Services
 
         }
 
-        public async Task<Block?> GetBlockDetails(int blockId)
+        public async Task<Block?> GetBlockDetails(int blockId, CancellationToken cancellationToken = default)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -213,7 +213,7 @@ namespace Lexplorer.Services
                     id = blockId
                 }
             });
-            var response = await _client.PostAsync(request);
+            var response = await _client.PostAsync(request, cancellationToken);
             var data = JsonConvert.DeserializeObject<Block>(response.Content!);
             return data;
         }
@@ -298,7 +298,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null)
+        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default)
         {
             var transactionsQuery = @"
               query transactions(
@@ -458,7 +458,7 @@ namespace Lexplorer.Services
 
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
                 return data;
             }
