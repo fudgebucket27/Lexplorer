@@ -100,7 +100,7 @@
         }
 
         string transactionCacheKey = $"transactions-page{pageNumber}-type{type}";
-        var transactionsData = await AppCache.GetOrAddAsync(transactionCacheKey,
+        var transactionsData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
             async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, typeName: type),
             DateTimeOffset.UtcNow.AddMinutes(10));
         transactions = transactionsData?.data?.transactions;

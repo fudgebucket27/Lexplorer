@@ -196,20 +196,20 @@
     protected override async Task OnInitializedAsync()
     {
         string blockCacheKey = $"homepage-block";
-        blockData = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
+        blockData = await AppCache.GetOrAddAsyncNonNull(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
         StateHasChanged();
         string transactionCacheKey = $"homepage-transaction";
-        transactionData = await AppCache.GetOrAddAsync(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
+        transactionData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         StateHasChanged();
         string pairsCacheKey = $"homepage-pairs";
-        pairsData = await AppCache.GetOrAddAsync(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
+        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
         int pairCount = 0;
         foreach(var pair in pairsData!.data!.pairs!)
         {
             string uniSwapTokenCache = $"homepage-uniswapToken-{pair!.token1!.address!}";
-            var uniswapToken = await AppCache.GetOrAddAsync(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
+            var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
             if(uniswapToken != null && pairCount == 0)
             {
                 uniswapTokens = new List<UniswapToken>();
