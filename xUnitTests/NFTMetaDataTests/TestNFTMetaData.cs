@@ -1,6 +1,7 @@
 ﻿using System;
 using Xunit;
 using Lexplorer.Services;
+using System.Collections.Generic;
 
 namespace xUnitTests.NFTMetaDataTests
 {
@@ -40,7 +41,7 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
 
-			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
 			Assert.Equal("video/mp4", contentType);
 		}
 
@@ -54,7 +55,7 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
 
-			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
 			Assert.Equal("image/jpeg", contentType);
 		}
 
@@ -68,7 +69,7 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
 
-			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
 			Assert.Equal("audio/mpeg", contentType);
 		}
 
@@ -82,8 +83,8 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
 
-			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
-			Assert.Equal("application/octet-stream", contentType);
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
+			Assert.True(new List<string> { "application/octet-stream", "model/gltf-binary" }.Contains(contentType!), $"unexpected contentType \"{contentType}\"");
 		}
 
 		[Theory]
@@ -96,7 +97,7 @@ namespace xUnitTests.NFTMetaDataTests
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
 
-			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!.StartsWith("ipfs://") ? meta!.animation_url.Remove(0, 7) : meta!.animation_url);
+			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
 			Assert.Equal("text/html", contentType);
 		}
 	}

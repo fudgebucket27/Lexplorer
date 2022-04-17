@@ -122,14 +122,14 @@ else
         string blockCacheKey = $"blockDetailOverview-{blockNumber}";
 
         isBlockLoading = true;
-        block = await AppCache.GetOrAddAsync(blockCacheKey, async () => await LoopringGraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(5));
+        block = await AppCache.GetOrAddAsyncNonNull(blockCacheKey, async () => await LoopringGraphQLService.GetBlockDetails(Int32.Parse(blockNumber)), DateTimeOffset.UtcNow.AddMinutes(5));
         if (block == null) return;
         blockData = new List<BlockData>();
         blockData.Add(block.data!);
         isBlockLoading = false;
         isTransactionLoading = true;
         string transactionDatacacheKey = $"blockDetailTransactions-{blockNumber}-page{pageNumber}";
-        transactionData = await AppCache.GetOrAddAsync(transactionDatacacheKey, async () => await LoopringGraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber), DateTimeOffset.UtcNow.AddMinutes(5));
+        transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey, async () => await LoopringGraphQLService.GetTransactions(Int32.Parse(pageNumber) * 10, 10, blockNumber), DateTimeOffset.UtcNow.AddMinutes(5));
         isTransactionLoading = false;
         StateHasChanged();
     }
