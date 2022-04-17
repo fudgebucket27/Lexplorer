@@ -32,7 +32,7 @@ namespace Lexplorer.Services
             return TokenAmountConverter.ToDecimal(amount, token?.decimals).ToString("");
         }
 
-        protected virtual void DoBuildLine(string? id, string? timestamp, string? type, string? from = null, string? to = null, 
+        protected virtual void DoBuildLine(Transaction transaction, string? id, string? timestamp, string? type, string? from = null, string? to = null, 
             string? added = null, string? addedToken = null, string? fee = null, string? feeToken = null, string? total = null, string? totalToken = null)
         //helper with default param values for more readable code
         {
@@ -44,7 +44,7 @@ namespace Lexplorer.Services
             bool areWeAccountA = orderBookTrade.accountA?.id == accountIdPerspective;
             if (areWeAccountA)
             {
-                DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
+                DoBuildLine(orderBookTrade, orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
                     from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
                     added: GetExportAmount(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB), //Amount of token B bought by Account A
                     addedToken: orderBookTrade.tokenB?.symbol,
@@ -56,7 +56,7 @@ namespace Lexplorer.Services
             }
             else
             {
-                DoBuildLine(orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
+                DoBuildLine(orderBookTrade, orderBookTrade.id, orderBookTrade.verifiedAt, orderBookTrade.typeName,
                     from: orderBookTrade.accountA?.address, to: orderBookTrade.accountB?.address,
                     added: GetExportAmount(orderBookTrade.fillBB, orderBookTrade.tokenA), //Amount of token A bought by Account B
                     addedToken: orderBookTrade.tokenA?.symbol,
@@ -77,7 +77,7 @@ namespace Lexplorer.Services
             else
             {
                 //we are account A and bought token B, selling token A, paying feeA in tokenB
-                DoBuildLine(swap.id, swap.verifiedAt, swap.typeName,
+                DoBuildLine(swap, swap.id, swap.verifiedAt, swap.typeName,
                     from: swap.account?.address,
                     to: swap.pool?.address,
                     added: GetExportAmount(swap.fillBA - swap.feeA, swap.tokenB), //Amount of token B bought by Account A minus feeA we paid
@@ -91,7 +91,7 @@ namespace Lexplorer.Services
         }
         private void WriteTransfer(Transfer transfer, string accountIdPerspective, CSVWriteLine writeLine)
         {
-            DoBuildLine(transfer.id, transfer.verifiedAt, transfer.typeName,
+            DoBuildLine(transfer, transfer.id, transfer.verifiedAt, transfer.typeName,
                 from: transfer.fromAccount?.address,
                 to: transfer.toAccount?.address,
                 added: (transfer.toAccount?.id == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
@@ -103,28 +103,28 @@ namespace Lexplorer.Services
         }
         private void WriteDeposit(Deposit deposit, string accountIdPerspective, CSVWriteLine writeLine)
         {
-            DoBuildLine(deposit.id, deposit.verifiedAt, deposit.typeName,
+            DoBuildLine(deposit, deposit.id, deposit.verifiedAt, deposit.typeName,
                 to: deposit.toAccount?.address,
                 added: GetExportAmount(deposit.amount, deposit.token),
                 addedToken: deposit.token?.symbol);
         }
         private void WriteWithdrawal(Withdrawal withdrawal, string accountIdPerspective, CSVWriteLine writeLine)
         {
-            DoBuildLine(withdrawal.id, withdrawal.verifiedAt, withdrawal.typeName,
+            DoBuildLine(withdrawal, withdrawal.id, withdrawal.verifiedAt, withdrawal.typeName,
                 from: withdrawal.fromAccount?.address,
                 total: GetExportAmount(withdrawal.amount, withdrawal.token),
                 totalToken: withdrawal.token?.symbol);
         }
         private void WriteAccountUpdate(AccountUpdate accountUpdate, string accountIdPerspective, CSVWriteLine writeLine)
         {
-            DoBuildLine(accountUpdate.id, accountUpdate.verifiedAt, accountUpdate.typeName, 
+            DoBuildLine(accountUpdate, accountUpdate.id, accountUpdate.verifiedAt, accountUpdate.typeName, 
                 from: accountUpdate.user?.address, 
                 fee: GetExportAmount(accountUpdate.fee, accountUpdate.feeToken),
                 feeToken: accountUpdate.feeToken?.symbol);
         }
         private void WriteTransferNFT(TransferNFT transferNFT, string accountIdPerspective, CSVWriteLine writeLine)
         {
-            DoBuildLine(transferNFT.id, transferNFT.verifiedAt, transferNFT.typeName,
+            DoBuildLine(transferNFT, transferNFT.id, transferNFT.verifiedAt, transferNFT.typeName,
                 from: transferNFT.fromAccount?.address,
                 to: transferNFT.toAccount?.address,
                 added: (transferNFT.toAccount?.id == accountIdPerspective) ? transferNFT.amount.ToString() : null,
