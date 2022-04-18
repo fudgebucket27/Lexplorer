@@ -1,0 +1,128 @@
+﻿@using Lexplorer.Helpers;
+@using Lexplorer.Components;
+@using System.Diagnostics;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject NavigationManager NavigationManager;
+@inject IAppCache AppCache;
+@page "/account";
+
+<PageTitle>The Lexplorer - Accounts</PageTitle>
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@accounts" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Latest accounts</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accounts!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <MudSpacer />
+        <MudSelect @bind-Value="@filterAccounts" T="string" Label="Filter by type">
+            <MudSelectItem Value="@("All")" />
+            <MudSelectItem Value="@("User")" />
+            <MudSelectItem Value="@("Pool")" />
+            <MudSelectItem Value="@("ProtocolAccount")" />
+        </MudSelect>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>L1 address</MudTh>
+        <MudTh>Created At (UTC)</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Account Id">@LinkHelper.GetObjectLink(context)</MudTd>
+        <MudTd DataLabel="Type">@context.typeName</MudTd>
+        <MudTd DataLabel="L1Address"><L1AccountLink address="@context?.address" /></MudTd>
+        <MudTd DataLabel="CreatedAt">@context.createdAtTransaction?.verifiedAt</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    public int gotoPage
+    {
+        get
+        {
+            return Int32.Parse(pageNumber ?? "1");
+        }
+        set
+        {
+            navigateTo(value);
+        }
+    }
+
+    public bool isLoading = true;
+    public readonly int pageSize = 25;
+
+    private IList<Lexplorer.Models.Account>? accounts { get; set; } = new List<Lexplorer.Models.Account>();
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? type { get; set; }
+
+    public string? filterAccounts
+    {
+        get
+        {
+            return type ?? "All";
+        }
+        set
+        {
+            type = (string.Equals(value ?? "All", "All", StringComparison.InvariantCultureIgnoreCase)) ? null : value;
+            navigateTo(gotoPage);
+        }
+    }
+
+    private void navigateTo(int page)
+    {
+        string URL = $"/account?pageNumber={page}";
+        if (type != null)
+            URL += $"&type={type}";
+        NavigationManager.NavigateTo(URL);
+    }
+
+    private CancellationTokenSource? cts;
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        //cancel any previous OnParametersSetAsync which might still be running
+        cts?.Cancel();
+
+        using (CancellationTokenSource localCTS = new CancellationTokenSource())
+        {
+            //give future calls a chance to cancel us; it is now safe to replace
+            //any previous value of cts, since we already cancelled it above
+            cts = localCTS;
+
+            try
+            {
+                isLoading = true;
+
+                string accountCacheKey = $"transactions-page{gotoPage}-type{type}";
+                accounts = await AppCache.GetOrAddAsyncNonNull(accountCacheKey,
+                    async () => await LoopringGraphQLService.GetAccounts((gotoPage - 1) * pageSize, pageSize, type, localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                isLoading = false;
+                StateHasChanged();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            }
+            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+            //otherwise a new call has already replaced cts with it's own localCTS
+            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+        }
+    }
+
+}
+

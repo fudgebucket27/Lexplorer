@@ -468,6 +468,70 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+        public async Task<IList<Account>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default)
+        {
+            var accountsQuery = @"
+                      query accounts(
+                        $skip: Int
+                        $first: Int
+                        $orderBy: Account_orderBy
+                        $orderDirection: OrderDirection
+                      ) {
+                        accounts(
+                          skip: $skip
+                          first: $first
+                          orderBy: $orderBy
+                          orderDirection: $orderDirection
+                        ) {
+                          ...AccountFragment
+                          ...PoolFragment
+                          ...UserFragment
+                        }
+                      }"
+                  + GraphQLFragments.AccountFragment
+                  + GraphQLFragments.TokenFragment
+                  + GraphQLFragments.PoolFragment
+                  + GraphQLFragments.UserFragment
+                  + GraphQLFragments.AccountCreatedAtFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+
+            //since there is no way to filter for typename in Accounts_filter, we simply
+            //query a different entity, i.e. pools instead of accounts
+            string typePluralName = "accounts";
+            if (!String.IsNullOrEmpty(typeName))
+            {
+                //lower case, but first char only
+                typePluralName = Char.ToLower(typeName[0]) + typeName.Substring(1) + "s";
+                accountsQuery = accountsQuery.Replace("accounts(", $"{typePluralName}(");
+            }
+
+            request.AddJsonBody(new
+            {
+                query = accountsQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    orderBy = "internalID",
+                    orderDirection = "desc"
+                }
+            });
+
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]![typePluralName];
+                return token!.ToObject<IList<Account>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
         public async Task<Account?> GetAccount(string accountId, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"

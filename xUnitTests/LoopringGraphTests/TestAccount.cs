@@ -51,5 +51,26 @@ namespace xUnitTests.LoopringGraphTests
                 Assert.NotNull(slot.nft);
             }
         }
+
+        [Fact]
+        public async void GetAccounts()
+        {
+            IList<Account>? accounts = await service.GetAccounts(0, 10);
+            Assert.NotEmpty(accounts);
+            foreach (var account in accounts!)
+            {
+                Assert.NotNull(account);
+            }
+        }
+        [Fact]
+        public async void GetPools()
+        {
+            IList<Account>? accounts = await service.GetAccounts(0, 10, "Pool");
+            Assert.NotEmpty(accounts);
+            foreach (var account in accounts!)
+            {
+                Assert.IsType<Pool>(account);
+            }
+        }
     }
 }
