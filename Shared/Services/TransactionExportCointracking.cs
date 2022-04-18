@@ -39,10 +39,12 @@ namespace Lexplorer.Services
             writeLine(sb.ToString());
         }
 
-        static private Dictionary<string, string> typeDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, string> typeDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            {"Swap", "Trade" },
-            {"OrderBookTrade", "Trade" },
+            { "Swap", "Trade" },
+            { "OrderBookTrade", "Trade" },
+            { "MintNFT", "Other Fee" },
+            { "WithdrawalNFT", "Withdrawal" }
         };
 
         protected override void DoBuildLine(Transaction transaction, string? id, string? timestamp, string? type, string? from = null, string? to = null,
