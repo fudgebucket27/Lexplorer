@@ -146,6 +146,23 @@ namespace Lexplorer.Services
                 total: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? mintNFT.amount.ToString() : null,
                 totalToken: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? "NFT" : null);
         }
+        private void WriteWithdrawalNFT(WithdrawalNFT withdrawalNFT, string accountIdPerspective, CSVWriteLine writeLine)
+        {
+            DoBuildLine(withdrawalNFT, withdrawalNFT.id, withdrawalNFT.verifiedAt, withdrawalNFT.typeName,
+                from: withdrawalNFT.fromAccount?.address,
+                to: null,
+                added: null,
+                addedToken: null,
+                fee: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? GetExportAmount(withdrawalNFT.fee, withdrawalNFT.feeToken) : null,
+                feeToken: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? withdrawalNFT.feeToken?.symbol : null,
+                total: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? withdrawalNFT.amount.ToString() : null,
+                totalToken: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);
+        }
+        private static readonly List<string> transactionTypesToIgnore = new()
+        {
+            { "SignatureVerification" },
+            { "AmmUpdate" }
+        };
         public void WriteTransaction(Transaction transaction, string accountIdPerspective, CSVWriteLine writeLine)
         {
             sb.Clear();
@@ -163,9 +180,11 @@ namespace Lexplorer.Services
                 WriteTransferNFT((TransferNFT)transaction, accountIdPerspective, writeLine);
             else if (transaction is MintNFT)
                 WriteMintNFT((MintNFT)transaction, accountIdPerspective, writeLine);
+            else if (transaction is WithdrawalNFT)
+                WriteWithdrawalNFT((WithdrawalNFT)transaction, accountIdPerspective, writeLine);
             else if (transaction is AccountUpdate)
                 WriteAccountUpdate((AccountUpdate)transaction, accountIdPerspective, writeLine);
-            else if (transaction.typeName == "SignatureVerification")
+            else if (transactionTypesToIgnore.Contains(transaction.typeName!))
 #pragma warning disable CS0642 // Possible mistaken empty statement
                 ; //nothing to export
 #pragma warning restore CS0642 // Possible mistaken empty statement
