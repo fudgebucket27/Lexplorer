@@ -134,6 +134,18 @@ namespace Lexplorer.Services
                 total: (transferNFT.fromAccount?.id == accountIdPerspective) ? transferNFT.amount.ToString() : null,
                 totalToken: (transferNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);
         }
+        private void WriteMintNFT(MintNFT mintNFT, string accountIdPerspective, CSVWriteLine writeLine)
+        {
+            DoBuildLine(mintNFT, mintNFT.id, mintNFT.verifiedAt, mintNFT.typeName,
+                from: mintNFT.minter?.address,
+                to: mintNFT.receiver?.address,
+                added: (mintNFT.receiver?.id == accountIdPerspective) ? mintNFT.amount.ToString() : null,
+                addedToken: (mintNFT.receiver?.id == accountIdPerspective) ? "NFT" : null,
+                fee: (mintNFT.receiver?.id == accountIdPerspective) ? GetExportAmount(mintNFT.fee, mintNFT.feeToken) : null, 
+                feeToken: (mintNFT.receiver?.id == accountIdPerspective) ? mintNFT.feeToken?.symbol : null, 
+                total: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? mintNFT.amount.ToString() : null,
+                totalToken: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? "NFT" : null);
+        }
         public void WriteTransaction(Transaction transaction, string accountIdPerspective, CSVWriteLine writeLine)
         {
             sb.Clear();
@@ -149,6 +161,8 @@ namespace Lexplorer.Services
                 WriteSwap((Swap)transaction, accountIdPerspective, writeLine);
             else if (transaction is TransferNFT)
                 WriteTransferNFT((TransferNFT)transaction, accountIdPerspective, writeLine);
+            else if (transaction is MintNFT)
+                WriteMintNFT((MintNFT)transaction, accountIdPerspective, writeLine);
             else if (transaction is AccountUpdate)
                 WriteAccountUpdate((AccountUpdate)transaction, accountIdPerspective, writeLine);
             else if (transaction.typeName == "SignatureVerification")
