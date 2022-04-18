@@ -166,24 +166,24 @@ namespace Lexplorer.Services
         public void WriteTransaction(Transaction transaction, string accountIdPerspective, CSVWriteLine writeLine)
         {
             sb.Clear();
-            if (transaction is OrderBookTrade)
-                WriteOrderBookTrade((OrderBookTrade)transaction, accountIdPerspective, writeLine);
-            else if (transaction is Transfer)
-                WriteTransfer((Transfer)transaction, accountIdPerspective, writeLine);
-            else if (transaction is Deposit)
-                WriteDeposit((Deposit)transaction, accountIdPerspective, writeLine);
-            else if (transaction is Withdrawal)
-                WriteWithdrawal((Withdrawal)transaction, accountIdPerspective, writeLine);
-            else if (transaction is Swap)
-                WriteSwap((Swap)transaction, accountIdPerspective, writeLine);
-            else if (transaction is TransferNFT)
-                WriteTransferNFT((TransferNFT)transaction, accountIdPerspective, writeLine);
-            else if (transaction is MintNFT)
-                WriteMintNFT((MintNFT)transaction, accountIdPerspective, writeLine);
-            else if (transaction is WithdrawalNFT)
-                WriteWithdrawalNFT((WithdrawalNFT)transaction, accountIdPerspective, writeLine);
-            else if (transaction is AccountUpdate)
-                WriteAccountUpdate((AccountUpdate)transaction, accountIdPerspective, writeLine);
+            if (transaction is OrderBookTrade orderBookTrade)
+                WriteOrderBookTrade(orderBookTrade, accountIdPerspective, writeLine);
+            else if (transaction is Transfer transfer)
+                WriteTransfer(transfer, accountIdPerspective, writeLine);
+            else if (transaction is Deposit deposit)
+                WriteDeposit(deposit, accountIdPerspective, writeLine);
+            else if (transaction is Withdrawal withdrawal)
+                WriteWithdrawal(withdrawal, accountIdPerspective, writeLine);
+            else if (transaction is Swap swap)
+                WriteSwap(swap, accountIdPerspective, writeLine);
+            else if (transaction is TransferNFT transferNFT)
+                WriteTransferNFT(transferNFT, accountIdPerspective, writeLine);
+            else if (transaction is MintNFT mintNFT)
+                WriteMintNFT(mintNFT, accountIdPerspective, writeLine);
+            else if (transaction is WithdrawalNFT withdrawalNFT)
+                WriteWithdrawalNFT(withdrawalNFT, accountIdPerspective, writeLine);
+            else if (transaction is AccountUpdate accountUpdate)
+                WriteAccountUpdate(accountUpdate, accountIdPerspective, writeLine);
             else if (transactionTypesToIgnore.Contains(transaction.typeName!))
 #pragma warning disable CS0642 // Possible mistaken empty statement
                 ; //nothing to export
