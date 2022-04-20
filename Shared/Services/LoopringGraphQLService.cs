@@ -298,7 +298,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default)
+        public async Task<Transactions?> GetTransactions(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default)
         {
             var transactionsQuery = @"
               query transactions(
@@ -306,8 +306,7 @@ namespace Lexplorer.Services
                 $first: Int
                 $orderBy: Transaction_orderBy
                 $orderDirection: OrderDirection
-                $block: Block_height
-                $where: Transaction_filter
+                $whereFilter: Transaction_filter
               ) {
                 proxy(id: 0) {
                   transactionCount
@@ -333,8 +332,7 @@ namespace Lexplorer.Services
                   first: $first
                   orderBy: $orderBy
                   orderDirection: $orderDirection
-                  block: $block
-                  where: $where
+                  where: $whereFilter
                 ) {
                   id
                   internalID
@@ -403,7 +401,7 @@ namespace Lexplorer.Services
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
-            if (blockId != null)
+            if (typeName != null)
             {
                 request.AddJsonBody(new
                 {
@@ -413,28 +411,8 @@ namespace Lexplorer.Services
                         skip = skip,
                         first = first,
                         orderBy = "internalID",
-                        orderDirection = "desc"
-                        ,
-                        where = new
-                        {
-                            block = blockId
-                        }
-                    }
-                });
-            }
-            else if (typeName != null)
-            {
-                request.AddJsonBody(new
-                {
-                    query = transactionsQuery,
-                    variables = new
-                    {
-                        skip = skip,
-                        first = first,
-                        orderBy = "internalID",
-                        orderDirection = "desc"
-                                       ,
-                        where = new
+                        orderDirection = "desc",
+                        whereFilter = new
                         {
                             typename = typeName
                         }
@@ -443,6 +421,11 @@ namespace Lexplorer.Services
             }
             else
             {
+                //remove unused parameter to fix "Invalid query" error with non-hosted graph
+                //split and re-join all lines which don't contain the word "whereFilter"
+                transactionsQuery = String.Join(Environment.NewLine,
+                    transactionsQuery.Split(Environment.NewLine).Where(
+                        (a) => !(a.Contains("whereFilter"))));
                 request.AddJsonBody(new
                 {
                     query = transactionsQuery,

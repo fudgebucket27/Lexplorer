@@ -25,6 +25,23 @@ namespace xUnitTests.LoopringGraphTests
             Assert.NotNull(transaction);
             Assert.Equal(testID, transaction!.id);
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("Swap")]
+        public async void TestGetTransations(string? typeName)
+        {
+            var transactions = await service.GetTransactions(0, 5, typeName);
+            Assert.NotNull(transactions);
+            Assert.NotEmpty(transactions?.data?.transactions);
+            if (!String.IsNullOrEmpty(typeName))
+            {
+                foreach (var transaction in transactions?.data?.transactions!)
+                {
+                    Assert.Equal(typeName, transaction.typeName);
+                }
+            }
+        }
     }
 }
 
