@@ -153,7 +153,7 @@
                 isTransactionLoading = true;
                 string transactionDatacacheKey = $"blockDetailTransactions-{blockId}-page{gotoPage}";
                 var transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
-                    async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockNumber, cancellationToken: localCTS.Token),
+                    async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockId: blockNumber, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(5));
                 transactions = transactionData?.data?.transactions ?? new List<Transaction>();
                 isTransactionLoading = false;

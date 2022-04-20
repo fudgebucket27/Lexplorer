@@ -307,7 +307,7 @@ namespace Lexplorer.Services
                 $orderBy: Transaction_orderBy
                 $orderDirection: OrderDirection
                 $block: Block_height
-                $where: Transaction_filter
+                $whereFilter: Transaction_filter
               ) {
                 proxy(id: 0) {
                   transactionCount
@@ -334,7 +334,7 @@ namespace Lexplorer.Services
                   orderBy: $orderBy
                   orderDirection: $orderDirection
                   block: $block
-                  where: $where
+                  where: $whereFilter
                 ) {
                   id
                   internalID
@@ -415,7 +415,7 @@ namespace Lexplorer.Services
                         orderBy = "internalID",
                         orderDirection = "desc"
                         ,
-                        where = new
+                        whereFilter = new
                         {
                             block = blockId
                         }
@@ -432,9 +432,8 @@ namespace Lexplorer.Services
                         skip = skip,
                         first = first,
                         orderBy = "internalID",
-                        orderDirection = "desc"
-                                       ,
-                        where = new
+                        orderDirection = "desc",
+                        whereFilter = new
                         {
                             typename = typeName
                         }
@@ -443,6 +442,11 @@ namespace Lexplorer.Services
             }
             else
             {
+                //remove unused parameter to fix "Invalid query" error with non-hosted graph
+                //split and re-join all lines which don't contain the word "whereFilter"
+                transactionsQuery = String.Join(Environment.NewLine,
+                    transactionsQuery.Split(Environment.NewLine).Where(
+                        (a) => !(a.Contains("whereFilter"))));
                 request.AddJsonBody(new
                 {
                     query = transactionsQuery,
