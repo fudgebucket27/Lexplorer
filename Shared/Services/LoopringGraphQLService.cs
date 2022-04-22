@@ -19,7 +19,7 @@ namespace Lexplorer.Services
 {
     public class LoopringGraphQLService : IDisposable
     {
-        const string _baseUrl = "https://api.thegraph.com/subgraphs/name/loopring/loopring";
+        const string _baseUrl = "https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36";
 
         readonly RestClient _client;
 
