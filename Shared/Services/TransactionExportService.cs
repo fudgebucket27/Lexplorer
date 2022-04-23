@@ -32,9 +32,9 @@ namespace Lexplorer.Services
             registeredExportServices.Add(CSVFormatName, service);
         }
 
-        private readonly LoopringGraphQLService _graphqlService;
+        private readonly ILoopringGraphQLService _graphqlService;
 
-        public TransactionExportService(LoopringGraphQLService graphQLService)
+        public TransactionExportService(ILoopringGraphQLService graphQLService)
         {
             _graphqlService = graphQLService;
         }
