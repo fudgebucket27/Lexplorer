@@ -888,6 +888,61 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<Pair?> GetPair(string pairID)
+        {
+            var pairQuery = @"
+             query pair(
+                $pairID: ID!
+              ) {
+                pair(
+                  id: $pairID
+                ) {
+                  id
+                  internalID
+                  token0 {
+                    ...TokenFragment
+                  }
+                  token1 {
+                    ...TokenFragment
+                  }
+                  token0Price
+                  token1Price
+                  tradedVolumeToken0
+                  tradedVolumeToken1
+                  tradedVolumeToken0Swap
+                  tradedVolumeToken1Swap
+                  tradedVolumeToken0Orderbook
+                  tradedVolumeToken1Orderbook
+                }
+              }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = pairQuery,
+                variables = new
+                {
+                    pairID
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["pair"];
+                return token!.ToObject<Pair>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         private static readonly Dictionary<string, Type> resultCategories
             = new Dictionary<string, Type>
         {

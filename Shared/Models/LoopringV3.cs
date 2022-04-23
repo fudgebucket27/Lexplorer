@@ -115,6 +115,14 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public Token? token0 { get; set; }
         public Token? token1 { get; set; }
+        public Double token0Price { get; set; }
+        public Double token1Price { get; set; }
+        public Double tradedVolumeToken0 { get; set; }
+        public Double tradedVolumeToken1 { get; set; }
+        public Double tradedVolumeToken0Swap { get; set; }
+        public Double tradedVolumeToken1Swap { get; set; }
+        public Double tradedVolumeToken0Orderbook { get; set; }
+        public Double tradedVolumeToken1Orderbook { get; set; }
 
         public List<DailyEntity>? dailyEntities { get; set; }
         public List<WeeklyEntity>? weeklyEntities { get; set; }
