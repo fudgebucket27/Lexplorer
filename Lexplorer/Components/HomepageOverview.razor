@@ -133,7 +133,7 @@
     </MudGrid>
      <MudGrid>
         <MudItem xs="12" sm="12" md="4">
-            <MudTable Dense="true" Items="@pairsData?.data?.pairs" Hover="true">
+            <MudTable Dense="true" Items="@pairs" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Pairs</MudText>
                 </ToolBarContent>
@@ -144,10 +144,7 @@
                     <MudTh Style="text-align:right">Volume 7D</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Pair">@LinkHelper.GetObjectLink(context)</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolumePair1(context, false)</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage(context) %</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolumePair1(context)</MudTd>
+                    <PairsTableDetails pair="@context" uniswapTokens="@uniswapTokens"/>
                 </RowTemplate>
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToPairOverviewPage">View more pairs</MudButton>
@@ -158,37 +155,12 @@
 {
     private Blocks? blockData;
     private Transactions? transactionData;
-    private Pairs? pairsData;
-    private List<UniswapToken>? uniswapTokens;
+    private List<Lexplorer.Models.Pair>? pairs { get; set; } = new();
+    private Dictionary<string, UniswapToken> uniswapTokens = new();
 
     private double averageBlockTime;
     private long averageTransactions;
     private double lastBlockSubmittedTime;
-
-    private decimal? priceOfToken(Token token)
-    {
-        //find token.address in uniswapTokens and get most recent price; if not available, return 1.0 so no conversion
-        return uniswapTokens?.Where(c => c.address == @token?.address).FirstOrDefault()?.data?.tokenDayDatas?[0].priceUSD;
-    }
-
-    private string? getVolumePair1(Pair pair, Boolean weekly = true)
-    {
-        if (pair == null) return null;
-        decimal? price = (pair.token1 == null) ? null : priceOfToken(pair.token1);
-        var volume = weekly
-            ? pair.weeklyEntities![0].tradedVolumeToken1Swap
-            : pair.dailyEntities![0].tradedVolumeToken1Swap;
-        if (price.HasValue)
-            return $"${@TokenAmountConverter.ToStringWithExponent(volume, pair.token1?.decimals ?? 0, price.Value)}";
-        else
-            return $"{pair.token1?.symbol} {@TokenAmountConverter.ToStringWithExponent(volume, pair.token1?.decimals ?? 0, 1)}";
-    }
-
-    private string? get24hPercentage(Pair pair)
-    {
-        if (pair == null) return null;
-        return (pair.dailyEntities![0].tradedVolumeToken1Swap * 7 / pair.weeklyEntities![0].tradedVolumeToken1Swap * 100).ToString("N2");
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,24 +173,20 @@
         transactionData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         StateHasChanged();
         string pairsCacheKey = $"homepage-pairs";
-        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
-        int pairCount = 0;
-        foreach(var pair in pairsData!.data!.pairs!)
+        var pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
+        pairs = pairsData?.data?.pairs;
+        foreach (var pair in pairs!)
         {
-            string uniSwapTokenCache = $"homepage-uniswapToken-{pair!.token1!.address!}";
-            var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
-            if(uniswapToken != null && pairCount == 0)
-            {
-                uniswapTokens = new List<UniswapToken>();
-                uniswapTokens!.Add(uniswapToken!);
-            }
-            else
-            {
-                uniswapTokens!.Add(uniswapToken!);
-            }
-            pairCount++;
+            if (String.IsNullOrEmpty(pair.token1?.address)) continue;
+
+            string uniswapTokenCacheKey = $"uniSwapTokenPrice-{pair.token1?.address}";
+            var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey,
+                async () => await UniswapGraphQLService.GetTokenPrice(pair.token1?.address!),
+                DateTimeOffset.UtcNow.AddHours(1));
+            if (String.IsNullOrEmpty(uniswapToken?.address)) continue;
+
+            uniswapTokens.TryAdd(uniswapToken.address!, uniswapToken);
         }
-        StateHasChanged();
     }
 
     private void CalculateAverageBlockTime()

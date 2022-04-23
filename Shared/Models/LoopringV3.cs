@@ -420,21 +420,19 @@ namespace Lexplorer.Models
         public List<Pair>? pairs { get; set; }
     }
 
-    public class DailyEntity
+    public class VolumeEntity
     {
         public double tradedVolumeToken1Swap { get; set; }
         public double tradedVolumeToken0Swap { get; set; }
         public string? id { get; set; }
     }
 
-    public class WeeklyEntity
+    public class DailyEntity : VolumeEntity
     {
-        public double tradedVolumeToken1Swap { get; set; }
-        public double tradedVolumeToken0Swap { get; set; }
-        public string? id { get; set; }
     }
 
-
-
+    public class WeeklyEntity : VolumeEntity
+    {
+    }
 
 }
