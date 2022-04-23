@@ -1,266 +1,154 @@
 ﻿@using Lexplorer.Helpers
 @using Lexplorer.Models
 @using System.Diagnostics
-@*@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
-@inject Lexplorer.Services.UniswapGraphQLService UniswapGraphQLService;
-@inject NavigationManager NavigationManager;
-@inject IAppCache AppCache;*@
 
-    <MudGrid>
-        <MudItem sm="12">
-            <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/></p>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.transactionCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.blockCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.userCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-    <MudGrid>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@averageBlockTime mins</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@averageTransactions.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@lastBlockSubmittedTime mins ago</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-    <MudGrid>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.nftMintCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.tradeNFTCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem sm="4">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
-                    <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.transferNFTCount.ToString("N0")</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
+<MudGrid>
+    <MudItem sm="12">
+        <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /></p>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.transactionCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.blockCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.userCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+<MudGrid>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@averageBlockTime mins</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@averageTransactions.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@lastBlockSubmittedTime mins ago</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+<MudGrid>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.nftMintCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.tradeNFTCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem sm="4">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">@blockData?.data?.proxy?.transferNFTCount.ToString("N0")</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
-    <MudGrid>
-        <MudItem sm="5">
-            <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Latest Blocks</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Block ID</MudTh>
-                    <MudTh>L1 Transaction Hash</MudTh>
-                    <MudTh>Block Size</MudTh>
-                    <MudTh>Verified At (UTC)</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
-                    <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
-                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
-                </RowTemplate>
-            </MudTable>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
-        </MudItem>
-        <MudItem sm="7">
-            <MudTable Dense="true" Items="@transactionData?.data?.transactions" Hover="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Latest Transactions</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Tx Id</MudTh>
-                    <MudTh>Type</MudTh>
-                    <MudTh>From</MudTh>
-                    <MudTh>To</MudTh>
-                    <MudTh Style="text-align:right">Bought</MudTh>
-                    <MudTh Style="text-align:right">Sold</MudTh>
-                    <MudTh Style="text-align:right">Fee</MudTh>
-                    <MudTh>Verified At (UTC)</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
-                    <MudTd DataLabel="Type">@context.typeName</MudTd>
-                    <TransactionTableDetails TransactionData=@context />
-                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blockData?.data?.blocks?[0].timestamp)</MudTd>
-                </RowTemplate>
-            </MudTable>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
-        </MudItem>
-    </MudGrid>
-     <MudGrid>
-        <MudItem sm="5">
-            <MudTable Dense="true" Items="@pairsData?.data?.pairs" Hover="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Pairs</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Pair</MudTh>
-                    <MudTh Style="text-align:right">Volume 24H</MudTh>
-                    <MudTh Style="text-align:right">24H % avg</MudTh>
-                    <MudTh Style="text-align:right">Volume 7D</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolumePair1(context, false)</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage(context) %</MudTd>
-                    <MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolumePair1(context)</MudTd>
-                </RowTemplate>
-            </MudTable>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToPairOverviewPage">View more pairs</MudButton>
-        </MudItem>
-    </MudGrid>
-
-@code
-{
-    //private Blocks? blockData;
-    //private Transactions? transactionData;
-    //private Pairs? pairsData;
-    //private List<UniswapToken>? uniswapTokens;
-
-    //private double averageBlockTime;
-    //private long averageTransactions;
-    //private double lastBlockSubmittedTime;
-
-    //private decimal? priceOfToken(Token token)
-    //{
-    //    //find token.address in uniswapTokens and get most recent price; if not available, return 1.0 so no conversion
-    //    return uniswapTokens?.Where(c => c.address == @token?.address).FirstOrDefault()?.data?.tokenDayDatas?[0].priceUSD;
-    //}
-
-    //private string? getVolumePair1(Pair pair, Boolean weekly = true)
-    //{
-    //    if (pair == null) return null;
-    //    decimal? price = (pair.token1 == null) ? null : priceOfToken(pair.token1);
-    //    var volume = weekly
-    //        ? pair.weeklyEntities![0].tradedVolumeToken1Swap
-    //        : pair.dailyEntities![0].tradedVolumeToken1Swap;
-    //    if (price.HasValue)
-    //        return $"${@TokenAmountConverter.ToStringWithExponent(volume, pair.token1?.decimals ?? 0, price.Value)}";
-    //    else
-    //        return $"{pair.token1?.symbol} {@TokenAmountConverter.ToStringWithExponent(volume, pair.token1?.decimals ?? 0, 1)}";
-    //}
-
-    //private string? get24hPercentage(Pair pair)
-    //{
-    //    if (pair == null) return null;
-    //    return (pair.dailyEntities![0].tradedVolumeToken1Swap * 7 / pair.weeklyEntities![0].tradedVolumeToken1Swap * 100).ToString("N2");
-    //}
-
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    string blockCacheKey = $"homepage-block";
-    //    blockData = await AppCache.GetOrAddAsyncNonNull(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
-    //    CalculateAverageBlockTime();
-    //    CalculateLastBlockSubmitted();
-    //    StateHasChanged();
-    //    string transactionCacheKey = $"homepage-transaction";
-    //    transactionData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
-    //    StateHasChanged();
-    //    string pairsCacheKey = $"homepage-pairs";
-    //    pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
-    //    int pairCount = 0;
-    //    foreach(var pair in pairsData!.data!.pairs!)
-    //    {
-    //        string uniSwapTokenCache = $"homepage-uniswapToken-{pair!.token1!.address!}";
-    //        var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniSwapTokenCache, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
-    //        if(uniswapToken != null && pairCount == 0)
-    //        {
-    //            uniswapTokens = new List<UniswapToken>();
-    //            uniswapTokens!.Add(uniswapToken!);
-    //        }
-    //        else
-    //        {
-    //            uniswapTokens!.Add(uniswapToken!);
-    //        }
-    //        pairCount++;
-    //    }
-    //    StateHasChanged();
-    //}
-
-    //private void CalculateAverageBlockTime()
-    //{
-    //    long transactionCount = 0;
-    //    long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-    //    List<long> timeBetweenBlocks = new List<long>();
-    //    foreach (var block in blockData!.data!.blocks!)
-    //    {
-    //        transactionCount += block.transactionCount;
-    //        timeBetweenBlocks.Add(currentTime - Int64.Parse(block.timestamp!));
-    //        currentTime = Int64.Parse(block.timestamp!);
-    //    }
-    //    averageTransactions = transactionCount / blockData.data.blocks.Count;
-    //    averageBlockTime = Math.Floor(timeBetweenBlocks.Average() / 60);
-    //}
-
-    //private void CalculateLastBlockSubmitted()
-    //{
-    //    long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-    //    long timeSinceLastBlock = currentTime - Int64.Parse(blockData!.data!.blocks![0].timestamp!);
-    //    lastBlockSubmittedTime = Math.Floor((double)timeSinceLastBlock / 60);
-    //}
-
-    //private void GoToBlockOverviewPage()
-    //{
-    //    string parameters = "blocks";
-    //    NavigationManager.NavigateTo(parameters);
-    //}
-
-    //private void GoToPairOverviewPage()
-    //{
-    //    string parameters = "pairs";
-    //    NavigationManager.NavigateTo(parameters);
-    //}
-
-    //private void GoToTransactionOverviewPage()
-    //{
-    //    string parameters = "transactions";
-    //    NavigationManager.NavigateTo(parameters);
-    //}
-}
+<MudGrid>
+    <MudItem sm="5">
+        <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Latest Blocks</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Block ID</MudTh>
+                <MudTh>L1 Transaction Hash</MudTh>
+                <MudTh>Block Size</MudTh>
+                <MudTh>Verified At (UTC)</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
+                <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
+                <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
+                <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
+            </RowTemplate>
+        </MudTable>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
+    </MudItem>
+    <MudItem sm="7">
+        <MudTable Dense="true" Items="@transactionData?.data?.transactions" Hover="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Latest Transactions</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Tx Id</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh>From</MudTh>
+                <MudTh>To</MudTh>
+                <MudTh Style="text-align:right">Bought</MudTh>
+                <MudTh Style="text-align:right">Sold</MudTh>
+                <MudTh Style="text-align:right">Fee</MudTh>
+                <MudTh>Verified At (UTC)</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+                <MudTd DataLabel="Type">@context.typeName</MudTd>
+                <TransactionTableDetails TransactionData=@context />
+                <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blockData?.data?.blocks?[0].timestamp)</MudTd>
+            </RowTemplate>
+        </MudTable>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
+    </MudItem>
+</MudGrid>
+<MudGrid>
+    <MudItem sm="5">
+        <MudTable Dense="true" Items="@pairsData?.data?.pairs" Hover="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Pairs</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Pair</MudTh>
+                <MudTh Style="text-align:right">Volume 24H</MudTh>
+                <MudTh Style="text-align:right">24H % avg</MudTh>
+                <MudTh Style="text-align:right">Volume 7D</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
+                <MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolumePair1(context, false)</MudTd>
+                <MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage(context) %</MudTd>
+                <MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolumePair1(context)</MudTd>
+            </RowTemplate>
+        </MudTable>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToPairOverviewPage">View more pairs</MudButton>
+    </MudItem>
+</MudGrid>
