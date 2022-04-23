@@ -144,7 +144,7 @@
                     <MudTh Style="text-align:right">Volume 7D</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
+                    <MudTd DataLabel="Pair">@LinkHelper.GetObjectLink(context)</MudTd>
                     <MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolumePair1(context, false)</MudTd>
                     <MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage(context) %</MudTd>
                     <MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolumePair1(context)</MudTd>

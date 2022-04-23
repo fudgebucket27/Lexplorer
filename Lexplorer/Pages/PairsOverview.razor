@@ -19,7 +19,7 @@
                         <MudTh Style="text-align:right">Volume 7D</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
+                        <MudTd DataLabel="Pair">@LinkHelper.GetObjectLink(context)</MudTd>
                    @if(@context.dailyEntities!.Count > 0 && @context.weeklyEntities!.Count > 0 && uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas!.Count > 0)
                    {
                         <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
