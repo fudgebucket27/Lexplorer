@@ -7,11 +7,55 @@
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 
-<h3>Pair @pairId</h3>
+
+<PageTitle>The Lexplorer - pair @(pair?.token0?.symbol) / @(pair?.token1?.symbol) </PageTitle>
+
+<MudText Typo="Typo.h6">Pair  @pair?.token0?.symbol / @pair?.token1?.symbol</MudText>
+<MudSimpleTable Dense="true">
+    <tbody>
+        <tr>
+            <td>Details</td>
+            <td>Token 1</td>
+            <td>Token 2</td>
+        </tr>
+        <tr>
+            <td>Price</td>
+            <td>1 @pair?.token0?.symbol = @TokenAmountConverter.ToString(pair?.token0Price, pair?.token1?.decimals) @pair?.token1?.symbol </td>
+            <td>1 @pair?.token1?.symbol = @TokenAmountConverter.ToString(pair?.token1Price, pair?.token0?.decimals) @pair?.token0?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0 ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1 ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume swaps</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0Swap ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1Swap ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume orderbook trades</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0Orderbook ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1Orderbook ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+    </tbody>
+</MudSimpleTable>
+
 
 @code {
     [Parameter]
     public string pairId { get; set; } = "";
 
-}
+    private Pair? pair { get; set; } = new Pair();
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (pair?.id != pairId)
+        {
+            string pairCacheKey = $"pair-{pairId}";
+            pair = await AppCache.GetOrAddAsyncNonNull(pairCacheKey,
+                async () => await LoopringGraphQLService.GetPair(pairId));
+            //StateHasChanged();
+        }
+    }
+}
