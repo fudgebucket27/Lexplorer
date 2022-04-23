@@ -6,6 +6,11 @@ using RestSharp;
 using System.Diagnostics;
 using RestSharp.Serializers;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace Lexplorer.Services
 {
