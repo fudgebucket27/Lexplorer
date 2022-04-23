@@ -6,7 +6,7 @@
     <MudItem sm="12">
         <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /></p>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" lg="4" >
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
@@ -14,7 +14,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
@@ -22,7 +22,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
@@ -32,7 +32,7 @@
     </MudItem>
 </MudGrid>
 <MudGrid>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
@@ -40,7 +40,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
@@ -48,7 +48,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
@@ -58,7 +58,7 @@
     </MudItem>
 </MudGrid>
 <MudGrid>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
@@ -66,7 +66,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
@@ -74,7 +74,7 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem sm="4">
+    <MudItem xs="12" sm="12" md="4">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
@@ -85,8 +85,8 @@
 </MudGrid>
 
 <MudGrid>
-    <MudItem sm="5">
-        <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
+    <MudItem xs="12" sm="12" md="4">
+        <MudTable Items="@blockData?.data?.blocks" Hover="true">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Latest Blocks</MudText>
             </ToolBarContent>
@@ -105,7 +105,7 @@
         </MudTable>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
     </MudItem>
-    <MudItem sm="7">
+    <MudItem xs="12" sm="12" md="8">
         <MudTable Dense="true" Items="@transactionData?.data?.transactions" Hover="true">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Latest Transactions</MudText>
@@ -131,7 +131,7 @@
     </MudItem>
 </MudGrid>
 <MudGrid>
-    <MudItem sm="5">
+    <MudItem xs="12" sm="12" md="4">
         <MudTable Dense="true" Items="@pairsData?.data?.pairs" Hover="true">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Pairs</MudText>
