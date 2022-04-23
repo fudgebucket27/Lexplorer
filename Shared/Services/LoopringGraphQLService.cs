@@ -1,23 +1,37 @@
 ﻿using Lexplorer.Helpers;
 using Lexplorer.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
-using System.Linq;
 using RestSharp.Serializers;
-using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace Lexplorer.Services
 {
-    public class LoopringGraphQLService : IDisposable
+    public interface ILoopringGraphQLService
+    {
+        void Dispose();
+        Task<Account?> GetAccount(string accountId, CancellationToken cancellationToken = default);
+        Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId, CancellationToken cancellationToken = default);
+        Task<IList<AccountNFTSlot>?> GetAccountNFTs(int skip, int first, string accountId, CancellationToken cancellationToken = default);
+        Task<IList<Account>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default);
+        Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId, double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default);
+        Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId, double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default);
+        Task<Tuple<double, double>?> GetBlockDateRange(DateTime startDateUTC, DateTime endDateUTC);
+        Task<Block?> GetBlockDetails(int blockId, CancellationToken cancellationToken = default);
+        Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID", string orderDirection = "desc", string? blockTimestamp = null, bool gte = true);
+        Task<NonFungibleToken?> GetNFT(string NFTId, CancellationToken cancellationToken = default);
+        Task<IList<NonFungibleToken>?> GetNFTs(int skip = 0, int first = 10, string orderBy = "mintedAt", string orderDirection = "desc");
+        Task<IList<Transaction>?> GetNFTTransactions(int skip, int first, string nftId, CancellationToken cancellationToken = default);
+        Task<string?> GetNFTTransactionsResponse(int skip, int first, string nftId, CancellationToken cancellationToken = default);
+        Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc");
+        Task<Transaction?> GetTransaction(string transactionId);
+        Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default);
+        Task<IList<object>?> Search(string searchTerm);
+    }
+
+    public class LoopringGraphQLService : ILoopringGraphQLService, IDisposable
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36";
 

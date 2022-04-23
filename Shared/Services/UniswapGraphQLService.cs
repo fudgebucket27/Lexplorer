@@ -1,16 +1,17 @@
 ﻿using Lexplorer.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System;
 
 namespace Lexplorer.Services
 {
-    public class UniswapGraphQLService : IDisposable
+    public interface IUniswapGraphQLService
+    {
+        void Dispose();
+        Task<UniswapToken?> GetTokenPrice(string address);
+    }
+
+    public class UniswapGraphQLService : IUniswapGraphQLService, IDisposable
     {
         const string _baseUrl = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
 
