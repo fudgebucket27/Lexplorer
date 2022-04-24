@@ -124,8 +124,8 @@ namespace Lexplorer.Models
         public Double tradedVolumeToken0Orderbook { get; set; }
         public Double tradedVolumeToken1Orderbook { get; set; }
 
-        public List<DailyEntity>? dailyEntities { get; set; }
-        public List<WeeklyEntity>? weeklyEntities { get; set; }
+        public List<PairDailyData>? dailyEntities { get; set; }
+        public List<PairWeeklyData>? weeklyEntities { get; set; }
     }
     public class Token
     {
@@ -428,19 +428,40 @@ namespace Lexplorer.Models
         public List<Pair>? pairs { get; set; }
     }
 
-    public class VolumeEntity
+    public class PairEntity
     {
-        public double tradedVolumeToken1Swap { get; set; }
-        public double tradedVolumeToken0Swap { get; set; }
         public string? id { get; set; }
+
+        public Double token0PriceLow { get; set; }
+        public Double token0PriceHigh { get; set; }
+        public Double token0PriceOpen { get; set; }
+        public Double token0PriceClose { get; set; }
+
+        public Double token1PriceLow { get; set; }
+        public Double token1PriceHigh { get; set; }
+        public Double token1PriceOpen { get; set; }
+        public Double token1PriceClose { get; set; }
+
+        public Double tradedVolumeToken0 { get; set; }
+        public Double tradedVolumeToken0Swap { get; set; }
+        public Double tradedVolumeToken0Orderbook { get; set; }
+        public Double tradedVolumeToken1 { get; set; }
+        public Double tradedVolumeToken1Swap { get; set; }
+        public Double tradedVolumeToken1Orderbook { get; set; }
     }
 
-    public class DailyEntity : VolumeEntity
+    public class PairDailyData : PairEntity
     {
+        public Double dayStart { get; set; }
+        public Double dayEnd { get; set; }
+        public Double dayNumber { get; set; }
     }
 
-    public class WeeklyEntity : VolumeEntity
+    public class PairWeeklyData : PairEntity
     {
+        public Double weekStart { get; set; }
+        public Double weekEnd { get; set; }
+        public Double weekNumber { get; set; }
     }
 
 }

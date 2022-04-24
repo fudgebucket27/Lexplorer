@@ -47,6 +47,7 @@
     public string pairId { get; set; } = "";
 
     private Pair? pair { get; set; } = new Pair();
+    private IList<PairDailyData>? dailyData { get; set; } = new List<PairDailyData>();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -54,8 +55,15 @@
         {
             string pairCacheKey = $"pair-{pairId}";
             pair = await AppCache.GetOrAddAsyncNonNull(pairCacheKey,
-                async () => await LoopringGraphQLService.GetPair(pairId));
-            //StateHasChanged();
+                async () => await LoopringGraphQLService.GetPair(pairId),
+                DateTimeOffset.UtcNow.AddHours(1));
+            if (pair == null) return;
+            StateHasChanged();
+            string dailyDataCacheKey = $"pair-{pairId}-dailyData";
+            dailyData = await AppCache.GetOrAddAsyncNonNull(dailyDataCacheKey,
+                async () => await LoopringGraphQLService.GetPairDailyEntities(pairId, 0, 30),
+                DateTimeOffset.UtcNow.AddHours(1)
+                );
         }
     }
 }
