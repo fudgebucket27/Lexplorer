@@ -98,6 +98,11 @@
         <ToolBarContent>
             <MudText Typo="Typo.h6">Transactions</MudText>
             <MudSpacer />
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+            <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+            <MudSpacer />
             <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions" />
         </ToolBarContent>
         <HeaderContent>
@@ -116,11 +121,5 @@
             <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId />
             <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
         </RowTemplate>
-        <PagerContent>
-            @if (transactions?.Count() > 10)
-            {
-                <MudTablePager HideRowsPerPage="true" HidePageNumber="false" InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left" />
-            }
-        </PagerContent>
     </MudTable>
 </MudContainer>
