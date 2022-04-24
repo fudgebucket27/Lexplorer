@@ -1,172 +1,75 @@
 ﻿@page "/blocks/{blockNumber}"
-@using System.Diagnostics;
-@inject Lexplorer.Services.ILoopringGraphQLService LoopringGraphQLService;
-@inject NavigationManager NavigationManager;
-@inject IAppCache AppCache;
 
 <PageTitle>The Lexplorer - Block Details</PageTitle>
-
-
-<MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(blockId == 1) OnClick="@(() => blockId = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(blockId == 1) OnClick="@(() => blockId -= 1)" />
-        <MudText Typo="Typo.h6">Block #@block?.data?.block?.id</MudText>
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (block?.data?.proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
-    </div>
-    @if (isBlockLoading)
-    {
-        <tr>
-            <td colspan="2">
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
-            </td>
-        </tr>
-    }
-    <tbody>
-        <tr>
-            <td>Block Hash</td>
-            <td>@block?.data?.block?.blockHash</td>
-        </tr>
-        <tr>
-            <td>Block Size</td>
-            <td>@block?.data?.block?.blockSize</td>
-        </tr>
-        <tr>
-            <td>L1 Transaction Hash</td>
-            <td><L1TransactionLink txHash="@block?.data?.block?.txHash" shortenHash="false"></L1TransactionLink></td>
-        </tr>
-        <tr>
-            <td>Verified At (UTC)</td>
-            <td>@TimestampConverter.ToUTCString(block?.data?.block?.timestamp!)</td>
-        </tr>
-        <tr>
-            <td>Raw Data</td>
-            <td>
-                <MudTextField T="string" Variant="Variant.Filled" Text="@block?.data?.block?.data" Lines="5" ReadOnly="true" />
-            </td>
-        </tr>
-    </tbody>
-</MudSimpleTable>
-
-<br />
-
-<MudTable Dense="true" Items="@transactions" Hover="true" Loading="@isTransactionLoading">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Transactions in block #@block?.data?.block?.id</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
-        <MudSpacer />
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Tx Id</MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>From</MudTh>
-        <MudTh>To</MudTh>
-        <MudTh Style="text-align:right">Bought</MudTh>
-        <MudTh Style="text-align:right">Sold</MudTh>
-        <MudTh Style="text-align:right">Fee</MudTh>
-        <MudTh>Time(UTC)</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Tx Id">@LinkHelper.GetObjectLink(context)</MudTd>
-        <MudTd DataLabel="Type">@context.typeName</MudTd>
-        <TransactionTableDetails TransactionData=@context />
-        <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block?.data?.block?.timestamp)</MudTd>
-    </RowTemplate>
-</MudTable>
-
-@code {
-    private Lexplorer.Models.Block? block;
-    private List<Transaction>? transactions = new List<Transaction>();
-
-    [Parameter]
-    public string blockNumber { get; set; } = "";
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string pageNumber { get; set; } = "1";
-
-    public int blockId
-    {
-        get
+<MudContainer Fixed="true" Class="my-3">
+    <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+        <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(blockId == 1) OnClick="@(() => blockId = 1)" />
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(blockId == 1) OnClick="@(() => blockId -= 1)" />
+            <MudText Typo="Typo.h6">Block #@block?.data?.block?.id</MudText>
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (block?.data?.proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
+        </div>
+        @if (isBlockLoading)
         {
-            return Math.Max(1, Int32.Parse(blockNumber ?? "1"));
+            <tr>
+                <td colspan="2">
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Style="overflow-wrap: break-word;" />
+                </td>
+            </tr>
         }
-        set
-        {
-            navigateTo(value, 1);
-        }
-    }
+        <tbody>
+            <tr>
+                <td width="25%">Block Hash</td>
+                <td>@block?.data?.block?.blockHash</td>
+            </tr>
+            <tr>
+                <td>Block Size</td>
+                <td>@block?.data?.block?.blockSize</td>
+            </tr>
+            <tr>
+                <td>L1 Transaction Hash</td>
+                <td><L1TransactionLink txHash="@block?.data?.block?.txHash" shortenHash="false"></L1TransactionLink></td>
+            </tr>
+            <tr>
+                <td>Verified At (UTC)</td>
+                <td>@TimestampConverter.ToUTCString(block?.data?.block?.timestamp!)</td>
+            </tr>
+            <tr>
+                <td>Raw Data</td>
+                <td>
+                    <MudText Style="height:150px;overflow-x:clip;overflow-y:scroll;word-break:break-word;">@block?.data?.block?.data</MudText>
+                </td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
 
-    public int gotoPage
-    {
-        get
-        {
-            return Math.Max(1, Int32.Parse(pageNumber ?? "1"));
-        }
-        set
-        {
-            navigateTo(blockId, value);
-        }
-    }
+    <br />
 
-    private void navigateTo(int block, int page)
-    {
-        string URL = $"blocks/{block}?pageNumber={page}";
-        NavigationManager.NavigateTo(URL);
-    }
-
-    public bool isTransactionLoading = true;
-    public bool isBlockLoading = true;
-    private int pageSize = 15;
-    private CancellationTokenSource? cts;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        //cancel any previous OnParametersSetAsync which might still be running
-        cts?.Cancel();
-
-        using (CancellationTokenSource localCTS = new CancellationTokenSource())
-        {
-            //give future calls a chance to cancel us; it is now safe to replace
-            //any previous value of cts, since we already cancelled it above
-            try
-            {
-
-                cts = localCTS;
-
-                isBlockLoading = true;
-                string blockCacheKey = $"blockDetailOverview-{blockId}";
-                block = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
-                    async () => await LoopringGraphQLService.GetBlockDetails(blockId, localCTS.Token),
-                    DateTimeOffset.UtcNow.AddMinutes(5));
-                if (block == null) return;
-                isBlockLoading = false;
-                StateHasChanged();
-
-                isTransactionLoading = true;
-                string transactionDatacacheKey = $"blockDetailTransactions-{blockId}-page{gotoPage}";
-                var transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
-                    async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockId: blockNumber, cancellationToken: localCTS.Token),
-                    DateTimeOffset.UtcNow.AddMinutes(5));
-                transactions = transactionData?.data?.transactions ?? new List<Transaction>();
-                isTransactionLoading = false;
-                StateHasChanged();
-
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-            }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
-        }
-    }
-}
+    <MudTable Dense="true" Items="@transactions" Hover="true" Loading="@isTransactionLoading">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Transactions in block #@block?.data?.block?.id</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+            <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+            <MudSpacer />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tx Id</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>From</MudTh>
+            <MudTh>To</MudTh>
+            <MudTh Style="text-align:right">Bought</MudTh>
+            <MudTh Style="text-align:right">Sold</MudTh>
+            <MudTh Style="text-align:right">Fee</MudTh>
+            <MudTh>Time(UTC)</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Tx Id">@LinkHelper.GetObjectLink(context)</MudTd>
+            <MudTd DataLabel="Type">@context.typeName</MudTd>
+            <TransactionTableDetails TransactionData=@context />
+            <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block?.data?.block?.timestamp)</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
