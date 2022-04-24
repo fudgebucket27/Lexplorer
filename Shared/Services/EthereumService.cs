@@ -4,60 +4,65 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Nethereum.ENS;
 
-namespace Lexplorer.Services
+namespace Lexplorer.Services;
+
+public interface IEthereumService
 {
+    Task<string?> GetEthAddressFromEns(string? ens);
+    Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType);
+    Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, string? contractABI, string? functionName);
+}
 
-    public class EthereumService
+public class EthereumService : IEthereumService
+{
+    public const string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+
+    public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
     {
-        public const string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+        if (tokenId == null) return null;
+        //call erc1155 or erc 721 contract depending on type 
+        string? metadataLink = nftType == 0
+            ? await GetMetadataLink(tokenId, tokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri")
+            : await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI");
+        if (metadataLink == null)
+            metadataLink = await GetMetadataLink(tokenId, CF_NFTTokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri"); //call counterfactual nft contract
 
-        public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
+        return metadataLink;
+    }
+
+    public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, string? contractABI, string? functionName)
+    {
+
+        var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
+        try
         {
-            if (tokenId == null) return null;
-            //call erc1155 or erc 721 contract depending on type 
-            string? metadataLink = nftType == 0
-                ? await GetMetadataLink(tokenId, tokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri") 
-                : await GetMetadataLink(tokenId, tokenAddress, "function tokenURI(uint256 tokenId) public view virtual override returns (string memory)", "tokenURI");
-            if (metadataLink == null)
-                metadataLink = await GetMetadataLink(tokenId, CF_NFTTokenAddress, "function uri(uint256 id) external view returns (string memory)", "uri"); //call counterfactual nft contract
-
-            return metadataLink;
+            var contract = web3.Eth.GetContract(contractABI, tokenAddress);
+            var function = contract.GetFunction(functionName);
+            object[] parameters = new object[1] { tokenId! };
+            var uri = await function.CallAsync<string>(parameters);
+            return uri;
         }
-
-        public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, string? contractABI, string? functionName)
+        catch (Exception e)
         {
-
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
-            try
-            {
-                var contract = web3.Eth.GetContract(contractABI, tokenAddress);
-                var function = contract.GetFunction(functionName);
-                object[] parameters = new object[1] { tokenId! };
-                var uri = await function.CallAsync<string>(parameters);
-                return uri;
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-                return null;
-            }
+            Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            return null;
         }
+    }
 
-        public async Task<string?> GetEthAddressFromEns(string? ens)
+    public async Task<string?> GetEthAddressFromEns(string? ens)
+    {
+
+        var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
+        var ensService = new ENSService(web3);
+
+        try
         {
-
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
-            var ensService = new ENSService(web3);
-           
-            try
-            {
-                return await ensService.ResolveAddressAsync(ens);
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-                return null;
-            }
+            return await ensService.ResolveAddressAsync(ens);
+        }
+        catch (Exception e)
+        {
+            Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            return null;
         }
     }
 }

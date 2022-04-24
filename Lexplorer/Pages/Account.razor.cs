@@ -11,8 +11,8 @@ namespace Lexplorer.Pages;
 public partial class Account : ComponentBase
 {
     [Inject] ILoopringGraphQLService LoopringGraphQLService { get; set; }
-    [Inject] EthereumService EthereumService { get; set; }
-    [Inject] NftMetadataService NftMetadataService { get; set; }
+    [Inject] IEthereumService EthereumService { get; set; }
+    [Inject] INftMetadataService NftMetadataService { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] IDialogService DialogService { get; set; }
     [Inject] IAppCache AppCache { get; set; }

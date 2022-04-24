@@ -6,7 +6,7 @@ using MudBlazor;
 namespace Lexplorer.Components;
 public partial class TransactionExportDialog : ComponentBase
 {
-    [Inject] TransactionExportService TransactionExportService { get; set; }
+    [Inject] ITransactionExportService TransactionExportService { get; set; }
     [Inject] IJSRuntime JS { get; set; }
 
     [CascadingParameter]

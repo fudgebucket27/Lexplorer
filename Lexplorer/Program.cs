@@ -12,9 +12,9 @@ builder.Services.AddServerSideBlazor().AddHubOptions(o =>
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<ILoopringGraphQLService, LoopringGraphQLService>();
 builder.Services.AddSingleton<IUniswapGraphQLService, UniswapGraphQLService>();
-builder.Services.AddSingleton<TransactionExportService>();
-builder.Services.AddSingleton<EthereumService>();
-builder.Services.AddSingleton<NftMetadataService>();
+builder.Services.AddSingleton<ITransactionExportService, TransactionExportService>();
+builder.Services.AddSingleton<IEthereumService, EthereumService>();
+builder.Services.AddSingleton<INftMetadataService, NftMetadataService>();
 builder.Services.AddLazyCache();
 
 //registration of CSV export formats, no automatic registration possible
