@@ -8,7 +8,7 @@ using MudBlazor;
 using System.Diagnostics;
 
 namespace Lexplorer.Pages;
-public partial class Account : ComponentBase
+public partial class AccountDetail : ComponentBase
 {
     [Inject] ILoopringGraphQLService LoopringGraphQLService { get; set; }
     [Inject] IEthereumService EthereumService { get; set; }
@@ -57,7 +57,7 @@ public partial class Account : ComponentBase
     public readonly int pageSize = 25;
     public readonly int nftPageSize = 12; //6 per row
 
-    private AccountModel? account { get; set; }
+    private Models.Account? account { get; set; }
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();

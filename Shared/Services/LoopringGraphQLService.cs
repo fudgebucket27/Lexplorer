@@ -17,10 +17,10 @@ namespace Lexplorer.Services
     public interface ILoopringGraphQLService
     {
         void Dispose();
-        Task<AccountModel?> GetAccount(string accountId, CancellationToken cancellationToken = default);
+        Task<Account?> GetAccount(string accountId, CancellationToken cancellationToken = default);
         Task<List<AccountTokenBalance>?> GetAccountBalance(string accountId, CancellationToken cancellationToken = default);
         Task<IList<AccountNFTSlot>?> GetAccountNFTs(int skip, int first, string accountId, CancellationToken cancellationToken = default);
-        Task<IList<AccountModel>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default);
+        Task<IList<Account>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default);
         Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId, double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default);
         Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId, double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default);
         Task<Tuple<double, double>?> GetBlockDateRange(DateTime startDateUTC, DateTime endDateUTC);
@@ -491,7 +491,7 @@ namespace Lexplorer.Services
                 return null;
             }
         }
-        public async Task<IList<AccountModel>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default)
+        public async Task<IList<Account>?> GetAccounts(int skip, int first, string? typeName = null, CancellationToken cancellationToken = default)
         {
             var accountsQuery = @"
                       query accounts(
@@ -547,7 +547,7 @@ namespace Lexplorer.Services
                 var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken? token = jresponse["data"]![typePluralName];
-                return token!.ToObject<IList<AccountModel>>();
+                return token!.ToObject<IList<Account>>();
             }
             catch (Exception ex)
             {
@@ -555,7 +555,7 @@ namespace Lexplorer.Services
                 return null;
             }
         }
-        public async Task<AccountModel?> GetAccount(string accountId, CancellationToken cancellationToken = default)
+        public async Task<Account?> GetAccount(string accountId, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"
             query account(
@@ -588,7 +588,7 @@ namespace Lexplorer.Services
                 var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["account"]!;
-                return result.ToObject<AccountModel>()!;
+                return result.ToObject<Account>()!;
             }
             catch (Exception ex)
             {
@@ -913,8 +913,8 @@ namespace Lexplorer.Services
         private static readonly Dictionary<string, Type> resultCategories
             = new Dictionary<string, Type>
         {
-                { "accounts", typeof(AccountModel) },
-                { "accountsByAddress", typeof(AccountModel) },
+                { "accounts", typeof(Account) },
+                { "accountsByAddress", typeof(Account) },
                 { "blocks", typeof(BlockDetail) },
                 { "transactions", typeof(Transaction) },
                 { "nonFungibleTokens", typeof(NonFungibleToken) },

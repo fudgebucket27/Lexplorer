@@ -46,7 +46,7 @@ public partial class AccountsOverview : ComponentBase
 
     public bool isLoading = true;
     public readonly int pageSize = 25;
-    private IList<AccountModel>? accounts { get; set; } = new List<AccountModel>();
+    private IList<Models.Account>? accounts { get; set; } = new List<Models.Account>();
     private CancellationTokenSource? cts;
 
     protected override async Task OnParametersSetAsync()

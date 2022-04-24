@@ -5,11 +5,11 @@
 
     public class LinkHelper
     {
-        public static MarkupString CreateUserLink(AccountModel? account, string? ignoreId = null, bool includeAccountId = false)
+        public static MarkupString CreateUserLink(Account? account, string? ignoreId = null, bool includeAccountId = false)
         {
             return CreateUserLink(account?.id, account?.address, true, ignoreId, includeAccountId);
         }
-        public static MarkupString CreateUserLink(AccountModel? account, bool shortenAddress = true, bool includeAccountId = false)
+        public static MarkupString CreateUserLink(Account? account, bool shortenAddress = true, bool includeAccountId = false)
         {
             return CreateUserLink(account?.id, account?.address, shortenAddress, null, includeAccountId);
         }
@@ -31,8 +31,8 @@
 
         public static Tuple<string, string>? GetObjectLinkAddress(object? linkedObject)
         {
-            if (linkedObject is AccountModel)
-                return new Tuple<string, string>($"account/{((AccountModel)linkedObject).id}", ((AccountModel)linkedObject).id ?? "");
+            if (linkedObject is Account)
+                return new Tuple<string, string>($"account/{((Account)linkedObject).id}", ((Account)linkedObject).id ?? "");
             else if (linkedObject is BlockDetail)
                 return new Tuple<string, string>($"blocks/{((BlockDetail)linkedObject).id}", ((BlockDetail)linkedObject).id ?? "");
             else if (linkedObject is Transaction)
