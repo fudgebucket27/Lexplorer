@@ -1,385 +1,356 @@
 ﻿@page "/transactions/{transactionId}"
-@inject IAppCache AppCache;
-@inject Lexplorer.Services.ILoopringGraphQLService LoopringGraphQLService;
 
 <PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 
-<MudText Typo="Typo.h6">@(transaction?.typeName ?? "Transaction") #@transactionId</MudText>
-<MudSimpleTable Dense="true">
-    <tbody>
-        <tr>
-            <td>Block #</td>
-            <td>@LinkHelper.GetObjectLink(transaction?.block)</td>
-            <td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td>Verified At (UTC)</td>
-            <td colspan="2">@transaction?.verifiedAt</td>
-        </tr>
-        @if (swap != null)
-        {
+<MudContainer Fixed="true" Class="my-3">
+    <MudText Typo="Typo.h6">@(transaction?.typeName ?? "Transaction") #@transactionId</MudText>
+    <MudSimpleTable Dense="true" Class="mt-3">
+        <tbody>
             <tr>
-                <td> </td>
-                <td>User</td>
-                <td>Pool</td>
+                <td>Block #</td>
+                <td>@LinkHelper.GetObjectLink(transaction?.block)</td>
+                <td>&nbsp;</td>
             </tr>
             <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(swap.account, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(swap.pool, false, true)</td>
+                <td>Verified At (UTC)</td>
+                <td colspan="2">@transaction?.verifiedAt</td>
             </tr>
-            <tr>
-                <td>Sold</td>
-                <td>@TokenAmountConverter.ToString(swap.fillSA, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
-                <td>@TokenAmountConverter.ToString(swap.fillSB, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
-            </tr>
-            <tr>
-                <td>Bought</td>
-                <td>@TokenAmountConverter.ToString(swap.fillBA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
-                <td>@TokenAmountConverter.ToString(swap.fillBB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td>@TokenAmountConverter.ToString(swap.feeA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
-                <td>@TokenAmountConverter.ToString(swap.feeB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
-            </tr>
-        }
-        @if (transfer != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(transfer.fromAccount, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(transfer.toAccount, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(transfer.amount, transfer.token?.decimals) @transfer.token?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(transfer.fee, transfer.feeToken?.decimals) @transfer.feeToken?.symbol</td>
-            </tr>
-        }
-        @if (orderBookTrade != null)
-        {
-            <tr>
-                <td>Description</td>
-                <td>
-                    User @LinkHelper.GetObjectLink(orderBookTrade.accountA)
-                    sold @TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
-                    at @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
-                    and received @TokenAmountConverter.ToString(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
-                    @(orderBookTrade.feeA > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals)} {@orderBookTrade.tokenB?.symbol} in fees" : "")
-                </td>
-                <td>
-                    User @LinkHelper.GetObjectLink(orderBookTrade.accountB) sold
-                    @TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
-                    at @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
-                    and received @TokenAmountConverter.ToString(orderBookTrade.fillBB - orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
-                    @(orderBookTrade.feeB > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals)} {@orderBookTrade.tokenA?.symbol} in fees" : "")
-                </td>
-            </tr>
-            <tr>
-                <td>Details</td>
-                <td>A</td>
-                <td>B</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(orderBookTrade.accountB, false, true)</td>
-            </tr>
-            <tr>
-                <td>Sold</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
-            </tr>
-            <tr>
-                <td>Bought</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.fillBA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.fillBB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
-                <td>@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
-            </tr>
-            <tr>
-                <td>Token price</td>
-                <td>1 @orderBookTrade.tokenA?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
-                <td>1 @orderBookTrade.tokenB?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fill amount</td>
-                <td>@(orderBookTrade.fillAmountBorSA ? "Buy" : "Sell")</td>
-                <td>@(orderBookTrade.fillAmountBorSB ? "Buy" : "Sell")</td>
-            </tr>
-        }
-        @if (deposit != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td><L1AccountLink address="@deposit.toAccount?.address" shortenAddress="false" /></td>
-                <td>@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
-            </tr>
-        }
-        @if (withdrawal != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(withdrawal.fromAccount, false, true)</td>
-                <td><L1AccountLink address="@withdrawal.fromAccount?.address" shortenAddress="false" /></td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(withdrawal.amount, withdrawal.token?.decimals) @withdrawal.token?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
-            </tr>
-        }
-        @if (add != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(add.account, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(add.pool, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(add.amount, add.token?.decimals) @add.token?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(add.fee, add.feeToken?.decimals) @add.feeToken?.symbol</td>
-            </tr>
-        }
-        @if (remove != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(remove.pool, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(remove.account, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, remove.token?.decimals) @remove.token?.symbol</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(remove.fee, remove.feeToken?.decimals) @remove.feeToken?.symbol</td>
-            </tr>
-        }
-        @if (ammUpdate != null)
-        {
-            <tr>
-                <td>Pool</td>
-                <td colspan="2">@LinkHelper.CreateUserLink(ammUpdate.pool, false, true)</td>
-            </tr>
-            <tr>
-                <td>Balance</td>
-                <td colspan="2">@ammUpdate.balance</td>
-            </tr>
-            <tr>
-                <td>Token weight</td>
-                <td colspan="2">@ammUpdate.tokenWeight</td>
-            </tr>
-        }
-        @if (mintNFT != null)
-        {
-            <tr>
-                <td> </td>
-                <td>Minter</td>
-                <td>Receiver</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(mintNFT.minter, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(mintNFT.receiver, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@mintNFT.amount.ToString() NFT</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(mintNFT.fee, mintNFT.feeToken?.decimals) @mintNFT.feeToken?.symbol</td>
-            </tr>
-            <tr>
-                <td>NFT type @mintNFT.nft?.nftType</td>
-                <td colspan="2">@LinkHelper.GetObjectLink(@mintNFT.nft)</td>
-            </tr>
-        }
-        @if (transferNFT != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(transferNFT.fromAccount, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(transferNFT.toAccount, false, true)</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@transferNFT.amount.ToString() NFT</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(transferNFT.fee, transferNFT.feeToken?.decimals) @transferNFT.feeToken?.symbol</td>
-            </tr>
-            @foreach ((NonFungibleToken nft, int index) in transferNFT.nfts?.WithIndex()!)
+            @if (swap != null)
             {
                 <tr>
-                    <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    <td> </td>
+                    <td>User</td>
+                    <td>Pool</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(swap.account, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(swap.pool, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Sold</td>
+                    <td>@TokenAmountConverter.ToString(swap.fillSA, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(swap.fillSB, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Bought</td>
+                    <td>@TokenAmountConverter.ToString(swap.fillBA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(swap.fillBB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td>@TokenAmountConverter.ToString(swap.feeA, swap.tokenB?.decimals) @swap.tokenB?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(swap.feeB, swap.tokenA?.decimals) @swap.tokenA?.symbol</td>
                 </tr>
             }
-        }
-        @if (withdrawalNFT != null)
-        {
-            <tr>
-                <td> </td>
-                <td>From</td>
-                <td>To</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(withdrawalNFT.fromAccount, false, true)</td>
-                <td><L1AccountLink address="@withdrawalNFT.fromAccount?.address" shortenAddress="false" /></td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td colspan="2">@withdrawalNFT.amount.ToString() NFT</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td colspan="2">@TokenAmountConverter.ToString(withdrawalNFT.fee, withdrawalNFT.feeToken?.decimals) @withdrawalNFT.feeToken?.symbol</td>
-            </tr>
-            @foreach ((NonFungibleToken nft, int index) in withdrawalNFT.nfts?.WithIndex()!)
+            @if (transfer != null)
             {
                 <tr>
-                    <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(transfer.fromAccount, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(transfer.toAccount, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(transfer.amount, transfer.token?.decimals) @transfer.token?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(transfer.fee, transfer.feeToken?.decimals) @transfer.feeToken?.symbol</td>
                 </tr>
             }
-        }
-        @if (tradeNFT != null)
-        {
-            <tr>
-                <td>Description</td>
-                <td>
-                    User @LinkHelper.GetObjectLink(tradeNFT.accountBuyer)
-                    bought @tradeNFT.fillBB.ToString() NFT
-                    at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and paid @TokenAmountConverter.ToString(tradeNFT.fillSB + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    @(tradeNFT.feeBuyer > 0 ? $" including {@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} fees" : "")
-                </td>
-                <td>
-                    User @LinkHelper.GetObjectLink(tradeNFT.accountSeller)
-                    sold @tradeNFT.fillSA.ToString() NFT
-                    at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and received @TokenAmountConverter.ToString(tradeNFT.fillBA - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    @(tradeNFT.feeSeller > 0 ? $" paying {@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} in fees" : "")
-                </td>
-            </tr>
-            <tr>
-                <td>Details</td>
-                <td>Buyer</td>
-                <td>Seller</td>
-            </tr>
-            <tr>
-                <td>Account</td>
-                <td>@LinkHelper.CreateUserLink(tradeNFT.accountBuyer, false, true)</td>
-                <td>@LinkHelper.CreateUserLink(tradeNFT.accountSeller, false, true)</td>
-            </tr>
-            <tr>
-                <td>Bought</td>
-                <td>@tradeNFT.fillBB.ToString() NFT</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillBA, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-            </tr>
-            <tr>
-                <td>Sold</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillSB, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-                <td>@tradeNFT.fillSA.ToString() NFT</td>
-            </tr>
-            <tr>
-                <td>Fee</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-            </tr>
-            @foreach ((NonFungibleToken nft, int index) in tradeNFT.nfts?.WithIndex()!)
+            @if (orderBookTrade != null)
             {
                 <tr>
-                    <td>NFT @(index + 1) type @nft.nftType</td>
-                    <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    <td>Description</td>
+                    <td>
+                        User @LinkHelper.GetObjectLink(orderBookTrade.accountA)
+                        sold @TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                        at @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                        and received @TokenAmountConverter.ToString(orderBookTrade.fillBA - orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                        @(orderBookTrade.feeA > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals)} {@orderBookTrade.tokenB?.symbol} in fees" : "")
+                    </td>
+                    <td>
+                        User @LinkHelper.GetObjectLink(orderBookTrade.accountB) sold
+                        @TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol
+                        at @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                        and received @TokenAmountConverter.ToString(orderBookTrade.fillBB - orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol
+                        @(orderBookTrade.feeB > 0 ? $"paying {@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals)} {@orderBookTrade.tokenA?.symbol} in fees" : "")
+                    </td>
+                </tr>
+                <tr>
+                    <td>Details</td>
+                    <td>A</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(orderBookTrade.accountA, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(orderBookTrade.accountB, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Sold</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.fillSA, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.fillSB, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Bought</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.fillBA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.fillBB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeA, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(orderBookTrade.feeB, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Token price</td>
+                    <td>1 @orderBookTrade.tokenA?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenAPrice, orderBookTrade.tokenB?.decimals) @orderBookTrade.tokenB?.symbol</td>
+                    <td>1 @orderBookTrade.tokenB?.symbol = @TokenAmountConverter.ToString(orderBookTrade.tokenBPrice, orderBookTrade.tokenA?.decimals) @orderBookTrade.tokenA?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fill amount</td>
+                    <td>@(orderBookTrade.fillAmountBorSA ? "Buy" : "Sell")</td>
+                    <td>@(orderBookTrade.fillAmountBorSB ? "Buy" : "Sell")</td>
                 </tr>
             }
-        }
-        <tr>
-            <td>Raw Data</td>
-            <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
-        </tr>
-    </tbody>
-</MudSimpleTable>
-
-@code {
-    private Transaction? transaction;
-    private Swap? swap { get { return transaction as Swap; } }
-    private Transfer? transfer { get { return transaction as Transfer; } }
-    private OrderBookTrade? orderBookTrade { get { return transaction as OrderBookTrade; } }
-    private Deposit? deposit { get { return transaction as Deposit; } }
-    private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
-    private Add? add { get { return transaction as Add; } }
-    private Remove? remove { get { return transaction as Remove; } }
-    private AmmUpdate? ammUpdate { get { return transaction as AmmUpdate; } }
-    private MintNFT? mintNFT { get { return transaction as MintNFT; } }
-    private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
-    public WithdrawalNFT? withdrawalNFT { get { return transaction as WithdrawalNFT; } }
-    public TradeNFT? tradeNFT { get { return transaction as TradeNFT; } }
-
-    [Parameter]
-    public string transactionId { get; set; } = "";
-
-    protected override async Task OnParametersSetAsync()
-    {
-        string transactionCacheKey = $"transactionDetail-{transactionId}";
-        if (transaction?.id != transactionId)
-        {
-            transaction = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
-            StateHasChanged();
-        }
-    }
-}
+            @if (deposit != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td><L1AccountLink address="@deposit.toAccount?.address" shortenAddress="false" /></td>
+                    <td>@LinkHelper.CreateUserLink(deposit.toAccount, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(deposit.amount, deposit.token?.decimals) @deposit.token?.symbol</td>
+                </tr>
+            }
+            @if (withdrawal != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(withdrawal.fromAccount, false, true)</td>
+                    <td><L1AccountLink address="@withdrawal.fromAccount?.address" shortenAddress="false" /></td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(withdrawal.amount, withdrawal.token?.decimals) @withdrawal.token?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(withdrawal.fee, withdrawal.feeToken?.decimals) @withdrawal.feeToken?.symbol</td>
+                </tr>
+            }
+            @if (add != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(add.account, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(add.pool, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(add.amount, add.token?.decimals) @add.token?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(add.fee, add.feeToken?.decimals) @add.feeToken?.symbol</td>
+                </tr>
+            }
+            @if (remove != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(remove.pool, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(remove.account, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(remove.amount, remove.token?.decimals) @remove.token?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(remove.fee, remove.feeToken?.decimals) @remove.feeToken?.symbol</td>
+                </tr>
+            }
+            @if (ammUpdate != null)
+            {
+                <tr>
+                    <td>Pool</td>
+                    <td colspan="2">@LinkHelper.CreateUserLink(ammUpdate.pool, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Balance</td>
+                    <td colspan="2">@ammUpdate.balance</td>
+                </tr>
+                <tr>
+                    <td>Token weight</td>
+                    <td colspan="2">@ammUpdate.tokenWeight</td>
+                </tr>
+            }
+            @if (mintNFT != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>Minter</td>
+                    <td>Receiver</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(mintNFT.minter, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(mintNFT.receiver, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@mintNFT.amount.ToString() NFT</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(mintNFT.fee, mintNFT.feeToken?.decimals) @mintNFT.feeToken?.symbol</td>
+                </tr>
+                <tr>
+                    <td>NFT type @mintNFT.nft?.nftType</td>
+                    <td colspan="2">@LinkHelper.GetObjectLink(@mintNFT.nft)</td>
+                </tr>
+            }
+            @if (transferNFT != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(transferNFT.fromAccount, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(transferNFT.toAccount, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@transferNFT.amount.ToString() NFT</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(transferNFT.fee, transferNFT.feeToken?.decimals) @transferNFT.feeToken?.symbol</td>
+                </tr>
+                @foreach ((NonFungibleToken nft, int index) in transferNFT.nfts?.WithIndex()!)
+                {
+                    <tr>
+                        <td>NFT @(index + 1) type @nft.nftType</td>
+                        <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    </tr>
+                }
+            }
+            @if (withdrawalNFT != null)
+            {
+                <tr>
+                    <td> </td>
+                    <td>From</td>
+                    <td>To</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(withdrawalNFT.fromAccount, false, true)</td>
+                    <td><L1AccountLink address="@withdrawalNFT.fromAccount?.address" shortenAddress="false" /></td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td colspan="2">@withdrawalNFT.amount.ToString() NFT</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td colspan="2">@TokenAmountConverter.ToString(withdrawalNFT.fee, withdrawalNFT.feeToken?.decimals) @withdrawalNFT.feeToken?.symbol</td>
+                </tr>
+                @foreach ((NonFungibleToken nft, int index) in withdrawalNFT.nfts?.WithIndex()!)
+                {
+                    <tr>
+                        <td>NFT @(index + 1) type @nft.nftType</td>
+                        <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    </tr>
+                }
+            }
+            @if (tradeNFT != null)
+            {
+                <tr>
+                    <td>Description</td>
+                    <td>
+                        User @LinkHelper.GetObjectLink(tradeNFT.accountBuyer)
+                        bought @tradeNFT.fillBB.ToString() NFT
+                        at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                        and paid @TokenAmountConverter.ToString(tradeNFT.fillSB + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                        @(tradeNFT.feeBuyer > 0 ? $" including {@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} fees" : "")
+                    </td>
+                    <td>
+                        User @LinkHelper.GetObjectLink(tradeNFT.accountSeller)
+                        sold @tradeNFT.fillSA.ToString() NFT
+                        at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                        and received @TokenAmountConverter.ToString(tradeNFT.fillBA - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                        @(tradeNFT.feeSeller > 0 ? $" paying {@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} in fees" : "")
+                    </td>
+                </tr>
+                <tr>
+                    <td>Details</td>
+                    <td>Buyer</td>
+                    <td>Seller</td>
+                </tr>
+                <tr>
+                    <td>Account</td>
+                    <td>@LinkHelper.CreateUserLink(tradeNFT.accountBuyer, false, true)</td>
+                    <td>@LinkHelper.CreateUserLink(tradeNFT.accountSeller, false, true)</td>
+                </tr>
+                <tr>
+                    <td>Bought</td>
+                    <td>@tradeNFT.fillBB.ToString() NFT</td>
+                    <td>@TokenAmountConverter.ToString(tradeNFT.fillBA, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                </tr>
+                <tr>
+                    <td>Sold</td>
+                    <td>@TokenAmountConverter.ToString(tradeNFT.fillSB, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                    <td>@tradeNFT.fillSA.ToString() NFT</td>
+                </tr>
+                <tr>
+                    <td>Fee</td>
+                    <td>@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                    <td>@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                </tr>
+                @foreach ((NonFungibleToken nft, int index) in tradeNFT.nfts?.WithIndex()!)
+                {
+                    <tr>
+                        <td>NFT @(index + 1) type @nft.nftType</td>
+                        <td colspan="2">@LinkHelper.GetObjectLink(@nft)</td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td>Raw Data</td>
+                <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
+</MudContainer>
