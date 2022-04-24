@@ -1,18 +1,14 @@
 ﻿@page "/pairs"
-@inject Lexplorer.Services.ILoopringGraphQLService LoopringGraphQLService;
-@inject Lexplorer.Services.IUniswapGraphQLService UniswapGraphQLService;
-@inject IAppCache AppCache;
-
-@inject NavigationManager NavigationManager;
 
 <PageTitle>The Lexplorer - Pairs</PageTitle>
 
-@if (pairsData != null && uniswapTokens != null && uniswapTokens!.Count > 0)
-{
+<MudContainer Fixed="true" Class="my-3">
+    @if (pairsData != null && uniswapTokens != null && uniswapTokens!.Count > 0)
+    {
         <MudGrid>
             <MudItem sm="12">
                 <MudText Typo="Typo.h6">Pairs <MudText Typo="Typo.caption">Current Page: @pageNumber</MudText></MudText>
-                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading=@isLoading>
+                <MudTable Dense="true" Items="@pairsData.data!.pairs" Hover="true" Loading=@isLoading Class="mt-3">
                     <HeaderContent>
                         <MudTh>Pair</MudTh>
                         <MudTh Style="text-align:right">Volume 24H</MudTh>
@@ -20,101 +16,41 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Pair">@context.token0!.symbol/@context.token1!.symbol</MudTd>
-                   @if(@context.dailyEntities!.Count > 0 && @context.weeklyEntities!.Count > 0 && uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas!.Count > 0)
-                   {
+                        @if (@context.dailyEntities!.Count > 0 && @context.weeklyEntities!.Count > 0 && uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas!.Count > 0)
+                        {
                         <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(@context.dailyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
                         <MudTd Style="text-align:right" DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities[0].tradedVolumeToken1Swap, @context.token1!.decimals, uniswapTokens!.Where(c => c.address! == @context.token1!.address).FirstOrDefault()!.data!.tokenDayDatas![0].priceUSD) </MudTd>
-                    }
-                    else
-                    {
-                       <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(0, @context.token1!.decimals, 0) </MudTd>
-                       <MudTd Style="text-align:right" DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
-                    }
+                        }
+                        else
+                        {
+                        <MudTd Style="text-align:right" DataLabel="Volume 24H">$@TokenAmountConverter.ToStringWithExponent(0, @context.token1!.decimals, 0) </MudTd>
+                        <MudTd Style="text-align:right" DataLabel="Volume 7D">$@TokenAmountConverter.ToStringWithExponent(@context.weeklyEntities![0].tradedVolumeToken1Swap, @context.token1!.decimals, 0) </MudTd>
+                        }
 
-                    </RowTemplate>
-                </MudTable>
-            </MudItem>
-        </MudGrid>
-    if (pageNumber != "0")
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+        if (pageNumber != "0")
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        }
+    }
+    else if (pairsData != null && pairsData!.data!.pairs!.Count == 0)
     {
-                <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
+        <MudText Typo="Typo.h6">No pairs to show</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
     }
     else
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-    }
-}
-else if (pairsData != null && pairsData!.data!.pairs!.Count == 0)
-{
-     <MudText Typo="Typo.h6">No pairs to show</MudText>
-     <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="GoToStartPage">Back to Start</MudButton>
-     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToPreviousPage">Previous Page</MudButton>
-     <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="GoToNextPage">Next Page</MudButton>
-}
-else
-{
         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-}
-
-@code {
-    private Pairs? pairsData;
-    private List<UniswapToken>? uniswapTokens;
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string pageNumber { get; set; } = "0";
-
-    private bool isLoading;
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (String.IsNullOrEmpty(pageNumber))
-        {
-            pageNumber = "0";
-        }
-        isLoading = true;
-        string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
-        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
-        int pairCount = 0;
-        foreach (var pair in pairsData!.data!.pairs!)
-        {
-            string uniswapTokenCacheKey = $"pairsOverview-token-{pair!.token1!.address!}-pageNumber{pageNumber}";
-            var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey, async () => await UniswapGraphQLService.GetTokenPrice(pair!.token1!.address!), DateTimeOffset.UtcNow.AddHours(1));
-            if(uniswapToken != null && pairCount == 0)
-            {
-                uniswapTokens = new List<UniswapToken>();
-                uniswapTokens!.Add(uniswapToken!);
-            }
-            else
-            {
-                uniswapTokens!.Add(uniswapToken!);
-            }
-
-            pairCount++;
-        }
-        isLoading = false;
-        StateHasChanged();
     }
-
-    private void GoToNextPage()
-    {
-        int nextPage = Int32.Parse(pageNumber) + 1;
-        string parameters = $"pairs?pageNumber={nextPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
-
-    private void GoToPreviousPage()
-    {
-        int previousPage = Int32.Parse(pageNumber) - 1;
-        string parameters = $"pairs?pageNumber={previousPage.ToString()}";
-        NavigationManager.NavigateTo(parameters);
-    }
-    private void GoToStartPage()
-    {
-        string parameters = "pairs/";
-        NavigationManager.NavigateTo(parameters);
-    }
-}
+</MudContainer>
