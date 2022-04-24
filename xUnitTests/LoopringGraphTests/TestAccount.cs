@@ -25,7 +25,7 @@ namespace xUnitTests.LoopringGraphTests
         [TestPriority(-10)]
         public async void GetAccount()
         {
-            Account? account = await service.GetAccount(fixture.testAccountId);
+            AccountModel? account = await service.GetAccount(fixture.testAccountId);
             Assert.NotNull(account);
             Assert.Equal(fixture.testAccountId, account!.id);
             Assert.Null(account.balances);
@@ -55,7 +55,7 @@ namespace xUnitTests.LoopringGraphTests
         [Fact]
         public async void GetAccounts()
         {
-            IList<Account>? accounts = await service.GetAccounts(0, 10);
+            IList<AccountModel>? accounts = await service.GetAccounts(0, 10);
             Assert.NotEmpty(accounts);
             foreach (var account in accounts!)
             {
@@ -65,7 +65,7 @@ namespace xUnitTests.LoopringGraphTests
         [Fact]
         public async void GetPools()
         {
-            IList<Account>? accounts = await service.GetAccounts(0, 10, "Pool");
+            IList<AccountModel>? accounts = await service.GetAccounts(0, 10, "Pool");
             Assert.NotEmpty(accounts);
             foreach (var account in accounts!)
             {
