@@ -11,126 +11,125 @@
 @inject IAppCache AppCache;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
-
-<MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
-    </div>
-    <tbody>
-        <tr>
-            <td>L1 Address</td>
-            <td><L1AccountLink address="@account?.address" shortenAddress="false" /></td>
-        </tr>
-        <tr>
-            <td>Account Type</td>
-            <td>@account?.typeName</td>
-        </tr>
-        <tr>
-            <td>Created At (UTC)</td>
-            <td>@account?.createdAtTransaction?.verifiedAt</td>
-        </tr>
-        @if (account is User)
-        {
+<MudContainer Fixed="true" Class="my-3">
+    <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+        <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+            <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
+        </div>
+        <tbody>
             <tr>
-                <td>Public key</td>
-                <td>0x@((account as User)!.publicKey)</td>
+                <td>L1 Address</td>
+                <td><L1AccountLink address="@account?.address" shortenAddress="false" /></td>
             </tr>
+            <tr>
+                <td>Account Type</td>
+                <td>@account?.typeName</td>
+            </tr>
+            <tr>
+                <td>Created At (UTC)</td>
+                <td>@account?.createdAtTransaction?.verifiedAt</td>
+            </tr>
+            @if (account is User)
+            {
+                <tr>
+                    <td>Public key</td>
+                    <td>0x@((account as User)!.publicKey)</td>
+                </tr>
 
-        }
-    </tbody>
-</MudSimpleTable>
+            }
+        </tbody>
+    </MudSimpleTable>
 
-<br />
+    <br />
 
-<MudTabs>
-    <MudTabPanel Text="Token balances">
-        <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading>
-            <HeaderContent>
-                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
-                <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals) @context.token.symbol</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                @if (account?.balances?.Count > 10)
-                {
-                    <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left" />
-                }
-            </PagerContent>
-        </MudTable>
-    </MudTabPanel>
-    <MudTabPanel Text="NFTs">
-        @if ((accountNFTSlots?.Count ?? 0) < 1)
-        {
-            <MudText>No NFTs</MudText>
-        }
-        else
-        {
-            <MudGrid>
-                <MudItem xs="12" Class="d-flex justify-center">
-                    <MudToolBar>
-                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
-                        <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
-                    </MudToolBar>
-                </MudItem>
-                @foreach (var slot in accountNFTSlots!)
-                {
-                    var metaData = GetMetadata(slot.nft?.id);
-                    <MudItem xs="2">
-                        <MudCard Style="height:100%">
-                            <MudCardHeader>
-                                <CardHeaderContent>
-                                    <MudText Typo="Typo.body1">@metaData?.name</MudText>
+    <MudTabs>
+        <MudTabPanel Text="Token balances">
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading>
+                <HeaderContent>
+                    <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
+                    <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals) @context.token.symbol</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    @if (account?.balances?.Count > 10)
+                    {
+                        <MudTablePager InfoFormat="@("{first_item}-{last_item} of {all_items}")" HorizontalAlignment="HorizontalAlignment.Left" />
+                    }
+                </PagerContent>
+            </MudTable>
+        </MudTabPanel>
+        <MudTabPanel Text="NFTs">
+            @if ((accountNFTSlots?.Count ?? 0) < 1)
+            {
+                <MudText>No NFTs</MudText>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="12" Class="d-flex justify-center">
+                        <MudToolBar>
+                            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
+                            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
+                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+                            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
+                        </MudToolBar>
+                    </MudItem>
+                    @foreach (var slot in accountNFTSlots!)
+                    {
+                        var metaData = GetMetadata(slot.nft?.id);
+                        <MudItem xs="12" lg="4">
+                            <MudCard>
+                                <MudCardMedia Image="@metaData?.imageURL" Style="object-fit:contain" />
+                                <MudCardContent>
+                                    <MudText Typo="Typo.h5">@metaData?.name</MudText>
                                     <MudText Typo="Typo.body2">@metaData?.description</MudText>
                                     <MudText Typo="Typo.body2">Balance: @slot.balance.ToString("#,##0")</MudText>
-                                </CardHeaderContent>
-                                <CardHeaderActions>
-                                    <MudIconButton Icon="@Icons.Material.Filled.Link" Color="Color.Default" Link=@LinkHelper.GetObjectLinkAddress(slot.nft)?.Item1 />
-                                </CardHeaderActions>
-                            </MudCardHeader>
-                            <MudCardMedia Image="@metaData?.imageURL" Height="300" />
-                        </MudCard>
-                    </MudItem>
-                }
-            </MudGrid>
-        }
-    </MudTabPanel>
-</MudTabs>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Link=@LinkHelper.GetObjectLinkAddress(slot.nft)?.Item1>Go to NFT</MudButton>
+                                </MudCardActions>
+                            </MudCard>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+        </MudTabPanel>
+    </MudTabs>
 
-<br />
+    <br />
 
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Transactions</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions" />
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Tx Id</MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>From</MudTh>
-        <MudTh>To</MudTh>
-        <MudTh Style="text-align:right">Bought</MudTh>
-        <MudTh Style="text-align:right">Sold</MudTh>
-        <MudTh Style="text-align:right">Fee</MudTh>
-        <MudTh>Verified At (UTC)</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
-        <MudTd DataLabel="Type">@context.typeName</MudTd>
-        <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId />
-        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-    </RowTemplate>
-</MudTable>
+    <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Transactions</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+            <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tx Id</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>From</MudTh>
+            <MudTh>To</MudTh>
+            <MudTh Style="text-align:right">Bought</MudTh>
+            <MudTh Style="text-align:right">Sold</MudTh>
+            <MudTh Style="text-align:right">Fee</MudTh>
+            <MudTh>Verified At (UTC)</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+            <MudTd DataLabel="Type">@context.typeName</MudTd>
+            <TransactionTableDetails TransactionData=@context ignoreUserIDForLink=@accountId />
+            <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
 
 @code {
     [Parameter]
