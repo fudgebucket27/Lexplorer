@@ -11,8 +11,8 @@
 @inject IAppCache AppCache;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
-<MudContainer Fixed="true" Class="my-3">
-    <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+<MudContainer Fixed="true" Class="px-0">
+    <MudSimpleTable Class="mt-3" Dense="true" Striped="true" Bordered="true">
         <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
             <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
         </div>
@@ -80,8 +80,8 @@
                     @foreach (var slot in accountNFTSlots!)
                     {
                         var metaData = GetMetadata(slot.nft?.id);
-                        <MudItem xs="12" lg="4">
-                            <MudCard>
+                        <MudItem xs="12" sm="4" md="4" lg="2">
+                            <MudCard Style="height:100%;position:relative">
                                 <MudCardMedia Image="@metaData?.imageURL" Style="object-fit:contain" />
                                 <MudCardContent>
                                     <MudText Typo="Typo.h5">@metaData?.name</MudText>
@@ -89,7 +89,7 @@
                                     <MudText Typo="Typo.body2">Balance: @slot.balance.ToString("#,##0")</MudText>
                                 </MudCardContent>
                                 <MudCardActions>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" Link=@LinkHelper.GetObjectLinkAddress(slot.nft)?.Item1>Go to NFT</MudButton>
+                                    <MudButton Style="position:absolute;bottom:0;" Variant="Variant.Text" Color="Color.Primary" Link=@LinkHelper.GetObjectLinkAddress(slot.nft)?.Item1>Go to NFT</MudButton>
                                 </MudCardActions>
                             </MudCard>
                         </MudItem>
@@ -130,6 +130,7 @@
         </RowTemplate>
     </MudTable>
 </MudContainer>
+
 
 @code {
     [Parameter]
