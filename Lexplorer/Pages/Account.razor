@@ -73,7 +73,7 @@
                         <MudToolBar>
                             <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
                             <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
-                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
                             <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
                         </MudToolBar>
                     </MudItem>
