@@ -23,6 +23,10 @@ function triggerFileDownload(fileName, url) {
   anchorElement.href = url;
   anchorElement.download = fileName ?? '';
   anchorElement.click();
-  anchorElement.remove();
+    anchorElement.remove();
+}
+
+window.prefersDarkMode = function(){
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 </script>
