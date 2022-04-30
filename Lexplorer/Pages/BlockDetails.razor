@@ -80,7 +80,7 @@
 
 @code {
     private Lexplorer.Models.Block? block;
-    private List<Transaction>? transactions = new List<Transaction>();
+    private List<Transaction>? transactions = new();
 
     [Parameter]
     public string blockNumber { get; set; } = "";
