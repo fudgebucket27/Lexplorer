@@ -1,11 +1,8 @@
 ﻿@page "/account/{accountId}"
-@using Lexplorer.Models
-@using Lexplorer.Helpers
-@using Lexplorer.Components
 @using System.Diagnostics
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
-@inject Lexplorer.Services.EthereumService EthereumService;
-@inject Lexplorer.Services.NftMetadataService NftMetadataService;
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject EthereumService EthereumService;
+@inject NftMetadataService NftMetadataService;
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService;
 @inject IAppCache AppCache;
@@ -175,8 +172,8 @@
     public readonly int pageSize = 25;
     public readonly int nftPageSize = 12; //6 per row
 
-    private Lexplorer.Models.Account? account { get; set; }
-    private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
+    private Account? account { get; set; }
+    private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts;

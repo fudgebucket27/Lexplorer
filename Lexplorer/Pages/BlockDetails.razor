@@ -1,9 +1,6 @@
 ﻿@page "/blocks/{blockNumber}"
-@using Lexplorer.Components
-@using Lexplorer.Models;
-@using Lexplorer.Helpers;
 @using System.Diagnostics;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
@@ -83,7 +80,7 @@
 
 @code {
     private Lexplorer.Models.Block? block;
-    private List<Transaction>? transactions = new List<Transaction>();
+    private List<Transaction>? transactions = new();
 
     [Parameter]
     public string blockNumber { get; set; } = "";

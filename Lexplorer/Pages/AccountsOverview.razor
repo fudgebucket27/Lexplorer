@@ -1,7 +1,5 @@
-﻿@using Lexplorer.Helpers;
-@using Lexplorer.Components;
-@using System.Diagnostics;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+﻿@using System.Diagnostics;
+@inject LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 @page "/account";
@@ -59,7 +57,7 @@
     public bool isLoading = true;
     public readonly int pageSize = 25;
 
-    private IList<Lexplorer.Models.Account>? accounts { get; set; } = new List<Lexplorer.Models.Account>();
+    private IList<Account>? accounts { get; set; } = new List<Account>();
 
     [Parameter]
     [SupplyParameterFromQuery]

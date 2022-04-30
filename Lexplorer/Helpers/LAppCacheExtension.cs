@@ -1,5 +1,4 @@
-﻿using System;
-using LazyCache;
+﻿using LazyCache;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Lexplorer.Helpers
