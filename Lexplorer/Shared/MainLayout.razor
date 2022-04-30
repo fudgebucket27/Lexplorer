@@ -3,6 +3,7 @@
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.EthereumService EthereumService;
+@inject IJSRuntime JS;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider />
@@ -85,6 +86,11 @@
     protected override void OnInitialized()
     {
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isDarkMode = await JS.InvokeAsync<bool>("prefersDarkMode");
     }
 
     private async void DoSearch()
