@@ -1,11 +1,8 @@
 ﻿@page "/account/{accountId}"
-@using Lexplorer.Models
-@using Lexplorer.Helpers
-@using Lexplorer.Components
 @using System.Diagnostics
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
-@inject Lexplorer.Services.EthereumService EthereumService;
-@inject Lexplorer.Services.NftMetadataService NftMetadataService;
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject EthereumService EthereumService;
+@inject NftMetadataService NftMetadataService;
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService;
 @inject IAppCache AppCache;

@@ -1,8 +1,7 @@
 ﻿@inherits LayoutComponentBase
-@using Lexplorer.Helpers
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
-@inject Lexplorer.Services.EthereumService EthereumService;
+@inject EthereumService EthereumService;
 @inject IJSRuntime JS;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
