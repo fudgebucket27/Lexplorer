@@ -108,7 +108,7 @@ namespace Lexplorer.Models
     }
     public class Pool : Account
     {
-        public int feeBipsAMM { get; set; }
+        public Int32? feeBipsAMM { get; set; }
     }
     public class Pair
     {
