@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager;
 @inject EthereumService EthereumService;
 @inject IJSRuntime JS;
+@inject IDialogService DialogService
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider />
@@ -13,8 +14,9 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6" Class="d-none d-sm-flex">The Lexplorer</MudText>
         <MudSpacer />
-        <MudTextField Style="@($"background:var(--mud-palette-background);")" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense" />
+        <MudTextField Class="d-none d-sm-flex" Style="@($"background:var(--mud-palette-background);")" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense" />
         <MudSpacer />
+        <MudIconButton Class="d-flex d-sm-none" Icon="@Icons.Filled.Search" OnClick="DialogSearch"/>
         <MudToggleIconButton @bind-Toggled="@_isDarkMode"
                              Icon="@Icons.Filled.DarkMode" Color="Color.Inherit" Title="DarkMode"
                              ToggledIcon="@Icons.Filled.LightMode" ToggledTitle="LightMode" />
@@ -119,5 +121,21 @@
         }
         searching = false;
         StateHasChanged();
+    }
+
+    async Task DialogSearch()
+    {
+        DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = DialogService.Show<SearchDialog>("Search", maxWidth);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            searchTerm = result.Data == null 
+                ? ""
+                : result.Data.ToString();
+
+            DoSearch();
+        }
     }
 }
