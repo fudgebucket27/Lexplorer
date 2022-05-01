@@ -1,7 +1,5 @@
-﻿@using Lexplorer.Helpers;
-@using Lexplorer.Components;
-@using System.Diagnostics;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+﻿@using System.Diagnostics;
+@inject LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 @page "/account";
@@ -14,7 +12,7 @@
         <MudSpacer />
         <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
         <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accounts!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
         <MudSpacer />
         <MudSelect @bind-Value="@filterAccounts" T="string" Label="Filter by type">
@@ -59,7 +57,7 @@
     public bool isLoading = true;
     public readonly int pageSize = 25;
 
-    private IList<Lexplorer.Models.Account>? accounts { get; set; } = new List<Lexplorer.Models.Account>();
+    private IList<Account>? accounts { get; set; } = new List<Account>();
 
     [Parameter]
     [SupplyParameterFromQuery]

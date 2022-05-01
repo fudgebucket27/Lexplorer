@@ -1,9 +1,4 @@
-﻿@using Lexplorer.Helpers;
-@using Lexplorer.Models;
-@using Lexplorer.Components;
-@using System.Globalization;
-
-@switch (TransactionData?.typeName)
+﻿@switch (TransactionData?.typeName)
 {
     case "Deposit":
         <MudTd DataLabel="From Address"><L1AccountLink address="@deposit?.toAccount?.address" /></MudTd>

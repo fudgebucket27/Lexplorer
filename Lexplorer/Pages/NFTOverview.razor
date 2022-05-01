@@ -1,8 +1,5 @@
 ﻿@page "/nfts"
-@using Lexplorer.Models
-@using Lexplorer.Helpers
-@using Lexplorer.Components
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringGraphQLService LoopringGraphQLService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
 
@@ -14,7 +11,7 @@
         <MudSpacer />
         <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
         <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(nfts?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
         <MudSpacer />
     </ToolBarContent>

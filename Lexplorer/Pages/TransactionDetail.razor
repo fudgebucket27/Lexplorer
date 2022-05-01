@@ -1,9 +1,6 @@
 ﻿@page "/transactions/{transactionId}"
-@using Lexplorer.Components;
-@using Lexplorer.Helpers;
-@using Lexplorer.Models;
 @inject IAppCache AppCache;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringGraphQLService LoopringGraphQLService;
 
 <PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 

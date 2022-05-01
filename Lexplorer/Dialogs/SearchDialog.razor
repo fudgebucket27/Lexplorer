@@ -1,0 +1,28 @@
+﻿<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+            <MudTextField AutoFocus="true" @bind-Value="searchTerm" Label="Searchterm..." Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoDialogSearch" Margin="Margin.Dense" />
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="DoDialogSearch">Search</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    private string? _searchTerm;
+    private string? searchTerm
+    {
+        get { return _searchTerm; }
+        set
+        {
+            _searchTerm = value;
+            DoDialogSearch();
+        }
+    }
+
+    void DoDialogSearch() => MudDialog?.Close(DialogResult.Ok(searchTerm));
+
+}

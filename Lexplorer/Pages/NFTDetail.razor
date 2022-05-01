@@ -1,13 +1,10 @@
 ﻿@page "/nfts/{nftId}"
-@using Lexplorer.Components;
-@using Lexplorer.Helpers;
-@using Lexplorer.Models;
 @using System.Diagnostics
 @inject IAppCache AppCache;
 @inject NavigationManager NavigationManager;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
-@inject Lexplorer.Services.EthereumService EthereumService;
-@inject Lexplorer.Services.NftMetadataService NftMetadataService;
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject EthereumService EthereumService;
+@inject NftMetadataService NftMetadataService;
 
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
@@ -86,7 +83,7 @@
         <MudSpacer />
         <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
         <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:150px;" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
         <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
         <MudSpacer />
     </ToolBarContent>
@@ -118,7 +115,7 @@
     public string pageNumber { get; set; } = "1";
 
     private NonFungibleToken? nft;
-    private IList<Lexplorer.Models.Transaction>? transactions { get; set; } = new List<Transaction>();
+    private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     public bool isLoading = true;
     public readonly int pageSize = 25;
 
