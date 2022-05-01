@@ -131,9 +131,7 @@
 
         if (!result.Cancelled)
         {
-            searchTerm = result.Data == null 
-                ? ""
-                : result.Data.ToString();
+            searchTerm = result?.Data?.ToString();
 
             DoSearch();
         }
