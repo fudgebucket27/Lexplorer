@@ -455,6 +455,13 @@ namespace Lexplorer.Models
         public double dayStart { get; set; }
         public double dayEnd { get; set; }
         public double dayNumber { get; set; }
+
+        //Day number is the amount of days since the start block of Loopring 3.6 (block 11149814)
+        //https://etherscan.io/block/11149814
+        //Oct-29-2020 05:41:42 AM +UTC
+        private static readonly DateTime _LRUTCStartBlock = new(2020, 10, 29, 05, 41, 42, DateTimeKind.Utc);
+
+        public DateTime dayDateTime => _LRUTCStartBlock.AddDays(dayNumber);
     }
 
     public class PairWeeklyData : PairEntity

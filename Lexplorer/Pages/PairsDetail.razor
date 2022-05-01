@@ -3,6 +3,7 @@
 @using Lexplorer.Helpers;
 @using Lexplorer.Models;
 @using System.Diagnostics
+@using ApexCharts;
 @inject IAppCache AppCache;
 @inject NavigationManager NavigationManager;
 @inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
@@ -41,18 +42,71 @@
     </tbody>
 </MudSimpleTable>
 
+@if (dailyData != null)
+{
+    <MudItem lg="12" Class="mt-3">
+        <ApexChart
+                   TItem="PairDailyData"
+                   Title="30 day volume"
+                   Options="chartOptions">
+
+            <ApexPointSeries TItem="PairDailyData"
+                             Items="dailyData"
+                             Name="Total volume"
+                             XValue="@(d => d.dayDateTime)"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0, pair?.token0?.decimals ?? 0))"
+                             SeriesType="SeriesType.Bar"
+                             OrderBy="d => d.X" />
+            <ApexPointSeries TItem="PairDailyData"
+                             Items="dailyData"
+                             Name="Swap volume"
+                             XValue="@(d => d.dayDateTime)"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Swap, pair?.token0?.decimals ?? 0))"
+                             SeriesType="SeriesType.Bar"
+                             OrderBy="d => d.X" />
+            <ApexPointSeries TItem="PairDailyData"
+                             Items="dailyData"
+                             Name="Orderbook volume"
+                             XValue="@(d => d.dayDateTime)"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Orderbook, pair?.token0?.decimals ?? 0))"
+                             SeriesType="SeriesType.Bar"
+                             OrderBy="d => d.X" />
+        </ApexChart>
+    </MudItem>
+}
 
 @code {
     [Parameter]
     public string pairId { get; set; } = "";
 
     private Pair? pair { get; set; } = new Pair();
-    private IList<PairDailyData>? dailyData { get; set; } = new List<PairDailyData>();
+    private IList<PairDailyData>? dailyData { get; set; } = null;
+
+    private ApexChartOptions<PairDailyData> chartOptions = new();
+
+    protected override void OnInitialized()
+    {
+        chartOptions = new ApexChartOptions<PairDailyData>();
+        
+        chartOptions.Yaxis = new List<YAxis>();
+        chartOptions.Yaxis.Add(new YAxis
+        {
+            Labels = new YAxisLabels
+            {
+                //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
+                //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
+                Formatter = @"function (value) {
+                        return Number(value).toLocaleString();}"
+            }
+        }
+        );
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         if (pair?.id != pairId)
         {
+            dailyData = null;
             string pairCacheKey = $"pair-{pairId}";
             pair = await AppCache.GetOrAddAsyncNonNull(pairCacheKey,
                 async () => await LoopringGraphQLService.GetPair(pairId),
@@ -64,6 +118,7 @@
                 async () => await LoopringGraphQLService.GetPairDailyEntities(pairId, 0, 30),
                 DateTimeOffset.UtcNow.AddHours(1)
                 );
+            StateHasChanged();
         }
     }
 }
