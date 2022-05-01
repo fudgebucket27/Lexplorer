@@ -1,7 +1,7 @@
 ﻿<MudDialog>
     <DialogContent>
         <div class="d-flex flex-column py-1">
-            <MudTextField @bind-Value="SearchTerm" Label="Searchterm..." Variant="Variant.Text"/>
+            <MudTextField @bind-Value="searchTerm" Label="Searchterm..." Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoDialogSearch" Margin="Margin.Dense" />
         </div>
     </DialogContent>
     <DialogActions>
@@ -12,8 +12,17 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    private string SearchTerm { get; set; }
+    private string? _searchTerm;
+    private string? searchTerm
+    {
+        get { return _searchTerm; }
+        set
+        {
+            _searchTerm = value;
+            DoDialogSearch();
+        }
+    }
 
-    void DoDialogSearch() => MudDialog.Close(DialogResult.Ok(SearchTerm));
+    void DoDialogSearch() => MudDialog.Close(DialogResult.Ok(searchTerm));
 
 }
