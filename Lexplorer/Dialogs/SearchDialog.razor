@@ -10,7 +10,7 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
     private string? _searchTerm;
     private string? searchTerm
@@ -23,6 +23,6 @@
         }
     }
 
-    void DoDialogSearch() => MudDialog.Close(DialogResult.Ok(searchTerm));
+    void DoDialogSearch() => MudDialog?.Close(DialogResult.Ok(searchTerm));
 
 }

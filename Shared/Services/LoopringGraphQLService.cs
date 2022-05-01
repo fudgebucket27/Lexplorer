@@ -306,7 +306,6 @@ namespace Lexplorer.Services
                 $first: Int
                 $orderBy: Transaction_orderBy
                 $orderDirection: OrderDirection
-                $block: Block_height
                 $whereFilter: Transaction_filter
               ) {
                 proxy(id: 0) {
@@ -333,7 +332,6 @@ namespace Lexplorer.Services
                   first: $first
                   orderBy: $orderBy
                   orderDirection: $orderDirection
-                  block: $block
                   where: $whereFilter
                 ) {
                   id
@@ -413,8 +411,7 @@ namespace Lexplorer.Services
                         skip = skip,
                         first = first,
                         orderBy = "internalID",
-                        orderDirection = "desc"
-                        ,
+                        orderDirection = "desc",
                         whereFilter = new
                         {
                             block = blockId
