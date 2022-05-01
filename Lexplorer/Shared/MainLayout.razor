@@ -16,7 +16,7 @@
         <MudSpacer />
         <MudTextField Class="d-none d-sm-flex" Style="@($"background:var(--mud-palette-background);")" @bind-Value="searchTerm" Label="Search account, block or transaction" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoSearch" Margin="Margin.Dense" />
         <MudSpacer />
-        <MudIconButton Class="d-flex d-sm-none" Icon="@Icons.Filled.Search" OnClick="DialogSearch"/>
+        <MudIconButton Class="d-flex d-sm-none" Icon="@Icons.Filled.Search" OnClick="DialogSearch" Color="Color.Inherit"/>
         <MudToggleIconButton @bind-Toggled="@_isDarkMode"
                              Icon="@Icons.Filled.DarkMode" Color="Color.Inherit" Title="DarkMode"
                              ToggledIcon="@Icons.Filled.LightMode" ToggledTitle="LightMode" />
