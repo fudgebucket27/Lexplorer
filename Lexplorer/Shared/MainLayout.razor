@@ -125,7 +125,13 @@
 
     async Task DialogSearch()
     {
-        DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, Position = DialogPosition.TopCenter };
+        DialogOptions maxWidth = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Medium, 
+            FullWidth = true, 
+            Position = DialogPosition.TopCenter,
+            CloseButton = true
+        };
         var dialog = DialogService.Show<SearchDialog>("Search", maxWidth);
         var result = await dialog.Result;
 
