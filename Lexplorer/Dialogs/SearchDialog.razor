@@ -1,0 +1,19 @@
+﻿<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+            <MudTextField @bind-Value="SearchTerm" Label="Searchterm..." Variant="Variant.Text"/>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="DoDialogSearch">Search</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private string SearchTerm { get; set; }
+
+    void DoDialogSearch() => MudDialog.Close(DialogResult.Ok(SearchTerm));
+
+}

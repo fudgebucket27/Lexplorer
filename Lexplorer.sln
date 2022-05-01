@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lexplorer", "Lexplorer\Lexp
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{E3CCB3F9-47E9-4F8E-85D6-9C964F24367C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xUnitTests", "xUnitTests\xUnitTests.csproj", "{246057E4-2CD6-46C3-9A50-37D8E365DD1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xUnitTests", "xUnitTests\xUnitTests.csproj", "{246057E4-2CD6-46C3-9A50-37D8E365DD1E}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
