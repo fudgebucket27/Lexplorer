@@ -19,7 +19,7 @@ namespace xUnitTests.LoopringGraphTests
         public TestBlock(GraphQLTestsFixture fixture)
         {
             this.fixture = fixture;
-            this.service = fixture!.LGS;
+            service = fixture!.LGS;
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace xUnitTests.LoopringGraphTests
         [Fact]
         public async void GetBlockDateRange()
         {
-            Tuple<Double, Double>? blockIDs = await service.GetBlockDateRange(
+            Tuple<double, double>? blockIDs = await service.GetBlockDateRange(
                 new DateTime(2022, 2, 20, 0, 0, 0, DateTimeKind.Utc), 
                 new DateTime(2022, 2, 22, 0, 0, 0, DateTimeKind.Utc));
             Assert.NotNull(blockIDs);

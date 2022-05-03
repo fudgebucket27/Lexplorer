@@ -16,7 +16,7 @@ namespace xUnitTests.LoopringGraphTests
         public TestNFT(GraphQLTestsFixture fixture)
         {
             this.fixture = fixture;
-            this.service = fixture!.LGS;
+            service = fixture!.LGS;
         }
 
         [Fact]

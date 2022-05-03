@@ -229,8 +229,8 @@
         foreach (var block in blockData!.data!.blocks!)
         {
             transactionCount += block.transactionCount;
-            timeBetweenBlocks.Add(currentTime - Int64.Parse(block.timestamp!));
-            currentTime = Int64.Parse(block.timestamp!);
+            timeBetweenBlocks.Add(currentTime - long.Parse(block.timestamp!));
+            currentTime = long.Parse(block.timestamp!);
         }
         averageTransactions = transactionCount / blockData.data.blocks.Count;
         averageBlockTime = Math.Floor(timeBetweenBlocks.Average() / 60);
@@ -239,7 +239,7 @@
     private void CalculateLastBlockSubmitted()
     {
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-        long timeSinceLastBlock = currentTime - Int64.Parse(blockData!.data!.blocks![0].timestamp!);
+        long timeSinceLastBlock = currentTime - long.Parse(blockData!.data!.blocks![0].timestamp!);
         lastBlockSubmittedTime = Math.Floor((double)timeSinceLastBlock / 60);
     }
 

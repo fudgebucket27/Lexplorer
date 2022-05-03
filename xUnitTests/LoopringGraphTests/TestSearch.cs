@@ -18,7 +18,7 @@ namespace xUnitTests.LoopringGraphTests
         public TestSearch(GraphQLTestsFixture fixture)
         {
             this.fixture = fixture;
-            this.service = fixture!.LGS;
+            service = fixture!.LGS;
         }
 
         [Fact]

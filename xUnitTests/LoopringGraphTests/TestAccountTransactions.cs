@@ -26,7 +26,7 @@ namespace xUnitTests.LoopringGraphTests
         public TestAccountTransactions(GraphQLTestsFixture fixture)
         {
             this.fixture = fixture;
-            this.service = fixture!.LGS;
+            service = fixture!.LGS;
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace xUnitTests.LoopringGraphTests
         internal void EnsureTransactionDateRange(Transaction? transaction)
         {
             Assert.NotNull(transaction);
-            Assert.InRange<DateTime>(transaction!.verifiedAtDateTime!.Value, startDate, endDate);
+            Assert.InRange(transaction!.verifiedAtDateTime!.Value, startDate, endDate);
         }
 
     }

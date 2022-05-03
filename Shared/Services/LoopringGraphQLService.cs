@@ -29,7 +29,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID",
-            string orderDirection = "desc", string? blockTimestamp = null, Boolean gte = true)
+            string orderDirection = "desc", string? blockTimestamp = null, bool gte = true)
         {
             var blocksQuery = @"
             query blocks(
@@ -112,7 +112,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Tuple<Double, Double>?> GetBlockDateRange(DateTime startDateUTC, DateTime endDateUTC)
+        public async Task<Tuple<double, double>?> GetBlockDateRange(DateTime startDateUTC, DateTime endDateUTC)
         {
             var blockQuery = @"
             query swap (
@@ -158,7 +158,7 @@ namespace Lexplorer.Services
             {
                 var response = await _client.PostAsync(request);
                 JToken token = JToken.Parse(response.Content!);
-                return new Tuple<Double, Double>(
+                return new Tuple<double, double>(
                     (double)token["data"]!["firstblock"]![0]!["id"]!,
                     (double)token["data"]!["lastblock"]![0]!["id"]!);
             }
@@ -441,7 +441,7 @@ namespace Lexplorer.Services
             {
                 //remove unused parameter to fix "Invalid query" error with non-hosted graph
                 //split and re-join all lines which don't contain the word "whereFilter"
-                transactionsQuery = String.Join(Environment.NewLine,
+                transactionsQuery = string.Join(Environment.NewLine,
                     transactionsQuery.Split(Environment.NewLine).Where(
                         (a) => !(a.Contains("whereFilter"))));
                 request.AddJsonBody(new
@@ -501,10 +501,10 @@ namespace Lexplorer.Services
             //since there is no way to filter for typename in Accounts_filter, we simply
             //query a different entity, i.e. pools instead of accounts
             string typePluralName = "accounts";
-            if (!String.IsNullOrEmpty(typeName))
+            if (!string.IsNullOrEmpty(typeName))
             {
                 //lower case, but first char only
-                typePluralName = Char.ToLower(typeName[0]) + typeName.Substring(1) + "s";
+                typePluralName = char.ToLower(typeName[0]) + typeName.Substring(1) + "s";
                 accountsQuery = accountsQuery.Replace("accounts(", $"{typePluralName}(");
             }
 
@@ -605,7 +605,7 @@ namespace Lexplorer.Services
                 query = balanceQuery,
                 variables = new
                 {
-                    accountId = Int32.Parse(accountId)
+                    accountId = int.Parse(accountId)
                 }
             });
             var response = await _client.PostAsync(request, cancellationToken);
@@ -630,7 +630,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
-            Double? firstBlockId = null, Double? lastBlockId = null, CancellationToken cancellationToken = default)
+            double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -739,7 +739,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
-            Double? firstBlockId = null, Double? lastBlockId = null, CancellationToken cancellationToken = default)
+            double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default)
         {
             try
             {

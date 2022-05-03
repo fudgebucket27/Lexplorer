@@ -1,7 +1,17 @@
 ﻿<MudDialog>
     <DialogContent>
         <div class="d-flex flex-column py-1">
-            <MudTextField AutoFocus="true" @bind-Value="searchTerm" Label="Searchterm..." Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Info" OnAdornmentClick="DoDialogSearch" Margin="Margin.Dense" />
+            <MudTextField AutoFocus="true"
+                          @bind-Value="searchTerm"
+                          Immediate="true"
+                          Label="Searchterm..."
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Filled.Search"
+                          AdornmentColor="Color.Info"
+                          OnAdornmentClick="DoDialogSearch"
+                          OnKeyDown="SearchTermKeyDown"
+                          Margin="Margin.Dense" />
         </div>
     </DialogContent>
     <DialogActions>
@@ -12,13 +22,12 @@
 @code {
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
-    private string? _searchTerm;
-    private string? searchTerm
+    private string? searchTerm { get; set; }
+
+    private void SearchTermKeyDown(KeyboardEventArgs e)
     {
-        get { return _searchTerm; }
-        set
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            _searchTerm = value;
             DoDialogSearch();
         }
     }

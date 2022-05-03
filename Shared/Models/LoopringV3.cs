@@ -23,33 +23,33 @@ namespace Lexplorer.Models
     {
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
-        public Int64 accountUpdateCount { get; set; }
-        public Int64 addCount { get; set; }
-        public Int64 ammUpdateCount { get; set; }
+        public long accountUpdateCount { get; set; }
+        public long addCount { get; set; }
+        public long ammUpdateCount { get; set; }
         public string? blockHash { get; set; }
         public int blockSize { get; set; }
         public string? data { get; set; }
-        public Int64 depositCount { get; set; }
-        public Double gasLimit { get; set; }
-        public Double gasPrice { get; set; }
-        public Double height { get; set; }
+        public long depositCount { get; set; }
+        public double gasLimit { get; set; }
+        public double gasPrice { get; set; }
+        public double height { get; set; }
         public string? id { get; set; }
-        public Int64 nftDataCount { get; set; }
-        public Int64 nftMintCount { get; set; }
+        public long nftDataCount { get; set; }
+        public long nftMintCount { get; set; }
         public Account? operatorAccount { get; set; }
-        public Int64 orderbookTradeCount { get; set; }
-        public Int64 removeCount { get; set; }
-        public Int64 signatureVerificationCount { get; set; }
-        public Int64 swapCount { get; set; }
-        public Int64 swapNFTCount { get; set; }
+        public long orderbookTradeCount { get; set; }
+        public long removeCount { get; set; }
+        public long signatureVerificationCount { get; set; }
+        public long swapCount { get; set; }
+        public long swapNFTCount { get; set; }
         public string? timestamp { get; set; }
-        public Int64 tradeNFTCount { get; set; }
-        public Int64 transactionCount { get; set; }
-        public Int64 transferCount { get; set; }
-        public Int64 transferNFTCount { get; set; }
+        public long tradeNFTCount { get; set; }
+        public long transactionCount { get; set; }
+        public long transferCount { get; set; }
+        public long transferNFTCount { get; set; }
         public string? txHash { get; set; }
-        public Int64 withdrawalCount { get; set; }
-        public Int64 withdrawalNFTCount { get; set; }
+        public long withdrawalCount { get; set; }
+        public long withdrawalNFTCount { get; set; }
     }
 
     public class BlockData
@@ -75,25 +75,25 @@ namespace Lexplorer.Models
     }
     public class Proxy
     {
-        public Int64 accountUpdateCount { get; set; }
-        public Int64 addCount { get; set; }
-        public Int64 ammUpdateCount { get; set; }
-        public Int64 depositCount { get; set; }
-        public Int64 nftDataCount { get; set; }
-        public Int64 nftMintCount { get; set; }
-        public Int64 orderbookTradeCount { get; set; }
-        public Int64 removeCount { get; set; }
-        public Int64 signatureVerificationCount { get; set; }
-        public Int64 swapCount { get; set; }
-        public Int64 swapNFTCount { get; set; }
-        public Int64 tradeNFTCount { get; set; }
-        public Int64 blockCount { get; set; }
-        public Int64 userCount { get; set; }
-        public Int64 transactionCount { get; set; }
-        public Int64 transferCount { get; set; }
-        public Int64 transferNFTCount { get; set; }
-        public Int64 withdrawalCount { get; set; }
-        public Int64 withdrawalNFTCount { get; set; }
+        public long accountUpdateCount { get; set; }
+        public long addCount { get; set; }
+        public long ammUpdateCount { get; set; }
+        public long depositCount { get; set; }
+        public long nftDataCount { get; set; }
+        public long nftMintCount { get; set; }
+        public long orderbookTradeCount { get; set; }
+        public long removeCount { get; set; }
+        public long signatureVerificationCount { get; set; }
+        public long swapCount { get; set; }
+        public long swapNFTCount { get; set; }
+        public long tradeNFTCount { get; set; }
+        public long blockCount { get; set; }
+        public long userCount { get; set; }
+        public long transactionCount { get; set; }
+        public long transferCount { get; set; }
+        public long transferNFTCount { get; set; }
+        public long withdrawalCount { get; set; }
+        public long withdrawalNFTCount { get; set; }
     }
 
     [JsonConverter(typeof(JsonSubtypes), "__typename")]
@@ -108,7 +108,7 @@ namespace Lexplorer.Models
     }
     public class Pool : Account
     {
-        public Int32? feeBipsAMM { get; set; }
+        public int? feeBipsAMM { get; set; }
     }
     public class Pair
     {
@@ -130,11 +130,11 @@ namespace Lexplorer.Models
 
     public class AccountTokenBalance
     {
-        public Double balance { get; set; }
+        public double balance { get; set; }
         public string? id { get; set; }
         public Token? token { get; set; }
         public Account? account { get; set; }
-        public Double fBalance {
+        public double fBalance {
             get
             {
                 return balance / Math.Pow(10, token!.decimals);
@@ -205,25 +205,25 @@ namespace Lexplorer.Models
         public Pool? pool { get; set; }
         public Token? tokenA { get; set; }
         public Token? tokenB { get; set; }
-        public Double tokenAPrice { get; set; }
-        public Double tokenBPrice { get; set; }
+        public double tokenAPrice { get; set; }
+        public double tokenBPrice { get; set; }
         public Pair? pair { get; set; }
-        public Double fillSA { get; set; }
-        public Double fillSB { get; set; }
+        public double fillSA { get; set; }
+        public double fillSB { get; set; }
         public bool fillAmountBorSA { get; set; }
         public bool fillAmountBorSB { get; set; }
-        public Double fillBA { get; set; }
-        public Double fillBB { get; set; }
-        public Double feeA { get; set; }
-        public Double protocolFeeA { get; set; }
-        public Double feeB { get; set; }
-        public Double protocolFeeB { get; set; }
+        public double fillBA { get; set; }
+        public double fillBB { get; set; }
+        public double feeA { get; set; }
+        public double protocolFeeA { get; set; }
+        public double feeB { get; set; }
+        public double protocolFeeB { get; set; }
     }
     public class Deposit : Transaction
     {
         public Account? toAccount { get; set; }
         public Token? token { get; set; }
-        public Double amount { get; set; }
+        public double amount { get; set; }
     }
 
     public class OrderBookTrade : Transaction
@@ -232,19 +232,19 @@ namespace Lexplorer.Models
         public Account? accountB { get; set; }
         public Token? tokenA { get; set; }
         public Token? tokenB { get; set; }
-        public Double tokenAPrice { get; set; }
-        public Double tokenBPrice { get; set; }
+        public double tokenAPrice { get; set; }
+        public double tokenBPrice { get; set; }
         public Pair? pair { get; set; }
-        public Double fillSA { get; set; }
-        public Double fillSB { get; set; }
+        public double fillSA { get; set; }
+        public double fillSB { get; set; }
         public bool fillAmountBorSA { get; set; }
         public bool fillAmountBorSB { get; set; }
-        public Double fillBA { get; set; }
-        public Double fillBB { get; set; }
-        public Double feeA { get; set; }
-        public Double protocolFeeA { get; set; }
-        public Double feeB { get; set; }
-        public Double protocolFeeB { get; set; }
+        public double fillBA { get; set; }
+        public double fillBB { get; set; }
+        public double feeA { get; set; }
+        public double protocolFeeA { get; set; }
+        public double feeB { get; set; }
+        public double protocolFeeB { get; set; }
     }
 
     public class Withdrawal : Transaction
@@ -253,8 +253,8 @@ namespace Lexplorer.Models
         public Token? token { get; set; }
         public Token? feeToken { get; set; }
         public bool valid { get; set; }
-        public Double amount { get; set; }
-        public Double fee { get; set; }
+        public double amount { get; set; }
+        public double fee { get; set; }
     }
     public class Transfer : Transaction
     {
@@ -262,8 +262,8 @@ namespace Lexplorer.Models
         public Account? toAccount { get; set; }
         public Token? token { get; set; }
         public Token? feeToken { get; set; }
-        public Double amount { get; set; }
-        public Double fee { get; set; }
+        public double amount { get; set; }
+        public double fee { get; set; }
     }
     public class Add : Transaction
     {
@@ -271,8 +271,8 @@ namespace Lexplorer.Models
         public Pool? pool { get; set; }
         public Token? token { get; set; }
         public Token? feeToken { get; set; }
-        public Double fee { get; set; }
-        public Double amount { get; set; }
+        public double fee { get; set; }
+        public double amount { get; set; }
     }
     public class Remove : Transaction
     {
@@ -280,21 +280,21 @@ namespace Lexplorer.Models
         public Pool? pool { get; set; }
         public Token? token { get; set; }
         public Token? feeToken { get; set; }
-        public Double fee { get; set; }
-        public Double amount { get; set; }
+        public double fee { get; set; }
+        public double amount { get; set; }
     }
     public class AmmUpdate : Transaction
     {
         public Pool? pool { get; set; }
-        public Double tokenWeight { get; set; }
-        public String? tokenID { get; set; }
-        public Double balance { get; set; }
+        public double tokenWeight { get; set; }
+        public string? tokenID { get; set; }
+        public double balance { get; set; }
     }
     public class AccountUpdate : Transaction
     {
         public User? user { get; set; }
         public Token? feeToken { get; set; }
-        public Double fee { get; set; }
+        public double fee { get; set; }
         public string? publicKey { get; set; }
         public int? nonce { get; set; }
     }
@@ -317,7 +317,7 @@ namespace Lexplorer.Models
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
         public Account? account { get; set; }
-        public Double balance { get; set; }
+        public double balance { get; set; }
         public Transaction? createdAtTransaction { get; set; }
         public Transaction? lastUpdatedAtTransaction { get; set; }
         public List<Transaction>? transactions { get; set; }
@@ -337,8 +337,8 @@ namespace Lexplorer.Models
         public Account? receiver { get; set; }
         public NonFungibleToken? nft { get; set; }
         public Token? feeToken { get; set; }
-        public Double fee { get; set; }
-        public Double amount { get; set; }
+        public double fee { get; set; }
+        public double amount { get; set; }
         public string? extraData { get; set; }
     }
 
@@ -347,9 +347,9 @@ namespace Lexplorer.Models
         public Account? fromAccount { get; set; }
         public AccountNFTSlot? slot { get; set; }
         public Token? feeToken { get; set; }
-        public Boolean valid { get; set; }
-        public Double amount { get; set; }
-        public Double fee { get; set; }
+        public bool valid { get; set; }
+        public double amount { get; set; }
+        public double fee { get; set; }
     }
 
     public class TransferNFT : TransactionNFT
@@ -359,8 +359,8 @@ namespace Lexplorer.Models
         public AccountNFTSlot? fromSlot { get; set; }
         public AccountNFTSlot? toSlot { get; set; }
         public Token? feeToken { get; set; }
-        public Double amount { get; set; }
-        public Double fee { get; set; }
+        public double amount { get; set; }
+        public double fee { get; set; }
     }
 
     public class TradeNFT : TransactionNFT
@@ -370,15 +370,15 @@ namespace Lexplorer.Models
         public AccountNFTSlot? slotSeller { get; set; }
         public AccountNFTSlot? slotBuyer { get; set; }
         public Token? token { get; set; }
-        public Double realizedNFTPrice { get; set; }
-        public Double fillSA { get; set; }
-        public Double fillSB { get; set; }
-        public Boolean fillAmountBorSA { get; set; }
-        public Boolean fillAmountBorSB { get; set; }
-        public Double fillBA { get; set; }
-        public Double fillBB { get; set; }
-        public Double feeSeller { get; set; }
-        public Double feeBuyer { get; set; }
+        public double realizedNFTPrice { get; set; }
+        public double fillSA { get; set; }
+        public double fillSB { get; set; }
+        public bool fillAmountBorSA { get; set; }
+        public bool fillAmountBorSB { get; set; }
+        public double fillBA { get; set; }
+        public double fillBB { get; set; }
+        public double feeSeller { get; set; }
+        public double feeBuyer { get; set; }
     }
     public class SwapNFT : TransactionNFT
     {
@@ -388,14 +388,14 @@ namespace Lexplorer.Models
         public AccountNFTSlot? slotBSeller { get; set; }
         public AccountNFTSlot? slotABuyer { get; set; }
         public AccountNFTSlot? slotBBuyer { get; set; }
-        public Double fillSA { get; set; }
-        public Double fillSB { get; set; }
-        public Boolean fillAmountBorSA { get; set; }
-        public Boolean fillAmountBorSB { get; set; }
-        public Double fillBA { get; set; }
-        public Double fillBB { get; set; }
-        public Double feeSeller { get; set; }
-        public Double feeBuyer { get; set; }
+        public double fillSA { get; set; }
+        public double fillSB { get; set; }
+        public bool fillAmountBorSA { get; set; }
+        public bool fillAmountBorSB { get; set; }
+        public double fillBA { get; set; }
+        public double fillBB { get; set; }
+        public double feeSeller { get; set; }
+        public double feeBuyer { get; set; }
 
     }
 
@@ -422,15 +422,15 @@ namespace Lexplorer.Models
 
     public class DailyEntity
     {
-        public Double tradedVolumeToken1Swap { get; set; }
-        public Double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
         public string? id { get; set; }
     }
 
     public class WeeklyEntity
     {
-        public Double tradedVolumeToken1Swap { get; set; }
-        public Double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
         public string? id { get; set; }
     }
 

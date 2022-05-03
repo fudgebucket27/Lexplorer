@@ -56,7 +56,7 @@
     bool _drawerOpen = true;
 
     private IList<object>? searchResults;
-    private Boolean searching = false;
+    private bool searching = false;
     private string? _searchTerm;
     private string? searchTerm
     {
@@ -103,7 +103,7 @@
         if (searchTerm.Contains(".eth", StringComparison.InvariantCultureIgnoreCase))
         {
             string? hexAddress = await EthereumService.GetEthAddressFromEns(searchTerm);
-            if (String.IsNullOrEmpty(hexAddress))
+            if (string.IsNullOrEmpty(hexAddress))
             {
                 searching = false; //nothing found
                 StateHasChanged();
