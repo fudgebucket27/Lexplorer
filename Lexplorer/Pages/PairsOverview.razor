@@ -72,13 +72,13 @@
         if (pairs == null) return;
         foreach (var pair in pairs!)
         {
-            if (String.IsNullOrEmpty(pair.token1?.address)) continue;
+            if (string.IsNullOrEmpty(pair.token1?.address)) continue;
 
             string uniswapTokenCacheKey = $"uniSwapTokenPrice-{pair.token1?.address}";
             var uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey,
                 async () => await UniswapGraphQLService.GetTokenPrice(pair.token1?.address!),
                 DateTimeOffset.UtcNow.AddHours(1));
-            if (String.IsNullOrEmpty(uniswapToken?.address)) continue;
+            if (string.IsNullOrEmpty(uniswapToken?.address)) continue;
 
             uniswapTokens.TryAdd(uniswapToken.address!, uniswapToken);
         }

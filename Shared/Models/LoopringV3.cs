@@ -115,14 +115,14 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public Token? token0 { get; set; }
         public Token? token1 { get; set; }
-        public Double token0Price { get; set; }
-        public Double token1Price { get; set; }
-        public Double tradedVolumeToken0 { get; set; }
-        public Double tradedVolumeToken1 { get; set; }
-        public Double tradedVolumeToken0Swap { get; set; }
-        public Double tradedVolumeToken1Swap { get; set; }
-        public Double tradedVolumeToken0Orderbook { get; set; }
-        public Double tradedVolumeToken1Orderbook { get; set; }
+        public double token0Price { get; set; }
+        public double token1Price { get; set; }
+        public double tradedVolumeToken0 { get; set; }
+        public double tradedVolumeToken1 { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken0Orderbook { get; set; }
+        public double tradedVolumeToken1Orderbook { get; set; }
 
         public List<PairDailyData>? dailyEntities { get; set; }
         public List<PairWeeklyData>? weeklyEntities { get; set; }
@@ -432,36 +432,36 @@ namespace Lexplorer.Models
     {
         public string? id { get; set; }
 
-        public Double token0PriceLow { get; set; }
-        public Double token0PriceHigh { get; set; }
-        public Double token0PriceOpen { get; set; }
-        public Double token0PriceClose { get; set; }
+        public double token0PriceLow { get; set; }
+        public double token0PriceHigh { get; set; }
+        public double token0PriceOpen { get; set; }
+        public double token0PriceClose { get; set; }
 
-        public Double token1PriceLow { get; set; }
-        public Double token1PriceHigh { get; set; }
-        public Double token1PriceOpen { get; set; }
-        public Double token1PriceClose { get; set; }
+        public double token1PriceLow { get; set; }
+        public double token1PriceHigh { get; set; }
+        public double token1PriceOpen { get; set; }
+        public double token1PriceClose { get; set; }
 
-        public Double tradedVolumeToken0 { get; set; }
-        public Double tradedVolumeToken0Swap { get; set; }
-        public Double tradedVolumeToken0Orderbook { get; set; }
-        public Double tradedVolumeToken1 { get; set; }
-        public Double tradedVolumeToken1Swap { get; set; }
-        public Double tradedVolumeToken1Orderbook { get; set; }
+        public double tradedVolumeToken0 { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken0Orderbook { get; set; }
+        public double tradedVolumeToken1 { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken1Orderbook { get; set; }
     }
 
     public class PairDailyData : PairEntity
     {
-        public Double dayStart { get; set; }
-        public Double dayEnd { get; set; }
-        public Double dayNumber { get; set; }
+        public double dayStart { get; set; }
+        public double dayEnd { get; set; }
+        public double dayNumber { get; set; }
     }
 
     public class PairWeeklyData : PairEntity
     {
-        public Double weekStart { get; set; }
-        public Double weekEnd { get; set; }
-        public Double weekNumber { get; set; }
+        public double weekStart { get; set; }
+        public double weekEnd { get; set; }
+        public double weekNumber { get; set; }
     }
 
 }

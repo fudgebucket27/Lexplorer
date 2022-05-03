@@ -9,7 +9,7 @@
     public string? address { get; set; }
 
     [Parameter]
-    public Boolean shortenAddress { get; set; } = true;
+    public bool shortenAddress { get; set; } = true;
 
     private string LinkURL { get { return $"https://etherscan.io/address/{address}"; } }
     private string? DisplayText

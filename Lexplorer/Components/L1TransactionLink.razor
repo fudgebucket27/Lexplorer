@@ -9,7 +9,7 @@
     public string? txHash { get; set; }
 
     [Parameter]
-    public Boolean shortenHash { get; set; } = true;
+    public bool shortenHash { get; set; } = true;
 
     private string LinkURL { get { return $"https://etherscan.io/tx/{txHash}"; } }
     private string? DisplayText
