@@ -11,7 +11,7 @@ namespace xUnitTests.HelperTests
 {
     public class TestTokenAmountConverterToDecimal
     {
-        Double x = 12345678;
+        double x = 12345678;
 
         [Fact]
         public void TestToDecimalSimple()
@@ -102,7 +102,7 @@ namespace xUnitTests.HelperTests
 
     public class TestTokenAmountConverterToStringWithExponent
     {
-        Double x = 12345678;
+        double x = 12345678;
 
         [Fact]
         public void TestMillons()
