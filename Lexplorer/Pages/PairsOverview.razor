@@ -71,13 +71,13 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (String.IsNullOrEmpty(pageNumber))
+        if (string.IsNullOrEmpty(pageNumber))
         {
             pageNumber = "0";
         }
         isLoading = true;
         string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
-        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(Int32.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
+        pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(int.Parse(pageNumber) * 10), DateTimeOffset.UtcNow.AddHours(1));
         int pairCount = 0;
         foreach (var pair in pairsData!.data!.pairs!)
         {
@@ -101,14 +101,14 @@ else
 
     private void GoToNextPage()
     {
-        int nextPage = Int32.Parse(pageNumber) + 1;
+        int nextPage = int.Parse(pageNumber) + 1;
         string parameters = $"pairs?pageNumber={nextPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }
 
     private void GoToPreviousPage()
     {
-        int previousPage = Int32.Parse(pageNumber) - 1;
+        int previousPage = int.Parse(pageNumber) - 1;
         string parameters = $"pairs?pageNumber={previousPage.ToString()}";
         NavigationManager.NavigateTo(parameters);
     }

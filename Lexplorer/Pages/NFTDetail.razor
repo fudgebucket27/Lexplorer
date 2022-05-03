@@ -125,7 +125,7 @@
     {
         get
         {
-            return Int32.Parse(pageNumber ?? "1");
+            return int.Parse(pageNumber ?? "1");
         }
         set
         {
@@ -168,7 +168,7 @@
                     StateHasChanged();
                 }
 
-                if (String.IsNullOrEmpty(pageNumber))
+                if (string.IsNullOrEmpty(pageNumber))
                 {
                     pageNumber = "1";
                 }
@@ -186,12 +186,12 @@
                     string nftMetadataLinkCacheKey = $"nftMetadataLink-{nft?.nftID}";
                     string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
                         async () => await EthereumService.GetMetadataLink(nft?.nftID, nft?.token, nft?.nftType));
-                    if (String.IsNullOrEmpty(nftMetadataLink)) return;
+                    if (string.IsNullOrEmpty(nftMetadataLink)) return;
 
                     string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
                     nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
                         async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token));
-                    if (!String.IsNullOrEmpty(nftMetadata?.animation_url))
+                    if (!string.IsNullOrEmpty(nftMetadata?.animation_url))
                     {
                         string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
                         nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,

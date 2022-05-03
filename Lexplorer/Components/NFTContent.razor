@@ -63,7 +63,7 @@ else if(hasAnimationContent("html"))
 
     private bool hasAnimationURL()
     {
-        if (String.IsNullOrEmpty(nftMetadata?.animation_url)) return false;
+        if (string.IsNullOrEmpty(nftMetadata?.animation_url)) return false;
         return nftMetadata?.image != nftMetadata?.animation_url;
     }
 
