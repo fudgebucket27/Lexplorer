@@ -36,7 +36,7 @@
     {
         get
         {
-            return Int32.Parse(pageNumber ?? "1");
+            return int.Parse(pageNumber ?? "1");
         }
         set
         {
@@ -59,7 +59,7 @@
     {
         isLoading = true;
 
-        if (String.IsNullOrEmpty(pageNumber))
+        if (string.IsNullOrEmpty(pageNumber))
         {
             pageNumber = "1";
         }

@@ -14,7 +14,7 @@ namespace xUnitTests.LoopringGraphTests
         public TestTransaction(GraphQLTestsFixture fixture)
         {
             this.fixture = fixture;
-            this.service = fixture!.LGS;
+            service = fixture!.LGS;
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace xUnitTests.LoopringGraphTests
             var transactions = await service.GetTransactions(0, 5, typeName: typeName);
             Assert.NotNull(transactions);
             Assert.NotEmpty(transactions?.data?.transactions);
-            if (!String.IsNullOrEmpty(typeName))
+            if (!string.IsNullOrEmpty(typeName))
             {
                 foreach (var transaction in transactions?.data?.transactions!)
                 {

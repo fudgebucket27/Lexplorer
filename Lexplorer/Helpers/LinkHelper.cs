@@ -19,12 +19,12 @@
         {
             if (address == null) return new MarkupString();
 
-            String link = (shortenAddress && (address.Length > 6)) ? String.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
+            string link = (shortenAddress && (address.Length > 6)) ? string.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
             if (includeAccountId)
                 link += $" ({id})";
             if ((id != null) && ((ignoreId == null) || (id != ignoreId)))
             {
-                link = String.Format(@"<a Class=""mud-theme-primary"" href=""account/{0}"">{1}</a>", id, link);
+                link = string.Format(@"<a Class=""mud-theme-primary"" href=""account/{0}"">{1}</a>", id, link);
             }
             return new MarkupString(link);
         }
