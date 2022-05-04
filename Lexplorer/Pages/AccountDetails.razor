@@ -59,7 +59,7 @@
             </MudTable>
         </MudTabPanel>
         <MudTabPanel Text="NFTs">
-            @if ((accountNFTSlots?.Count ?? 0) < 1)
+            @if (((accountNFTSlots?.Count ?? 0) < 1) && (gotoNFTPage == 1))
             {
                 <MudText>No NFTs</MudText>
             }
