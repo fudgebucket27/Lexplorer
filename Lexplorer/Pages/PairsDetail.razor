@@ -45,7 +45,7 @@
 @if (dailyData != null)
 {
     <MudItem lg="12" Class="mt-3">
-        <ApexChart
+        <ApexChart @ref="dailyChart"
                    TItem="PairDailyData"
                    Title="30 day volume"
                    Options="chartOptions">
@@ -82,12 +82,35 @@
     private Pair? pair { get; set; } = new Pair();
     private IList<PairDailyData>? dailyData { get; set; } = null;
 
+    private ApexChart<PairDailyData>? dailyChart;
     private ApexChartOptions<PairDailyData> chartOptions = new();
+
+    private bool __isDarkMode = false;
+    [CascadingParameter]
+    protected bool _isDarkMode
+    {
+        get
+        {
+            return __isDarkMode;
+        }
+        set
+        {
+            __isDarkMode = value;
+            chartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            dailyChart?.RenderAsync();
+        }
+    }
 
     protected override void OnInitialized()
     {
         chartOptions = new ApexChartOptions<PairDailyData>();
-        
+        chartOptions.Theme = new Theme
+        {
+            Mode = _isDarkMode ? Mode.Dark : Mode.Light
+        };
         chartOptions.Yaxis = new List<YAxis>();
         chartOptions.Yaxis.Add(new YAxis
         {
