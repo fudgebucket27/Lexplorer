@@ -1,0 +1,200 @@
+﻿@page "/pairs/{pairId}"
+@using Lexplorer.Components;
+@using Lexplorer.Helpers;
+@using Lexplorer.Models;
+@using System.Diagnostics
+@using ApexCharts;
+@inject IAppCache AppCache;
+@inject NavigationManager NavigationManager;
+@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+
+
+<PageTitle>The Lexplorer - pair @(pair?.token0?.symbol) / @(pair?.token1?.symbol) </PageTitle>
+
+<MudText Typo="Typo.h6">Pair  @pair?.token0?.symbol / @pair?.token1?.symbol</MudText>
+<MudSimpleTable Dense="true">
+    <tbody>
+        <tr>
+            <td>Details</td>
+            <td>Token 1</td>
+            <td>Token 2</td>
+        </tr>
+        <tr>
+            <td>Price</td>
+            <td>1 @pair?.token0?.symbol = @TokenAmountConverter.ToString(pair?.token0Price, pair?.token1?.decimals) @pair?.token1?.symbol </td>
+            <td>1 @pair?.token1?.symbol = @TokenAmountConverter.ToString(pair?.token1Price, pair?.token0?.decimals) @pair?.token0?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0 ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1 ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume swaps</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0Swap ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1Swap ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+        <tr>
+            <td>Total volume orderbook trades</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0Orderbook ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
+            <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1Orderbook ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
+        </tr>
+    </tbody>
+</MudSimpleTable>
+
+@if (dailyData != null)
+{
+    <MudItem lg="12" Class="my-3">
+        <ApexChart @ref="dailyPriceChart"
+                   Height="400"
+                   TItem="PairDailyData"
+                   Title="30 day price"
+                   Options="dailyPriceChartOptions"
+                   XAxisType="XAxisType.Datetime">
+
+            <ApexCandleSeries TItem="PairDailyData"
+                              Items="dailyData"
+                              Name="Apex Stock Price"
+                              XValue="@(d => d.dayDateTime)"
+                              Open="@(d => TokenAmountConverter.ToDecimal(d.token0PriceOpen, pair?.token1?.decimals ?? 0))"
+                              High="@(d => TokenAmountConverter.ToDecimal(d.token0PriceHigh, pair?.token1?.decimals ?? 0))"
+                              Low="@(d => TokenAmountConverter.ToDecimal(d.token0PriceLow, pair?.token1?.decimals ?? 0))"
+                              Close="@(d => TokenAmountConverter.ToDecimal(d.token0PriceClose, pair?.token1?.decimals ?? 0))"
+                              OrderBy="d => d.X" />
+        </ApexChart>
+    </MudItem>
+    <MudItem lg="12" Class="my-3">
+        <ApexChart @ref="dailyVolumeChart"
+                   Height="250"
+                   TItem="PairDailyData"
+                   Title="30 day volume"
+                   Options="dailyVolumeChartOptions"
+                   XAxisType="XAxisType.Datetime">
+
+            <ApexPointSeries TItem="PairDailyData"
+                             Items="dailyData"
+                             Name="Swap"
+                             XValue="@(d => d.dayDateTime)"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Swap, pair?.token0?.decimals ?? 0))"
+                             SeriesType="SeriesType.Bar"
+                             OrderBy="d => d.X" />
+            <ApexPointSeries TItem="PairDailyData"
+                             Items="dailyData"
+                             Name="Orderbook"
+                             XValue="@(d => d.dayDateTime)"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Orderbook, pair?.token0?.decimals ?? 0))"
+                             SeriesType="SeriesType.Bar"
+                             OrderBy="d => d.X" />
+        </ApexChart>
+    </MudItem>
+}
+
+@code {
+    [Parameter]
+    public string pairId { get; set; } = "";
+
+    private Pair? pair { get; set; } = new Pair();
+    private IList<PairDailyData>? dailyData { get; set; } = null;
+
+    private ApexChart<PairDailyData>? dailyPriceChart;
+    private ApexChartOptions<PairDailyData> dailyPriceChartOptions = new();
+    private ApexChart<PairDailyData>? dailyVolumeChart;
+    private ApexChartOptions<PairDailyData> dailyVolumeChartOptions = new();
+
+    private bool __isDarkMode = false;
+    [CascadingParameter]
+    protected bool _isDarkMode
+    {
+        get
+        {
+            return __isDarkMode;
+        }
+        set
+        {
+            __isDarkMode = value;
+            dailyVolumeChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            dailyVolumeChart?.RenderAsync();
+            dailyPriceChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            dailyPriceChart?.RenderAsync();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (pair?.id != pairId)
+        {
+            dailyData = null;
+            string pairCacheKey = $"pair-{pairId}";
+            pair = await AppCache.GetOrAddAsyncNonNull(pairCacheKey,
+                async () => await LoopringGraphQLService.GetPair(pairId),
+                DateTimeOffset.UtcNow.AddHours(1));
+            if (pair == null) return;
+            StateHasChanged();
+            string dailyDataCacheKey = $"pair-{pairId}-dailyData";
+            dailyData = await AppCache.GetOrAddAsyncNonNull(dailyDataCacheKey,
+                async () => await LoopringGraphQLService.GetPairDailyEntities(pairId, 0, 30),
+                DateTimeOffset.UtcNow.AddHours(1)
+                );
+
+            const string chartGroup = "dailyCharts";
+
+            dailyVolumeChartOptions = new ApexChartOptions<PairDailyData>();
+            dailyVolumeChartOptions.Chart = new Chart
+            {
+                Group = chartGroup,
+                Stacked = true,
+                Toolbar = new Toolbar
+                {
+                    Show = false
+                }
+            };
+            dailyVolumeChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            dailyVolumeChartOptions.Yaxis = new List<YAxis>();
+            dailyVolumeChartOptions.Yaxis.Add(new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
+                    //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
+                    Formatter = @"function (value) {
+                        return Number(value).toLocaleString();}",
+                    MinWidth = 80
+                }
+            }
+            );
+            dailyPriceChartOptions = new ApexChartOptions<PairDailyData>();
+            dailyPriceChartOptions.Chart = new Chart
+            {
+                Group = chartGroup,
+                Toolbar = new Toolbar
+                {
+                    Show = false
+                }
+            };
+            dailyPriceChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            dailyPriceChartOptions.Yaxis = new List<YAxis>();
+            dailyPriceChartOptions.Yaxis.Add(new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
+                    //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
+                    Formatter = $"function (value) {{return Number(value).toLocaleString() + \" { pair?.token1?.symbol }\";}}",
+                    MinWidth = 80
+                }
+            });
+        }
+    }
+}

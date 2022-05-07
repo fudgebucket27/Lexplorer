@@ -115,9 +115,17 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public Token? token0 { get; set; }
         public Token? token1 { get; set; }
+        public double token0Price { get; set; }
+        public double token1Price { get; set; }
+        public double tradedVolumeToken0 { get; set; }
+        public double tradedVolumeToken1 { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken0Orderbook { get; set; }
+        public double tradedVolumeToken1Orderbook { get; set; }
 
-        public List<DailyEntity>? dailyEntities { get; set; }
-        public List<WeeklyEntity>? weeklyEntities { get; set; }
+        public List<PairDailyData>? dailyEntities { get; set; }
+        public List<PairWeeklyData>? weeklyEntities { get; set; }
     }
     public class Token
     {
@@ -420,21 +428,47 @@ namespace Lexplorer.Models
         public List<Pair>? pairs { get; set; }
     }
 
-    public class DailyEntity
+    public class PairEntity
     {
-        public double tradedVolumeToken1Swap { get; set; }
-        public double tradedVolumeToken0Swap { get; set; }
         public string? id { get; set; }
+
+        public double token0PriceLow { get; set; }
+        public double token0PriceHigh { get; set; }
+        public double token0PriceOpen { get; set; }
+        public double token0PriceClose { get; set; }
+
+        public double token1PriceLow { get; set; }
+        public double token1PriceHigh { get; set; }
+        public double token1PriceOpen { get; set; }
+        public double token1PriceClose { get; set; }
+
+        public double tradedVolumeToken0 { get; set; }
+        public double tradedVolumeToken0Swap { get; set; }
+        public double tradedVolumeToken0Orderbook { get; set; }
+        public double tradedVolumeToken1 { get; set; }
+        public double tradedVolumeToken1Swap { get; set; }
+        public double tradedVolumeToken1Orderbook { get; set; }
     }
 
-    public class WeeklyEntity
+    public class PairDailyData : PairEntity
     {
-        public double tradedVolumeToken1Swap { get; set; }
-        public double tradedVolumeToken0Swap { get; set; }
-        public string? id { get; set; }
+        public double dayStart { get; set; }
+        public double dayEnd { get; set; }
+        public double dayNumber { get; set; }
+
+        //Day number is the amount of days since the start block of Loopring 3.6 (block 11149814)
+        //https://etherscan.io/block/11149814
+        //Oct-29-2020 05:41:42 AM +UTC
+        private static readonly DateTime _LRUTCStartBlock = new(2020, 10, 29, 05, 41, 42, DateTimeKind.Utc);
+
+        public DateTime dayDateTime => _LRUTCStartBlock.AddDays(dayNumber);
     }
 
-
-
+    public class PairWeeklyData : PairEntity
+    {
+        public double weekStart { get; set; }
+        public double weekEnd { get; set; }
+        public double weekNumber { get; set; }
+    }
 
 }

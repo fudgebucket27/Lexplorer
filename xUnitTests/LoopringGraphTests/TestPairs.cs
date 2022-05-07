@@ -28,5 +28,23 @@ namespace xUnitTests.LoopringGraphTests
             Assert.NotEmpty(pairs!.data!.pairs);
             Assert.Equal(10, pairs!.data!.pairs!.Count);
         }
+
+        [Theory]
+        [InlineData("0-1")]
+        public async void GetPair(string pairID)
+        {
+            var pair = await service.GetPair(pairID);
+            Assert.NotNull(pair);
+            Assert.Equal(pairID, pair!.id);
+        }
+
+        [Theory]
+        [InlineData("0-1", 0, 10)]
+        public async void GetDailyEntities(string pairID, int skip, int first)
+        {
+            var entities = await service.GetPairDailyEntities(pairID, skip, first);
+            Assert.NotEmpty(entities);
+            Assert.Equal(first, entities!.Count);
+        }
     }
 }

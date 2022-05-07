@@ -47,7 +47,9 @@
                     </RowTemplate>
                 </MudTable>
             }
-            @Body
+            <CascadingValue Value="@_isDarkMode">
+                @Body
+            </CascadingValue>
         </MudContainer>
     </MudMainContent>
 </MudLayout>
