@@ -8,72 +8,45 @@
 
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
-<MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
-    </div>
-    <tbody>
-        <tr>
-            <td>Description</td>
-            <td>@nftMetadata?.description</td>
-        </tr>
-        <tr>
-            <td>Royalty percentage</td>
-            <td>@nftMetadata?.royalty_percentage%</td>
-        </tr>
-        <tr>
-            <td>nftID</td>
-            <td>@nft?.nftID</td>
-        </tr>
-        <tr>
-            <td>Minter</td>
-            <td>@LinkHelper.CreateUserLink(nft?.minter, false, true) </td>
-        </tr>
-        <tr>
-            <td>Minted at</td>
-            <td>@LinkHelper.GetObjectLink(nft?.mintedAtTransaction) </td>
-        </tr>
-        <tr>
-            <td>Token address</td>
-            <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
-        </tr>
-        <tr>
-            <td>Image URL</td>
-            <td>@nftMetadata?.image</td>
-        </tr>
-        <tr>
-            <td>Animation URL</td>
-            <td>@nftMetadata?.animation_url</td>
-        </tr>
+<MudPaper Class="pa-3">
+    <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
+
+    <MudList Clickable="true">
+        <MudListItem Text="@nftMetadata?.description" Icon="@Icons.Material.Filled.Description" />
+        <MudDivider />
+        <MudListItem Text="@nftMetadata?.royalty_percentage.ToString()" Icon="@Icons.Material.Filled.Percent" />
+        <MudDivider />
+        <MudListItem Text="@nft?.nftID" Icon="@Icons.Material.Filled.Numbers" Style="word-break:break-all;"/>
+        <MudDivider />
+        <MudListItem Text="@nft?.minter?.address" Href="@("account/" + nft?.minter?.id)" Icon="@Icons.Material.Filled.Build" Style="word-break:break-all;"/>
+        <MudDivider />
+        <MudListItem Text="@nft?.mintedAtTransaction?.id.ToString()" Href="@("transactions/" + nft?.mintedAtTransaction?.id)" Icon="@Icons.Material.Filled.Traffic" Style="word-break:break-all;"/>
+        <MudDivider />
+        <MudListItem Text="@nft?.token" Icon="@Icons.Material.Filled.Token" Style="word-break:break-all;"/>
+        <MudDivider />
+        <MudListItem Text="@nftMetadata?.image" Icon="@Icons.Material.Filled.Image" Style="word-break:break-all;"/>
+        <MudDivider />
+        <MudListItem Text="@nftMetadata?.animation_url" Icon="@Icons.Material.Filled.Animation" Style="word-break:break-all;"/>
+        <MudDivider />
         @if (nftMetadata?.attributes?.Count > 0)
         {
-            <tr>
-                <td colspan="2">
-                    <MudExpansionPanels>
-                        <MudExpansionPanel Text="Traits">
-                            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-                                <tbody>
-                                    @foreach (var trait in nftMetadata?.attributes!)
-                                    {
-                                        <tr>
-                                            <td>@trait.trait_type</td>
-                                            <td>@trait.value</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </MudSimpleTable>
-                        </MudExpansionPanel>
-                    </MudExpansionPanels>
-                </td>
-            </tr>
+            <MudListItem InitiallyExpanded="false" Text="Traits">
+                <NestedList>
+                    @foreach (var trait in nftMetadata?.attributes!)
+                    {
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">@trait.trait_type</MudText>
+                            @trait.value
+                        </MudListItem>
+                    }
+                </NestedList>
+            </MudListItem>
         }
-        <tr>
-            <td colspan="2">
-                <NFTContent nftMetadata="@nftMetadata" />
-            </td>
-        </tr>
-    </tbody>
-</MudSimpleTable>
+        <MudDivider />
+    </MudList>
+    <NFTContent nftMetadata="@nftMetadata" width="100" />
+</MudPaper>
+
 
 <br />
 
