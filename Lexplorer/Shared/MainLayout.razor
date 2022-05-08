@@ -22,7 +22,7 @@
                              ToggledIcon="@Icons.Filled.LightMode" ToggledTitle="LightMode" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/fudgebucket27/Lexplorer" Target="_blank" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+    <MudDrawer @bind-Open="_drawerOpen" Breakpoint="Breakpoint.Lg" Elevation="1" ClipMode="DrawerClipMode.Docked">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Menu</MudText>
         </MudDrawerHeader>
