@@ -1,12 +1,12 @@
 ﻿
 @if (showImageSource())
 {
-    <img src="@nftMetadata?.imageURL" Width="@width" Height="@height" />
+    <img src="@nftMetadata?.imageURL" class="nft" />
 }
 
 @if (hasAnimationContent("video"))
 {
-    <video width="@width" height="@height" controls>
+    <video class="nft" controls>
         <source src="@nftMetadata?.animationURL">
         Your browser does not support the video tag.
     </video>
@@ -21,22 +21,16 @@ else if (hasAnimationContent("audio"))
 }
 else if (hasAnimationContent("image"))
 {
-    <img src="@nftMetadata?.animationURL" Width="@width" Height="@height" />
+    <img src="@nftMetadata?.animationURL" class="nft" />
 }
 else if (hasAnimationContent("model") || hasAnimationContent("octet-stream"))
 {
-<style>
-        model-viewer {
-            width: @ToPx(width);
-            height: @ToPx(height);
-        }
-</style>
-    <model-viewer bounds="tight" enable-pan autoplay src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
+    <model-viewer class="nft" bounds="tight" enable-pan autoplay src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
                   camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
 }
 else if(hasAnimationContent("html"))
 {
-    <iframe allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" height="100%" sandbox="allow-scripts" src="@nftMetadata?.animationURL" width="100%" style="min-height: @ToPx(height)"></iframe>
+    <iframe class="nft" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" sandbox="allow-scripts" src="@nftMetadata?.animationURL" style="min-height: @ToPx(height)"></iframe>
 }
 
 
