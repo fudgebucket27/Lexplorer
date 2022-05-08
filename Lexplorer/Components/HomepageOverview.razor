@@ -86,27 +86,7 @@
     </MudGrid>
 
     <MudGrid>
-        <MudItem xs="12" sm="12" md="4">
-            <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Latest Blocks</MudText>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Block ID</MudTh>
-                    <MudTh>L1 Transaction Hash</MudTh>
-                    <MudTh>Block Size</MudTh>
-                    <MudTh>Verified At (UTC)</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
-                    <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
-                    <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
-                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
-                </RowTemplate>
-            </MudTable>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="8">
+        <MudItem xs="12" sm="12" md="12">
             <MudTable Dense="true" Items="@transactionData?.data?.transactions" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Latest Transactions</MudText>
@@ -130,9 +110,27 @@
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
         </MudItem>
-    </MudGrid>
-     <MudGrid>
-        <MudItem xs="12" sm="12" md="4">
+        <MudItem xs="12" sm="12" md="6">
+            <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Latest Blocks</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Block ID</MudTh>
+                    <MudTh>L1 Transaction Hash</MudTh>
+                    <MudTh>Block Size</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Block Id"><a Class="mud-theme-primary" href="blocks/@context.id?pageNumber=0">@context.id</a></MudTd>
+                    <MudTd DataLabel="L1 Tx"><L1TransactionLink txHash="@context.txHash"></L1TransactionLink></MudTd>
+                    <MudTd DataLabel="Block Size">@context.blockSize</MudTd>
+                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@context.timestamp!)</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToBlockOverviewPage">View more blocks</MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="6">
             <MudTable Dense="true" Items="@pairs" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Pairs</MudText>
@@ -150,7 +148,6 @@
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToPairOverviewPage">View more pairs</MudButton>
         </MudItem>
     </MudGrid>
-
 @code
 {
     private Blocks? blockData;
