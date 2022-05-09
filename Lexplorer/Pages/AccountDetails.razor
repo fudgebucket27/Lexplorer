@@ -10,10 +10,14 @@
 <PageTitle>The Lexplorer - Account</PageTitle>
 <MudContainer Fixed="true" Class="px-0 extra-extra-extra-large">
     <MudSimpleTable Class="mt-3" Dense="true" Striped="true" Bordered="true">
-        <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-            <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
-        </div>
         <tbody>
+            <tr>
+                <td colspan="2">
+                    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                        <MudText Typo="Typo.h6">@account?.typeName #@account?.id</MudText>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td>L1 Address</td>
                 <td><L1AccountLink address="@account?.address" shortenAddress="false" /></td>
