@@ -8,9 +8,15 @@
 
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
-<MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <tbody >
+        <tr>
+            <td colspan="2">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
+                </div>
+            </td>
+        </tr>
         <tr>
             <td>Description</td>
             <td>@nftMetadata?.description</td>
@@ -72,7 +78,6 @@
         </tr>
     </tbody>
 </MudSimpleTable>
-
 
 <br />
 

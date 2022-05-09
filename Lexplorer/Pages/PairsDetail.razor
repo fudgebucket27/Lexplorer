@@ -11,9 +11,15 @@
 
 <PageTitle>The Lexplorer - pair @(pair?.token0?.symbol) / @(pair?.token1?.symbol) </PageTitle>
 
-<MudText Typo="Typo.h6">Pair  @pair?.token0?.symbol / @pair?.token1?.symbol</MudText>
-<MudSimpleTable Dense="true">
+<MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <tbody>
+        <tr>
+            <td colspan="3">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">Pair  @pair?.token0?.symbol / @pair?.token1?.symbol</MudText>
+                </div>
+            </td>
+        </tr>
         <tr>
             <td>Details</td>
             <td>Token 1</td>

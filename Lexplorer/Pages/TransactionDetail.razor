@@ -4,9 +4,15 @@
 
 <PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 
-<MudText Typo="Typo.h6">@(transaction?.typeName ?? "Transaction") #@transactionId</MudText>
-<MudSimpleTable Dense="true">
+<MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <tbody>
+        <tr>
+            <td colspan="3">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">@(transaction?.typeName ?? "Transaction") #@transactionId</MudText>
+                </div>
+            </td>
+        </tr>
         <tr>
             <td>Block #</td>
             <td>@LinkHelper.GetObjectLink(transaction?.block)</td>
