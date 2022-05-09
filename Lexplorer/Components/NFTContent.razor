@@ -38,17 +38,6 @@ else if(hasAnimationContent("html"))
     [Parameter]
     public NftMetadata? nftMetadata { get; set; }
 
-    [Parameter]
-    public int width { get; set; } = 512;
-
-    [Parameter]
-    public int height { get; set; } = 512;
-
-    private string ToPx(int size)
-    {
-        return size.ToString() + "px";
-    }
-
     private bool showImageSource()
     {
         //we show the image as long as there is no explicit animation URL - except for audio
