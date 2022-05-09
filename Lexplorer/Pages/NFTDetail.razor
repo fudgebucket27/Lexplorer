@@ -12,21 +12,21 @@
     <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
 
     <MudList Clickable="true">
-        <MudListItem Text="@nftMetadata?.description" Icon="@Icons.Material.Filled.Description" />
+        <MudListItem Text="@("Description: " + nftMetadata?.description)" />
         <MudDivider />
-        <MudListItem Text="@nftMetadata?.royalty_percentage.ToString()" Icon="@Icons.Material.Filled.Percent" />
+        <MudListItem Text="@("Roalty: " + nftMetadata?.royalty_percentage.ToString() + "%")" />
         <MudDivider />
-        <MudListItem Text="@nft?.nftID" Icon="@Icons.Material.Filled.Numbers" Style="word-break:break-all;"/>
+        <MudListItem Text="@("NFT Id: " + nft?.nftID)" Style="word-break:break-all;"/>
         <MudDivider />
-        <MudListItem Text="@nft?.minter?.address" Href="@("account/" + nft?.minter?.id)" Icon="@Icons.Material.Filled.Build" Style="word-break:break-all;"/>
+        <MudListItem Text="@("Minter: " + nft?.minter?.address)" Href="@("account/" + nft?.minter?.id)" Style="word-break:break-all;"/>
         <MudDivider />
-        <MudListItem Text="@nft?.mintedAtTransaction?.id.ToString()" Href="@("transactions/" + nft?.mintedAtTransaction?.id)" Icon="@Icons.Material.Filled.Traffic" Style="word-break:break-all;"/>
+        <MudListItem Text="@("Minted at: " + nft?.mintedAtTransaction?.id.ToString())" Href="@("transactions/" + nft?.mintedAtTransaction?.id)" Style="word-break:break-all;"/>
         <MudDivider />
-        <MudListItem Text="@nft?.token" Icon="@Icons.Material.Filled.Token" Style="word-break:break-all;"/>
+        <MudListItem Text="@("Token address: " + nft?.token)" Style="word-break:break-all;"/>
         <MudDivider />
-        <MudListItem Text="@nftMetadata?.image" Icon="@Icons.Material.Filled.Image" Style="word-break:break-all;"/>
+        <MudListItem Text="@("Image URL: " + nftMetadata?.image)" Style="word-break:break-all;"/>
         <MudDivider />
-        <MudListItem Text="@nftMetadata?.animation_url" Icon="@Icons.Material.Filled.Animation" Style="word-break:break-all;"/>
+        <MudListItem Text="@("Animation URL: " + nftMetadata?.animation_url)" Style="word-break:break-all;"/>
         <MudDivider />
         @if (nftMetadata?.attributes?.Count > 0)
         {
@@ -35,8 +35,7 @@
                     @foreach (var trait in nftMetadata?.attributes!)
                     {
                         <MudListItem>
-                            <MudText Typo="Typo.h6">@trait.trait_type</MudText>
-                            @trait.value
+                            <MudText Typo="Typo.inherit">@trait.trait_type => @trait.value</MudText>
                         </MudListItem>
                     }
                 </NestedList>
