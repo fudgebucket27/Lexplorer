@@ -54,7 +54,7 @@
         <ApexChart @ref="dailyPriceChart"
                    Height="400"
                    TItem="PairDailyData"
-                   Title="30 day price"
+                   Title=@($"30 day price in {pair?.token1?.symbol}")
                    Options="dailyPriceChartOptions"
                    XAxisType="XAxisType.Datetime">
 
@@ -73,7 +73,7 @@
         <ApexChart @ref="dailyVolumeChart"
                    Height="250"
                    TItem="PairDailyData"
-                   Title="30 day volume"
+                   Title=@($"30 day volume in {pair?.token1?.symbol}")
                    Options="dailyVolumeChartOptions"
                    XAxisType="XAxisType.Datetime">
 
@@ -81,14 +81,14 @@
                              Items="dailyData"
                              Name="Swap"
                              XValue="@(d => d.dayDateTime)"
-                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Swap, pair?.token0?.decimals ?? 0))"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Swap, pair?.token1?.decimals ?? 0))"
                              SeriesType="SeriesType.Bar"
                              OrderBy="d => d.X" />
             <ApexPointSeries TItem="PairDailyData"
                              Items="dailyData"
                              Name="Orderbook"
                              XValue="@(d => d.dayDateTime)"
-                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken0Orderbook, pair?.token0?.decimals ?? 0))"
+                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Orderbook, pair?.token1?.decimals ?? 0))"
                              SeriesType="SeriesType.Bar"
                              OrderBy="d => d.X" />
         </ApexChart>
