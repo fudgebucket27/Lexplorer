@@ -9,10 +9,14 @@
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
-    </div>
-    <tbody>
+    <tbody >
+        <tr>
+            <td colspan="2">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">@(nftMetadata?.name ?? $"NFT {nft?.nftID}")</MudText>
+                </div>
+            </td>
+        </tr>
         <tr>
             <td>Description</td>
             <td>@nftMetadata?.description</td>
@@ -23,27 +27,27 @@
         </tr>
         <tr>
             <td>nftID</td>
-            <td>@nft?.nftID</td>
+            <td Style="word-break:break-all;">@nft?.nftID</td>
         </tr>
         <tr>
             <td>Minter</td>
-            <td>@LinkHelper.CreateUserLink(nft?.minter, false, true) </td>
+            <td Style="word-break:break-all;">@LinkHelper.CreateUserLink(nft?.minter, false, true) </td>
         </tr>
         <tr>
             <td>Minted at</td>
-            <td>@LinkHelper.GetObjectLink(nft?.mintedAtTransaction) </td>
+            <td Style="word-break:break-all;">@LinkHelper.GetObjectLink(nft?.mintedAtTransaction) </td>
         </tr>
         <tr>
             <td>Token address</td>
-            <td><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
+            <td Style="word-break:break-all;"><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
         <tr>
             <td>Image URL</td>
-            <td>@nftMetadata?.image</td>
+            <td Style="word-break:break-all;">@nftMetadata?.image</td>
         </tr>
         <tr>
             <td>Animation URL</td>
-            <td>@nftMetadata?.animation_url</td>
+            <td Style="word-break:break-all;">@nftMetadata?.animation_url</td>
         </tr>
         @if (nftMetadata?.attributes?.Count > 0)
         {

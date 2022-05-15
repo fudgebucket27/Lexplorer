@@ -8,21 +8,25 @@
 
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(blockId == 1) OnClick="@(() => blockId = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(blockId == 1) OnClick="@(() => blockId -= 1)" />
-        <MudText Typo="Typo.h6">Block #@block?.data?.block?.id</MudText>
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (block?.data?.proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
-    </div>
-    @if (isBlockLoading)
-    {
+    <tbody>
         <tr>
             <td colspan="2">
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                <div>
+                    <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(blockId == 1) OnClick="@(() => blockId = 1)" />
+                    <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(blockId == 1) OnClick="@(() => blockId -= 1)" />
+                    <MudText Typo="Typo.h6" Inline="true">Block #@block?.data?.block?.id</MudText>
+                    <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (block?.data?.proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
+                </div>
             </td>
         </tr>
-    }
-    <tbody>
+        @if (isBlockLoading)
+        {
+            <tr>
+                <td colspan="2">
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                </td>
+            </tr>
+        }
         <tr>
             <td>Block Hash</td>
             <td>@block?.data?.block?.blockHash</td>

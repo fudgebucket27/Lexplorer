@@ -843,9 +843,9 @@ namespace Lexplorer.Services
                     ...TokenFragment
                   }
                   dailyEntities(skip: 1, first: 1, orderBy: dayEnd, orderDirection: desc) {
-                    tradedVolumeToken1Swap
-                    tradedVolumeToken0Swap
                     id
+                    tradedVolumeToken0
+                    tradedVolumeToken1
                   }
                   weeklyEntities(
                     skip: 0
@@ -853,9 +853,9 @@ namespace Lexplorer.Services
                     orderBy: weekEnd
                     orderDirection: desc
                   ) {
-                    tradedVolumeToken1Swap
-                    tradedVolumeToken0Swap
                     id
+                    tradedVolumeToken0
+                    tradedVolumeToken1
                   }
                 }
               }
@@ -880,6 +880,135 @@ namespace Lexplorer.Services
                 var response = await _client.PostAsync(request);
                 var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
                 return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Pair?> GetPair(string pairID)
+        {
+            var pairQuery = @"
+             query pair(
+                $pairID: ID!
+              ) {
+                pair(
+                  id: $pairID
+                ) {
+                  id
+                  internalID
+                  token0 {
+                    ...TokenFragment
+                  }
+                  token1 {
+                    ...TokenFragment
+                  }
+                  token0Price
+                  token1Price
+                  tradedVolumeToken0
+                  tradedVolumeToken1
+                  tradedVolumeToken0Swap
+                  tradedVolumeToken1Swap
+                  tradedVolumeToken0Orderbook
+                  tradedVolumeToken1Orderbook
+                }
+              }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = pairQuery,
+                variables = new
+                {
+                    pairID
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["pair"];
+                return token!.ToObject<Pair>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<IList<PairDailyData>?> GetPairDailyEntities(string pairID, int skip, int first, string orderBy = "dayEnd", string orderDirection = "desc")
+        {
+            var pairDailyEntitiesQuery = @"
+             query pair(
+                $pairID: ID!
+                $skip: Int
+                $first: Int
+                $orderBy: PairDailyData_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                pair(
+                  id: $pairID
+                ) {
+                  dailyEntities(
+                    skip: $skip
+                    first: $first
+                    orderBy: $orderBy
+                    orderDirection: $orderDirection
+                  ) {
+                    id
+                    dayStart
+                    dayEnd
+                    dayNumber
+                    token0PriceLow
+                    token0PriceHigh
+                    token0PriceOpen
+                    token0PriceClose
+
+                    token1PriceLow
+                    token1PriceHigh
+                    token1PriceOpen
+                    token1PriceClose
+
+                    tradedVolumeToken0
+                    tradedVolumeToken0Swap
+                    tradedVolumeToken0Orderbook
+                    tradedVolumeToken1
+                    tradedVolumeToken1Swap
+                    tradedVolumeToken1Orderbook
+                  }
+                }
+              }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = pairDailyEntitiesQuery,
+                variables = new
+                {
+                    pairID,
+                    skip,
+                    first,
+                    orderBy,
+                    orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["pair"]!["dailyEntities"];
+                return token!.ToObject<IList<PairDailyData>>();
             }
             catch (Exception ex)
             {

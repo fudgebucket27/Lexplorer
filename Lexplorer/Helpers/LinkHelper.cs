@@ -41,6 +41,9 @@
             else if (linkedObject is NonFungibleToken)
                 return new Tuple<string, string>($"nfts/{((NonFungibleToken)linkedObject).id}",
                     ((NonFungibleToken)linkedObject).nftID ?? "");
+            else if (linkedObject is Pair pair)
+                return new Tuple<string, string>($"pairs/{pair.id}",
+                    $"{pair.token0?.symbol} / {pair.token1?.symbol}");
             else
                 return null;
         }

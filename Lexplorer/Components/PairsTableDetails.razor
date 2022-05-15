@@ -1,0 +1,39 @@
+﻿@using Lexplorer.Models
+@using Lexplorer.Helpers
+
+<MudTd DataLabel="Pair">@LinkHelper.GetObjectLink(pair)</MudTd>
+<MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolume(false)</MudTd>
+<MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage() %</MudTd>
+<MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolume(true)</MudTd>
+
+@code {
+    [Parameter]
+    public Pair? pair { get; set; }
+    [Parameter]
+    public Dictionary<string, UniswapToken>? uniswapTokens { get; set; }
+
+    private string? getVolume(bool weekly)
+    {
+        if (pair?.token1 == null) return "";
+        var priceUSD = uniswapTokens!.GetValueOrDefault(pair.token1.address)?.data?.tokenDayDatas?.FirstOrDefault()?.priceUSD;
+        PairEntity? pairEntity = weekly ? pair.weeklyEntities?.FirstOrDefault() : pair?.dailyEntities?.FirstOrDefault();
+        var volume = pairEntity?.tradedVolumeToken1;
+        if (volume == null) return "";
+        if (priceUSD.HasValue)
+        {
+            return $"{TokenAmountConverter.ToStringWithExponent(volume.Value, pair!.token1.decimals, priceUSD.Value)} US$";
+        }
+        else
+        {
+            return $"{TokenAmountConverter.ToStringWithExponent(volume.Value, pair!.token1.decimals, 1)} {pair.token1.symbol}";
+        }
+    }
+
+    private string? get24hPercentage()
+    {
+        if (pair == null) return null;
+        return (pair.dailyEntities![0].tradedVolumeToken1 * 7 / pair.weeklyEntities![0].tradedVolumeToken1 * 100).ToString("N2");
+    }
+
+}
+
