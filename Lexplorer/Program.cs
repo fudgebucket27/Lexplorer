@@ -16,6 +16,10 @@ builder.Services.AddSingleton<TransactionExportService>();
 builder.Services.AddSingleton<EthereumService>();
 builder.Services.AddSingleton<NftMetadataService>();
 builder.Services.AddLazyCache();
+builder.Services.AddHttpClient<ILoopStatsService, LoopStatsService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("services:loopstats:endpoint").Value);
+});
 
 //registration of CSV export formats, no automatic registration possible
 //out of the box and extra framework seems overkill
