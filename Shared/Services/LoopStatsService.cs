@@ -1,5 +1,6 @@
 ﻿using Lexplorer.Models;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 using RestSharp;
 using System.Diagnostics;
 using System;
@@ -14,19 +15,21 @@ namespace Lexplorer.Services;
 
 public class LoopStatsService : ILoopStatsService
 {
-    private readonly HttpClient _client;
+    private readonly RestClient _restClient;
 
-    public LoopStatsService(HttpClient client)
+    public LoopStatsService(IConfiguration config)
     {
-        _client = client;
+        var baseUrl = config.GetSection("services:loopstats:endpoint").Value;
+        _restClient = new RestClient(baseUrl);
     }
 
     public async Task<LoopStatsDailyCount> GetDailyCount(CancellationToken cancellationToken = default)
     {
         try
         {
-            var dto = await _client.GetFromJsonAsync<LoopStatsDailyCount>("api/GetLastDaysCount", cancellationToken);
-            return dto;
+            var response = await _restClient.GetJsonAsync<LoopStatsDailyCount>("api/GetLastDaysCount", cancellationToken);
+
+            return response;
         }
         catch (HttpRequestException exc)
         {
