@@ -184,7 +184,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        dailyCount = await LoopStatsService.GetDailyCount();
+        string dailyCacheKey = "homepage-daily";
+        dailyCount = await AppCache.GetOrAddAsyncNonNull(dailyCacheKey, async () => await LoopStatsService.GetDailyCount(), DateTimeOffset.UtcNow.AddMinutes(10));
         string blockCacheKey = $"homepage-block";
         blockData = await AppCache.GetOrAddAsyncNonNull(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         CalculateAverageBlockTime();
