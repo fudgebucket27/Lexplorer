@@ -12,11 +12,6 @@ using Lexplorer.Exceptions;
 
 namespace Lexplorer.Services;
 
-public interface ILoopStatsService
-{
-    Task<LoopStatsDailyCount> GetDailyCount(CancellationToken cancellationToken = default);
-}
-
 public class LoopStatsService : ILoopStatsService
 {
     private readonly HttpClient _client;
@@ -37,7 +32,7 @@ public class LoopStatsService : ILoopStatsService
         {
             if (exc.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new NotFoundException(nameof(LoopStatsDailyCount));
+                throw new NotFoundException(nameof(LoopStatsDailyCount), innerException: exc.InnerException);
             }
 
             throw;

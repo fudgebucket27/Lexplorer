@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\NftMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\UniswapV2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EthereumService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ILoopStatsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringGraphQLService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopStatsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NftMetadataService.cs" />

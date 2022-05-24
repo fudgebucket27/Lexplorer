@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\Services\ILoopStatsService.cs" Link="ILoopStatsService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="JsonSubTypes" Version="1.8.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
