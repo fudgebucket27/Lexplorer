@@ -13,7 +13,7 @@ using Lexplorer.Exceptions;
 
 namespace Lexplorer.Services;
 
-public class LoopStatsService : ILoopStatsService
+public class LoopStatsService : ILoopStatsService, IDisposable
 {
     private readonly RestClient _restClient;
 
@@ -40,5 +40,10 @@ public class LoopStatsService : ILoopStatsService
 
             throw;
         }
+    }
+    public void Dispose()
+    {
+        _restClient?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
