@@ -35,7 +35,7 @@ public class LoopStatsService : ILoopStatsService, IDisposable
         {
             if (exc.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new NotFoundException(nameof(LoopStatsDailyCount), innerException: exc.InnerException);
+                throw new NotFoundException(nameof(LoopStatsDailyCount), innerException: exc);
             }
 
             throw;
