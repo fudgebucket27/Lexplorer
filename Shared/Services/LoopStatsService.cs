@@ -44,7 +44,7 @@ public class LoopStatsService : ILoopStatsService, IDisposable
         {
             var response = await _restClient.GetJsonAsync<LoopStatsDailyCount>("api/GetLastDaysCount", cancellationToken);
 
-            return response;
+            return response!;
         }
         catch (HttpRequestException exc)
         {
