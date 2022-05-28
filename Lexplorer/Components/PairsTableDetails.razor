@@ -3,7 +3,6 @@
 
 <MudTd DataLabel="Pair">@LinkHelper.GetObjectLink(pair)</MudTd>
 <MudTd Style="text-align:right" DataLabel="Volume 24H">@getVolume(false)</MudTd>
-<MudTd Style="text-align:right" DataLabel="24H % avg">@get24hPercentage() %</MudTd>
 <MudTd Style="text-align:right" DataLabel="Volume 7D">@getVolume(true)</MudTd>
 
 @code {
@@ -27,12 +26,6 @@
         {
             return $"{TokenAmountConverter.ToStringWithExponent(volume.Value, pair!.token1.decimals, 1)} {pair.token1.symbol}";
         }
-    }
-
-    private string? get24hPercentage()
-    {
-        if (pair == null) return null;
-        return (pair.dailyEntities![0].tradedVolumeToken1 * 7 / pair.weeklyEntities![0].tradedVolumeToken1 * 100).ToString("N2");
     }
 
 }
