@@ -842,7 +842,7 @@ namespace Lexplorer.Services
                   token1 {
                     ...TokenFragment
                   }
-                  dailyEntities(skip: 1, first: 1, orderBy: dayEnd, orderDirection: desc) {
+                  dailyEntities(skip: 0, first: 1, orderBy: dayEnd, orderDirection: desc) {
                     id
                     tradedVolumeToken0
                     tradedVolumeToken1
