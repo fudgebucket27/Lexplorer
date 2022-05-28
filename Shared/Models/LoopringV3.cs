@@ -316,6 +316,21 @@ namespace Lexplorer.Models
         public string? token { get; set; }
         public string? nftID { get; set; }
         public int nftType { get; set; }
+        public string nftTypeName
+        {
+            get
+            {
+                switch (nftType)
+                {
+                    case 0:
+                        return "ERC1155";
+                    case 1:
+                        return "ERC721";
+                    default:
+                        return "unknown";
+                }
+            }
+        }
         public List<AccountNFTSlot>? slots { get; set; }
         public List<TransactionNFT>? transactions { get; set; }
     }
