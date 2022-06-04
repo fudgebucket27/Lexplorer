@@ -6,97 +6,93 @@
 
     <MudGrid>
         <MudItem sm="12">
-            <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/></p>
+            <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /></p>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.transactionCount.ToString("N0") 
+                        @blockData?.data?.proxy?.transactionCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TransactionCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.blockCount.ToString("N0") 
+                        @blockData?.data?.proxy?.blockCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.BlockCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.userCount.ToString("N0") 
+                        @blockData?.data?.proxy?.userCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.UserCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-    </MudGrid>
-    <MudGrid>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Average Block Time</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">@averageBlockTime mins</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Average Transactions per Block</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">@averageTransactions.ToString("N0")</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Last Block Submitted</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">@lastBlockSubmittedTime mins ago</MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-    </MudGrid>
-    <MudGrid>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.nftMintCount.ToString("N0") 
+                        @blockData?.data?.proxy?.nftMintCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.NFTMintCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.tradeNFTCount.ToString("N0") 
+                        @blockData?.data?.proxy?.tradeNFTCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TradeNFTCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="12" lg="4">
-            <MudCard>
+        <MudItem xs="12" md="6" lg="4">
+            <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.transferNFTCount.ToString("N0") 
+                        @blockData?.data?.proxy?.transferNFTCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TransferNFTCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
