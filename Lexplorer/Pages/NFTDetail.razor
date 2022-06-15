@@ -9,7 +9,7 @@
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-    <tbody >
+    <tbody>
         <tr>
             <td colspan="2">
                 <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
@@ -20,6 +20,10 @@
         <tr>
             <td>Description</td>
             <td>@nftMetadata?.description</td>
+        </tr>
+        <tr>
+            <td>NFT type</td>
+            <td>@nft?.nftTypeName</td>
         </tr>
         <tr>
             <td>Royalty percentage</td>
@@ -199,7 +203,7 @@
                     {
                         string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
                         nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
-                            async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animationURL!, localCTS.Token));
+                            async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
                     }
                     StateHasChanged();
                 }

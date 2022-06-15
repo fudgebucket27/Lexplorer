@@ -1,13 +1,14 @@
-﻿
+﻿@inject NftMetadataService NftMetadataService;
+
 @if (showImageSource())
 {
-    <img src="@nftMetadata?.imageURL" class="nft" />
+    <img src="@NftMetadataService.MakeIPFSLink(nftMetadata?.image)" class="nft" />
 }
 
 @if (hasAnimationContent("video"))
 {
     <video class="nft" controls>
-        <source src="@nftMetadata?.animationURL">
+        <source src="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)">
         Your browser does not support the video tag.
     </video>
 }
@@ -15,22 +16,24 @@ else if (hasAnimationContent("audio"))
 {
     <br />
     <audio controls>
-        <source src="@nftMetadata?.animationURL">
+        <source src="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)">
         Your browser does not support the audio element.
     </audio>
 }
 else if (hasAnimationContent("image"))
 {
-    <img src="@nftMetadata?.animationURL" class="nft" />
+    <img src="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)" class="nft" />
 }
 else if (hasAnimationContent("model") || hasAnimationContent("octet-stream"))
 {
-    <model-viewer class="nft" bounds="tight" enable-pan autoplay src="@nftMetadata?.animationURL" ar ar-modes="webxr scene-viewer quick-look"
-                  camera-controls environment-image="neutral" poster="@nftMetadata?.imageURL" shadow-intensity="1"/>
+    <model-viewer class="nft" bounds="tight" enable-pan autoplay src="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)"
+                  ar ar-modes="webxr scene-viewer quick-look" camera-controls environment-image="neutral"
+                  poster="@NftMetadataService.MakeIPFSLink(nftMetadata?.image)" shadow-intensity="1" />
 }
-else if(hasAnimationContent("html"))
+else if (hasAnimationContent("html"))
 {
-    <iframe class="nft" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0" sandbox="allow-scripts" src="@nftMetadata?.animationURL" ></iframe>
+    <iframe class="nft" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" frameborder="0"
+            sandbox="allow-scripts allow-same-origin" src="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)"></iframe>
 }
 
 

@@ -9,14 +9,18 @@
     <Import_RootNamespace>Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GraphQLFragments.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TimestampConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TokenAmountConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\LoopringV3.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\LoopStats.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\NftMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\UniswapV2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\EthereumService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ILoopStatsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringGraphQLService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\LoopStatsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NftMetadataService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportDefaultCSVFormat.cs" />

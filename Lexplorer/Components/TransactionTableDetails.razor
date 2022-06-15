@@ -11,7 +11,7 @@
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(withdrawal?.fromAccount, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address"><L1AccountLink address="@withdrawal?.fromAccount?.address" /></MudTd>
         <MudTd></MudTd>
-        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @deposit?.token?.symbol</MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.amount, withdrawal?.token?.decimals) @withdrawal?.token?.symbol</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(withdrawal?.fee, withdrawal?.feeToken?.decimals) @withdrawal?.feeToken?.symbol</MudTd>
         break;
     case "OrderbookTrade":
