@@ -69,20 +69,23 @@
             }
             else
             {
+                
                 <MudGrid>
                     <MudItem xs="12" Class="d-flex justify-center">
-                        <MudToolBar>
+                        <MudPaper Width="100%" >
+                        <MudToolBar Class="justify-center">
                             <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
                             <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
                             <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
                             <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
                         </MudToolBar>
+                        </MudPaper>
                     </MudItem>
                     @foreach (var slot in accountNFTSlots!)
                     {
                         var metaData = GetMetadata(slot.nft?.id);
                         <MudItem xs="12" sm="4" md="4" lg="2">
-                            <MudCard Style="height:100%;position:relative">
+                            <MudCard Style="height:100%;position:relative" Class="ma-1 border-solid">
                                 <MudCardMedia Image="@NftMetadataService.MakeIPFSLink(metaData?.image)" Style="object-fit:contain" />
                                 <MudCardContent>
                                     <MudText Typo="Typo.h6">@metaData?.name</MudText>
@@ -95,7 +98,19 @@
                             </MudCard>
                         </MudItem>
                     }
+                    <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+                        <MudPaper Width="100%" Class="mx-4">
+	                    <MudToolBar Class="justify-center">
+                            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
+                            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
+                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+                            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
+                        </MudToolBar>
+                        </MudPaper>
+                    </MudHidden>
+                    <MudDivider DividerType="DividerType.Middle" Class="my-6"/>
                 </MudGrid>
+                
             }
         </MudTabPanel>
     </MudTabs>
@@ -104,7 +119,8 @@
 
     <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Transactions</MudText>
+            <MudText Typo="Typo.h6" Class="d-none d-sm-flex">Transactions</MudText>
+            <MudText Typo="Typo.h6" Class="d-flex d-sm-none d-xs-none">Tx's</MudText>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
             <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
