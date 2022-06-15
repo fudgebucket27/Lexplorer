@@ -83,7 +83,7 @@
                         var metaData = GetMetadata(slot.nft?.id);
                         <MudItem xs="12" sm="4" md="4" lg="2">
                             <MudCard Style="height:100%;position:relative">
-                                <MudCardMedia Image="@metaData?.imageURL" Style="object-fit:contain" />
+                                <MudCardMedia Image="@NftMetadataService.MakeIPFSLink(metaData?.image)" Style="object-fit:contain" />
                                 <MudCardContent>
                                     <MudText Typo="Typo.h6">@metaData?.name</MudText>
                                     <MudChip Label="true" Color="Color.Primary" Class="ml-0">x @slot.balance.ToString("#,##0")</MudChip>
