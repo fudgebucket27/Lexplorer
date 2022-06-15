@@ -7,23 +7,25 @@ using System.Diagnostics;
 using Lexplorer.Models;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 namespace Lexplorer.Services
 {
     public class NftMetadataService : IDisposable
     {
-        const string _ipfsBaseUrl = "https://fudgey.mypinata.cloud/ipfs/";
+        private string _ipfsBaseUrl;
 
         readonly RestClient _client;
 
-        private string makeAbsolutelink(string link)
+        public NftMetadataService(IConfiguration config) : this("")
         {
-            return link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
+            _ipfsBaseUrl = config.GetSection("services:pinata:endpoint").Value;
         }
 
-        public NftMetadataService()
+        public NftMetadataService(string ipfsBaseUrl)
         {
             _client = new RestClient();
+            _ipfsBaseUrl = ipfsBaseUrl;
         }
 
         public void Dispose()
@@ -32,9 +34,16 @@ namespace Lexplorer.Services
             GC.SuppressFinalize(this);
         }
 
+        public string? MakeIPFSLink(string? link)
+        {
+            if (link == null) return null;
+
+            return link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
+        }
+
         public async Task<NftMetadata?> GetMetadata(string link, CancellationToken cancellationToken = default)
         {
-            link = makeAbsolutelink(link);
+            link = MakeIPFSLink(link)!;
             //there is a fallback for if the metadata fails on the first try because
             //loopring deployed two different contracts for the nfts so some
             //metadata.json needs to be referenced directly while others are in a folder in ipfs
@@ -62,7 +71,7 @@ namespace Lexplorer.Services
 
         public async Task<string?> GetContentTypeFromURL(string link, CancellationToken cancellationToken = default)
         {
-            link = makeAbsolutelink(link);
+            link = MakeIPFSLink(link)!;
             var request = new RestRequest(link, Method.Head);
             try
             {
