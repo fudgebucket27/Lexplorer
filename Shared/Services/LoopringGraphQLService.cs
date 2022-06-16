@@ -818,7 +818,92 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+        public async Task<int> GetAccountTotalNfts(string accountId, CancellationToken cancellationToken = default)
+        {
+            var query = @"
+                        query accountNFTSlotsQuery(
+                        $skip: Int
+                        $first: Int
+                        $orderBy: AccountNFTSlot_orderBy
+                        $orderDirection: OrderDirection
+                        $where: AccountNFTSlot_filter
+                      ) {
+                        accountNFTSlots(
+                            skip: $skip
+                            first: $first
+                            orderBy: $orderBy
+                            orderDirection: $orderDirection
+                            where: $where
+                          ) {
+                            id
+                            balance
+                            nft {
+                              id
+                            }
+                        }
+                     }
+                    ";
 
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = query,
+                variables = new
+                {
+                    skip = 0,
+                    first = 1000,
+                    orderBy = "lastUpdatedAt",
+                    orderDirection = "desc",
+                    where = new
+                    {
+                        account = accountId,
+                        nft_not = ""
+                    },
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                int count = jresponse["data"]!["accountNFTSlots"]!.Count();
+
+                
+                // This sets an upper limit of 2000 NFTS instead of 1000
+                if (count == 1000)
+                {
+                    jObject = JObject.FromObject(new
+                    {
+                        query = query,
+                        variables = new
+                        {
+                            skip = 1000,
+                            first = 1000,
+                            orderBy = "lastUpdatedAt",
+                            orderDirection = "desc",
+                            where = new
+                            {
+                                account = accountId,
+                                nft_not = ""
+                            },
+                        }
+                    });
+                    request.AddStringBody(jObject.ToString(), ContentType.Json);
+
+                    response = await _client.PostAsync(request, cancellationToken);
+                    jresponse = JObject.Parse(response.Content!);
+                    count = count + jresponse["data"]!["accountNFTSlots"]!.Count();
+                }
+
+                return count;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return 0;
+            }
+        }
         public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"

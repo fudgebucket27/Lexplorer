@@ -73,11 +73,19 @@
                 <MudGrid>
                     <MudItem xs="12" Class="d-flex justify-center">
                         <MudPaper Width="100%" >
+                            
                         <MudToolBar Class="justify-center">
-                            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
-                            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
-                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-                            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
+                            <MudPagination Size="Size.Small" ShowFirstButton="true" 
+                                BoundaryCount="1" 
+                                MiddleCount="1" 
+                                ShowLastButton="true" 
+                                Selected="@currentPage"
+                                NextIcon="@Icons.Filled.NavigateBefore" 
+                                FirstIcon="@Icons.Filled.LastPage"
+                                BeforeIcon="@Icons.Filled.NavigateNext"
+                                LastIcon="@Icons.Filled.FirstPage"
+                                Count="@nftPages"
+                                SelectedChanged="@((int page) => gotoNFTPage = page)"/>
                         </MudToolBar>
                         </MudPaper>
                     </MudItem>
@@ -101,10 +109,17 @@
                     <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
                         <MudPaper Width="100%" Class="mx-4">
 	                    <MudToolBar Class="justify-center">
-                            <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage = 1)" />
-                            <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoNFTPage == 1) OnClick="@(() => gotoNFTPage -= 1)" />
-                            <MudNumericField HideSpinButtons="true" @bind-Value="gotoNFTPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-                            <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(accountNFTSlots?.Count < nftPageSize) OnClick="@(() => gotoNFTPage += 1)" />
+                            <MudPagination Size="Size.Small" ShowFirstButton="true" 
+                                BoundaryCount="1" 
+                                MiddleCount="1" 
+                                ShowLastButton="true" 
+                                Selected="@currentPage"
+                                NextIcon="@Icons.Filled.NavigateBefore" 
+                                FirstIcon="@Icons.Filled.LastPage"
+                                BeforeIcon="@Icons.Filled.NavigateNext"
+                                LastIcon="@Icons.Filled.FirstPage"
+                                Count="@nftPages"
+                                SelectedChanged="@((int page) => gotoNFTPage = page)"/>
                         </MudToolBar>
                         </MudPaper>
                     </MudHidden>
@@ -174,6 +189,8 @@
     [SupplyParameterFromQuery]
     public string nftPageNumber { get; set; } = "1";
 
+    int currentPage = 1;
+
     public int gotoNFTPage
     {
         get
@@ -182,6 +199,7 @@
         }
         set
         {
+            currentPage = value;
             string URL = $"/account/{accountId}?pageNumber={pageNumber}&nftPageNumber={value}";
             NavigationManager.NavigateTo(URL);
         }
@@ -191,12 +209,24 @@
     public bool isLoading = true;
     public readonly int pageSize = 25;
     public readonly int nftPageSize = 12; //6 per row
+    public int totalNfts = 0;
+    public int nftPages = 0;
 
     private Account? account { get; set; }
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Method for getting the total number of NFTS for account
+        string totalNftsKey = $"account{accountId}-totalnfts";
+        totalNfts = await AppCache.GetOrAddAsyncNonNull(totalNftsKey, 
+            async () => await LoopringGraphQLService.GetAccountTotalNfts(accountId!), 
+            DateTimeOffset.UtcNow.AddMinutes(10));
+        nftPages = (int)Math.Ceiling(decimal.Divide(totalNfts, nftPageSize));
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -210,6 +240,7 @@
             cts = localCTS;
             try
             {
+                currentPage = int.TryParse(nftPageNumber, out int dummy) ? dummy : 1;
                 isLoading = true;
                 //did the account change?
                 if (account != null && account.id != accountId)
@@ -238,7 +269,7 @@
                 {
                     pageNumber = "1";
                 }
-
+                
                 string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
                 transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
                     async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
