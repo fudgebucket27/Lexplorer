@@ -840,41 +840,20 @@ namespace Lexplorer.Services
                      }
                     ";
 
-            var request = new RestRequest();
-            request.AddHeader("Content-Type", "application/json");
-            JObject jObject = JObject.FromObject(new
-            {
-                query = query,
-                variables = new
-                {
-                    skip = 0,
-                    first = 1000,
-                    orderBy = "lastUpdatedAt",
-                    orderDirection = "desc",
-                    where = new
-                    {
-                        account = accountId,
-                        nft_not = ""
-                    },
-                }
-            });
-            request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
-                var response = await _client.PostAsync(request, cancellationToken);
-                JObject jresponse = JObject.Parse(response.Content!);
-                int count = jresponse["data"]!["accountNFTSlots"]!.Count();
+                int count = 0;
 
-                
-                // This sets an upper limit of 2000 NFTS instead of 1000
-                if (count == 1000)
+                while (count < 2000)
                 {
-                    jObject = JObject.FromObject(new
+                    var request = new RestRequest();
+                    request.AddHeader("Content-Type", "application/json");
+                    JObject jObject = JObject.FromObject(new
                     {
                         query = query,
                         variables = new
                         {
-                            skip = 1000,
+                            skip = count,
                             first = 1000,
                             orderBy = "lastUpdatedAt",
                             orderDirection = "desc",
@@ -887,9 +866,14 @@ namespace Lexplorer.Services
                     });
                     request.AddStringBody(jObject.ToString(), ContentType.Json);
 
-                    response = await _client.PostAsync(request, cancellationToken);
-                    jresponse = JObject.Parse(response.Content!);
+                    var response = await _client.PostAsync(request, cancellationToken);
+                    JObject jresponse = JObject.Parse(response.Content!);
                     count = count + jresponse["data"]!["accountNFTSlots"]!.Count();
+
+
+                    // If the first result is less than 1000 we know we can break the loop, or if the count is >= 1000 but less than 2000
+                    if (count < 1000 || (count > 1000 && count < 2000))
+                        break;
                 }
 
                 return count;
