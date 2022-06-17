@@ -836,10 +836,6 @@ namespace Lexplorer.Services
                             where: $where
                           ) {
                             id
-                            balance
-                            nft {
-                              id
-                            }
                         }
                      }
                     ";
