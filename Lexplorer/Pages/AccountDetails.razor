@@ -62,14 +62,13 @@
                 </PagerContent>
             </MudTable>
         </MudTabPanel>
-        <MudTabPanel Text="NFTs">
+        <MudTabPanel Text="NFTs">            
             @if (((accountNFTSlots?.Count ?? 0) < 1) && (gotoNFTPage == 1))
             {
                 <MudText class="pa-3">No NFTs</MudText>
             }
             else
             {
-                
                 <MudGrid>
                     <MudItem xs="12" Class="d-flex justify-center">
                         <MudPaper Width="100%" >
@@ -80,10 +79,6 @@
                                 MiddleCount="1" 
                                 ShowLastButton="true" 
                                 Selected="@currentPage"
-                                NextIcon="@Icons.Filled.NavigateBefore" 
-                                FirstIcon="@Icons.Filled.LastPage"
-                                BeforeIcon="@Icons.Filled.NavigateNext"
-                                LastIcon="@Icons.Filled.FirstPage"
                                 Count="@nftPages"
                                 SelectedChanged="@((int page) => gotoNFTPage = page)"/>
                         </MudToolBar>
@@ -218,16 +213,6 @@
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts;
 
-    protected override async Task OnInitializedAsync()
-    {
-        // Method for getting the total number of NFTS for account
-        string totalNftsKey = $"account{accountId}-totalnfts";
-        totalNfts = await AppCache.GetOrAddAsyncNonNull(totalNftsKey, 
-            async () => await LoopringGraphQLService.GetAccountTotalNfts(accountId!), 
-            DateTimeOffset.UtcNow.AddMinutes(10));
-        nftPages = (int)Math.Ceiling(decimal.Divide(totalNfts, nftPageSize));
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         //cancel any previous OnParametersSetAsync which might still be running
@@ -270,6 +255,13 @@
                     pageNumber = "1";
                 }
                 
+                // Method for getting the total number of NFTS for account
+                string totalNftsKey = $"account{accountId}-totalnfts";
+                totalNfts = await AppCache.GetOrAddAsyncNonNull(totalNftsKey, 
+                    async () => await LoopringGraphQLService.GetAccountTotalNfts(accountId!), 
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                nftPages = (int)Math.Ceiling(decimal.Divide(totalNfts, nftPageSize));
+
                 string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
                 transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
                     async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
