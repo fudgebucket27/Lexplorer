@@ -836,6 +836,7 @@ namespace Lexplorer.Services
                      }
                     ";
 
+            chunkSize = Math.Min(1000, chunkSize); //enforce max value of "first" from thegraph, i.e. 1000
             int count = 0;
 
             while (true)
