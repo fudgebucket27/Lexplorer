@@ -47,12 +47,12 @@ namespace xUnitTests.LoopringGraphTests
 
         [Theory]
         [InlineData("100007")]
+        [InlineData("10007")]
         public async void GetTotalNFTs(string accountID)
         {
             var nftCount = await service.GetAccountTotalNfts(accountID);
-            Assert.NotEqual(0, nftCount);
 
-            var nfts = await service.GetAccountNFTs(0, nftCount, accountID);
+            var nfts = await service.GetAccountNFTs(0, nftCount + 1, accountID);
             Assert.NotNull(nfts);
 
             Assert.Equal(nftCount, nfts!.Count);
