@@ -78,7 +78,7 @@
                                 BoundaryCount="1" 
                                 MiddleCount="1" 
                                 ShowLastButton="true" 
-                                Selected="@currentPage"
+                                Selected="@gotoNFTPage"
                                 Count="@nftPages"
                                 SelectedChanged="@((int page) => gotoNFTPage = page)"/>
                         </MudToolBar>
@@ -108,7 +108,7 @@
                                 BoundaryCount="1" 
                                 MiddleCount="1" 
                                 ShowLastButton="true" 
-                                Selected="@currentPage"
+                                Selected="@gotoNFTPage"
                                 Count="@nftPages"
                                 SelectedChanged="@((int page) => gotoNFTPage = page)"/>
                         </MudToolBar>
@@ -180,8 +180,6 @@
     [SupplyParameterFromQuery]
     public string nftPageNumber { get; set; } = "1";
 
-    int currentPage = 1;
-
     public int gotoNFTPage
     {
         get
@@ -190,7 +188,7 @@
         }
         set
         {
-            currentPage = value;
+            nftPageNumber = value.ToString(); //set immediately for MudPagination to not switch forth and back
             string URL = $"/account/{accountId}?pageNumber={pageNumber}&nftPageNumber={value}";
             NavigationManager.NavigateTo(URL);
         }
@@ -221,7 +219,6 @@
             cts = localCTS;
             try
             {
-                currentPage = int.TryParse(nftPageNumber, out int dummy) ? dummy : 1;
                 isLoading = true;
                 //did the account change?
                 if (account != null && account.id != accountId)
@@ -250,7 +247,7 @@
                 {
                     pageNumber = "1";
                 }
-                
+
                 // Method for getting the total number of NFTS for account
                 string totalNftsKey = $"account{accountId}-totalnfts";
                 totalNfts = await AppCache.GetOrAddAsyncNonNull(totalNftsKey, 
