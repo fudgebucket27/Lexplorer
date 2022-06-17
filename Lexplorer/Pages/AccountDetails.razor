@@ -254,8 +254,9 @@
                 // Method for getting the total number of NFTS for account
                 string totalNftsKey = $"account{accountId}-totalnfts";
                 totalNfts = await AppCache.GetOrAddAsyncNonNull(totalNftsKey, 
-                    async () => await LoopringGraphQLService.GetAccountTotalNfts(accountId!), 
+                    async () => await LoopringGraphQLService.GetAccountTotalNfts(accountId!, cancellationToken: localCTS.Token), 
                     DateTimeOffset.UtcNow.AddMinutes(10));
+                localCTS.Token.ThrowIfCancellationRequested();
                 nftPages = (int)Math.Ceiling(decimal.Divide(totalNfts, nftPageSize));
 
                 string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
