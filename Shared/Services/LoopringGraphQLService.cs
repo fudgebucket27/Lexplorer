@@ -818,7 +818,66 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+        public async Task<int> GetAccountTotalNfts(string accountId, int chunkSize = 1000, CancellationToken cancellationToken = default)
+        {
+            var query = @"
+                        query accountNFTSlotsQuery(
+                        $skip: Int
+                        $first: Int
+                        $where: AccountNFTSlot_filter
+                      ) {
+                        accountNFTSlots(
+                            skip: $skip
+                            first: $first
+                            where: $where
+                          ) {
+                            id
+                        }
+                     }
+                    ";
 
+            chunkSize = Math.Min(1000, chunkSize); //enforce max value of "first" from thegraph, i.e. 1000
+            int count = 0;
+
+            while (true)
+            {
+                try
+                {
+                    var request = new RestRequest();
+                    request.AddHeader("Content-Type", "application/json");
+                    JObject jObject = JObject.FromObject(new
+                    {
+                        query = query,
+                        variables = new
+                        {
+                            skip = count,
+                            first = chunkSize,
+                            where = new
+                            {
+                                account = accountId,
+                                nft_not = ""
+                            },
+                        }
+                    });
+                    request.AddStringBody(jObject.ToString(), ContentType.Json);
+
+                    var response = await _client.PostAsync(request, cancellationToken);
+                    JObject jresponse = JObject.Parse(response.Content!);
+                    int chunkCount = jresponse["data"]!["accountNFTSlots"]!.Count();
+                    count += chunkCount;
+
+                    if (chunkCount < chunkSize)
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    break;
+                }
+            }
+
+            return count;
+        }
         public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"
