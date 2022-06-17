@@ -818,7 +818,7 @@ namespace Lexplorer.Services
                 return null;
             }
         }
-        public async Task<int> GetAccountTotalNfts(string accountId, CancellationToken cancellationToken = default)
+        public async Task<int> GetAccountTotalNfts(string accountId, int chunkSize = 1000, CancellationToken cancellationToken = default)
         {
             var query = @"
                         query accountNFTSlotsQuery(
@@ -836,11 +836,11 @@ namespace Lexplorer.Services
                      }
                     ";
 
-            try
-            {
-                int count = 0;
+            int count = 0;
 
-                while (count < 2000)
+            while (true)
+            {
+                try
                 {
                     var request = new RestRequest();
                     request.AddHeader("Content-Type", "application/json");
@@ -850,7 +850,7 @@ namespace Lexplorer.Services
                         variables = new
                         {
                             skip = count,
-                            first = 1000,
+                            first = chunkSize,
                             where = new
                             {
                                 account = accountId,
@@ -862,21 +862,20 @@ namespace Lexplorer.Services
 
                     var response = await _client.PostAsync(request, cancellationToken);
                     JObject jresponse = JObject.Parse(response.Content!);
-                    count = count + jresponse["data"]!["accountNFTSlots"]!.Count();
+                    int chunkCount = jresponse["data"]!["accountNFTSlots"]!.Count();
+                    count += chunkCount;
 
-
-                    // If the first result is less than 1000 we know we can break the loop, or if the count is >= 1000 but less than 2000
-                    if (count < 1000 || (count > 1000 && count < 2000))
+                    if (chunkCount < chunkSize)
                         break;
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    break;
+                }
+            }
 
-                return count;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                return 0;
-            }
+            return count;
         }
         public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
