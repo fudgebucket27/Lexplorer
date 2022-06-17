@@ -824,15 +824,11 @@ namespace Lexplorer.Services
                         query accountNFTSlotsQuery(
                         $skip: Int
                         $first: Int
-                        $orderBy: AccountNFTSlot_orderBy
-                        $orderDirection: OrderDirection
                         $where: AccountNFTSlot_filter
                       ) {
                         accountNFTSlots(
                             skip: $skip
                             first: $first
-                            orderBy: $orderBy
-                            orderDirection: $orderDirection
                             where: $where
                           ) {
                             id
@@ -855,8 +851,6 @@ namespace Lexplorer.Services
                         {
                             skip = count,
                             first = 1000,
-                            orderBy = "lastUpdatedAt",
-                            orderDirection = "desc",
                             where = new
                             {
                                 account = accountId,
