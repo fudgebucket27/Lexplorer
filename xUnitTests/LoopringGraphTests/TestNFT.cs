@@ -36,6 +36,7 @@ namespace xUnitTests.LoopringGraphTests
             var nft = await service.GetNFT(nftID);
             Assert.NotNull(nft);
             Assert.NotNull(nft?.mintedAtTransaction);
+            Assert.NotEqual(0, nft?.mintedAtTransaction?.amount);
         }
 
         [Fact]
