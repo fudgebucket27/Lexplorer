@@ -14,18 +14,22 @@ using RestSharp.Serializers;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 namespace Lexplorer.Services
 {
     public class LoopringGraphQLService : IDisposable
     {
-        const string _baseUrl = "https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36";
-
         readonly RestClient _client;
 
-        public LoopringGraphQLService()
+        public LoopringGraphQLService(IConfiguration config)
         {
-            _client = new RestClient(_baseUrl);
+            _client = new RestClient(config.GetSection("services:loopringgraph:endpoint").Value);
+        }
+
+        public LoopringGraphQLService(string baseUrl)
+        {
+            _client = new RestClient(baseUrl);
         }
 
         public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID",
