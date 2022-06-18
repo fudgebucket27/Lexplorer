@@ -42,6 +42,10 @@
             <td Style="word-break:break-all;">@LinkHelper.GetObjectLink(nft?.mintedAtTransaction) </td>
         </tr>
         <tr>
+            <td>Minted amount</td>
+            <td Style="word-break:break-all;">@nft?.mintedAtTransaction?.amount</td>
+        </tr>
+        <tr>
             <td>Token address</td>
             <td Style="word-break:break-all;"><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
