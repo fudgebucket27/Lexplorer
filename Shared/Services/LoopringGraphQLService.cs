@@ -14,18 +14,23 @@ using RestSharp.Serializers;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using System.Numerics;
 
 namespace Lexplorer.Services
 {
     public class LoopringGraphQLService : IDisposable
     {
-        const string _baseUrl = "https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36";
-
         readonly RestClient _client;
 
-        public LoopringGraphQLService()
+        public LoopringGraphQLService(IConfiguration config)
         {
-            _client = new RestClient(_baseUrl);
+            _client = new RestClient(config.GetSection("services:loopringgraph:endpoint").Value);
+        }
+
+        public LoopringGraphQLService(string baseUrl)
+        {
+            _client = new RestClient(baseUrl);
         }
 
         public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID",
@@ -818,7 +823,66 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+        public async Task<int> GetAccountTotalNfts(string accountId, int chunkSize = 1000, CancellationToken cancellationToken = default)
+        {
+            var query = @"
+                        query accountNFTSlotsQuery(
+                        $skip: Int
+                        $first: Int
+                        $where: AccountNFTSlot_filter
+                      ) {
+                        accountNFTSlots(
+                            skip: $skip
+                            first: $first
+                            where: $where
+                          ) {
+                            id
+                        }
+                     }
+                    ";
 
+            chunkSize = Math.Min(1000, chunkSize); //enforce max value of "first" from thegraph, i.e. 1000
+            int count = 0;
+
+            while (true)
+            {
+                try
+                {
+                    var request = new RestRequest();
+                    request.AddHeader("Content-Type", "application/json");
+                    JObject jObject = JObject.FromObject(new
+                    {
+                        query = query,
+                        variables = new
+                        {
+                            skip = count,
+                            first = chunkSize,
+                            where = new
+                            {
+                                account = accountId,
+                                nft_not = ""
+                            },
+                        }
+                    });
+                    request.AddStringBody(jObject.ToString(), ContentType.Json);
+
+                    var response = await _client.PostAsync(request, cancellationToken);
+                    JObject jresponse = JObject.Parse(response.Content!);
+                    int chunkCount = jresponse["data"]!["accountNFTSlots"]!.Count();
+                    count += chunkCount;
+
+                    if (chunkCount < chunkSize)
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    break;
+                }
+            }
+
+            return count;
+        }
         public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"
@@ -1076,12 +1140,20 @@ namespace Lexplorer.Services
               }
             ";
 
+            string searchTermBytes = "";
             //avoid query errors with search strings that cannot be converted to bytes
             //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
             //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
-            string searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
-            if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
-                searchTermBytes = "";
+            if (BigInteger.TryParse(searchTerm, out BigInteger nftBigIntID))
+                //strip of any leading zeros
+                searchTermBytes = "0x" + nftBigIntID.ToString("X").TrimStart('0').ToLower();
+
+            else
+            {
+                searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
+                if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
+                    searchTermBytes = "";
+            }
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
