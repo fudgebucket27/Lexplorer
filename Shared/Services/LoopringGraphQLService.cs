@@ -1512,6 +1512,59 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<Remove?> GetAnyRemoveWithTokenID(string tokenID, CancellationToken cancellationToken = default)
+        {
+            var swapQuery = @"
+            query removeQuery(
+                $where: Remove_filter
+              ) {
+                removes(
+                  first: 1  
+                  where: $where
+                ) {
+                  id
+                  pool {
+                    id
+                    address
+                    __typename
+                  }
+                  token
+                  {
+                      ...TokenFragment
+                  }
+                }
+             }"
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = swapQuery,
+                variables = new
+                {
+                    first = 1,
+                    where = new
+                    {
+                        token = tokenID
+                    }
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["removes"]!;
+                return result.ToObject<IList<Remove>>()?.FirstOrDefault<Remove>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();
