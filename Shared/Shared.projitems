@@ -26,5 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportDefaultCSVFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\UniswapGraphQLService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportCointracking.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringPoolTokenCacheService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\LoopringPoolToken.cs" />
   </ItemGroup>
 </Project>
