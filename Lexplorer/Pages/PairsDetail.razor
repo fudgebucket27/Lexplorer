@@ -185,7 +185,7 @@
                     //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
                     //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
                     Formatter = @"function (value) {
-                        return Number(value).toLocaleString();}",
+                    return Number(value).toLocaleString();}",
                     MinWidth = 80
                 }
             }
@@ -210,7 +210,7 @@
                 {
                     //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
                     //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
-                    Formatter = $"function (value) {{return Number(value).toLocaleString() + \" { pair?.token1?.symbol }\";}}",
+                    Formatter = $"function (value) {{return Number(value).toLocaleString() + \" {pair?.token1?.symbol}\";}}",
                     MinWidth = 80
                 }
             });

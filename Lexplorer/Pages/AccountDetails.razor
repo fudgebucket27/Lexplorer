@@ -74,7 +74,7 @@
                 </PagerContent>
             </MudTable>
         </MudTabPanel>
-        <MudTabPanel Text="NFTs">            
+        <MudTabPanel Text="NFTs">
             @if ((accountNFTSlots.Count < 1) && (gotoNFTPage == 1))
             {
                 <MudText class="pa-3">No NFTs</MudText>
@@ -83,17 +83,16 @@
             {
                 <MudGrid>
                     <MudItem xs="12" Class="d-flex justify-center">
-                        <MudPaper Width="100%" >
-                            
-                        <MudToolBar Class="justify-center">
-                            <MudPagination Size="Size.Small" ShowFirstButton="true" 
-                                BoundaryCount="1" 
-                                MiddleCount="1" 
-                                ShowLastButton="true" 
-                                Selected="@gotoNFTPage"
-                                Count="@nftPages"
-                                SelectedChanged="@((int page) => gotoNFTPage = page)"/>
-                        </MudToolBar>
+                        <MudPaper Width="100%">
+                            <MudToolBar Class="justify-center">
+                                <MudPagination Size="Size.Small" ShowFirstButton="true"
+                                               BoundaryCount="1"
+                                               MiddleCount="1"
+                                               ShowLastButton="true"
+                                               Selected="@gotoNFTPage"
+                                               Count="@nftPages"
+                                               SelectedChanged="@((int page) => gotoNFTPage = page)" />
+                            </MudToolBar>
                         </MudPaper>
                     </MudItem>
                     @foreach (var slot in accountNFTSlots)
@@ -115,20 +114,20 @@
                     }
                     <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
                         <MudPaper Width="100%" Class="mx-4">
-	                    <MudToolBar Class="justify-center">
-                            <MudPagination Size="Size.Small" ShowFirstButton="true" 
-                                BoundaryCount="1" 
-                                MiddleCount="1" 
-                                ShowLastButton="true" 
-                                Selected="@gotoNFTPage"
-                                Count="@nftPages"
-                                SelectedChanged="@((int page) => gotoNFTPage = page)"/>
-                        </MudToolBar>
+                            <MudToolBar Class="justify-center">
+                                <MudPagination Size="Size.Small" ShowFirstButton="true"
+                                               BoundaryCount="1"
+                                               MiddleCount="1"
+                                               ShowLastButton="true"
+                                               Selected="@gotoNFTPage"
+                                               Count="@nftPages"
+                                               SelectedChanged="@((int page) => gotoNFTPage = page)" />
+                            </MudToolBar>
                         </MudPaper>
                     </MudHidden>
-                    <MudDivider DividerType="DividerType.Middle" Class="my-6"/>
+                    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
                 </MudGrid>
-                
+
             }
         </MudTabPanel>
     </MudTabs>
