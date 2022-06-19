@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using System.Numerics;
 
 namespace Lexplorer.Services
 {
@@ -1139,12 +1140,20 @@ namespace Lexplorer.Services
               }
             ";
 
+            string searchTermBytes = "";
             //avoid query errors with search strings that cannot be converted to bytes
             //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
             //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
-            string searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
-            if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
-                searchTermBytes = "";
+            if (BigInteger.TryParse(searchTerm, out BigInteger nftBigIntID))
+                //strip of any leading zeros
+                searchTermBytes = "0x" + nftBigIntID.ToString("X").TrimStart('0').ToLower();
+
+            else
+            {
+                searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
+                if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
+                    searchTermBytes = "";
+            }
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
