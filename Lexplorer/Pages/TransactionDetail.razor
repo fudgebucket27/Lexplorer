@@ -1,6 +1,7 @@
 ﻿@page "/transactions/{transactionId}"
 @inject IAppCache AppCache;
 @inject LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
 
 <PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 
@@ -178,7 +179,7 @@
             </tr>
             <tr>
                 <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(add.amount, add.token?.decimals) @add.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(add.amount, addToken?.decimals) @addToken?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
@@ -199,7 +200,7 @@
             </tr>
             <tr>
                 <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, remove.token?.decimals) @remove.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, removeToken?.decimals) @removeToken?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
@@ -369,7 +370,9 @@
     private Deposit? deposit { get { return transaction as Deposit; } }
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
     private Add? add { get { return transaction as Add; } }
+    private Token? addToken { get { return (add?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(add.token)?.token ?? add.token; } }
     private Remove? remove { get { return transaction as Remove; } }
+    private Token? removeToken { get { return (remove?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(remove.token)?.token ?? remove.token; } }
     private AmmUpdate? ammUpdate { get { return transaction as AmmUpdate; } }
     private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
@@ -385,7 +388,16 @@
         if (transaction?.id != transactionId)
         {
             transaction = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
-            StateHasChanged();
+
+            Pool? pool = null;
+            if (transaction is Remove tempRemove)
+                pool = tempRemove.pool;
+            if (transaction is AmmUpdate tempAmmUpdate)
+                pool = tempAmmUpdate.pool;
+            if (transaction is Add tempAdd)
+                pool = tempAdd.pool;
+            if (pool != null)
+                await poolTokenCacheService.GetPoolToken(pool);
         }
     }
 }

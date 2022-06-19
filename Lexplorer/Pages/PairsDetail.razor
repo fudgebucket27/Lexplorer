@@ -6,7 +6,8 @@
 @using ApexCharts;
 @inject IAppCache AppCache;
 @inject NavigationManager NavigationManager;
-@inject Lexplorer.Services.LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
 
 
 <PageTitle>The Lexplorer - pair @(pair?.token0?.symbol) / @(pair?.token1?.symbol) </PageTitle>
@@ -45,6 +46,14 @@
             <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken0Orderbook ?? 0, pair?.token0?.decimals ?? 0, 1) @pair?.token0?.symbol </td>
             <td>@TokenAmountConverter.ToStringWithExponent(pair?.tradedVolumeToken1Orderbook ?? 0, pair?.token1?.decimals ?? 0, 1) @pair?.token1?.symbol </td>
         </tr>
+        @if (poolToken != null)
+        {
+            <tr>
+                <td>Pool</td>
+                <td>@LinkHelper.GetObjectLink(poolToken.pool) </td>
+                <td>@poolToken.token?.name </td>
+            </tr>
+        }
     </tbody>
 </MudSimpleTable>
 
@@ -100,6 +109,7 @@
     public string pairId { get; set; } = "";
 
     private Pair? pair { get; set; } = new Pair();
+    private LoopringPoolToken? poolToken { get; set; }
     private IList<PairDailyData>? dailyData { get; set; } = null;
 
     private ApexChart<PairDailyData>? dailyPriceChart;
@@ -135,12 +145,15 @@
     {
         if (pair?.id != pairId)
         {
+            poolToken = null;
             dailyData = null;
             string pairCacheKey = $"pair-{pairId}";
             pair = await AppCache.GetOrAddAsyncNonNull(pairCacheKey,
                 async () => await LoopringGraphQLService.GetPair(pairId),
                 DateTimeOffset.UtcNow.AddHours(1));
             if (pair == null) return;
+            StateHasChanged();
+            poolToken = await poolTokenCacheService.GetPoolToken(pair);
             StateHasChanged();
             string dailyDataCacheKey = $"pair-{pairId}-dailyData";
             dailyData = await AppCache.GetOrAddAsyncNonNull(dailyDataCacheKey,

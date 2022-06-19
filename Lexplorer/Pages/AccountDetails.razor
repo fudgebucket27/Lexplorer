@@ -1,6 +1,7 @@
 ﻿@page "/account/{accountId}"
 @using System.Diagnostics
 @inject LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
 @inject EthereumService EthereumService;
 @inject NftMetadataService NftMetadataService;
 @inject NavigationManager NavigationManager;
@@ -37,6 +38,17 @@
                     <td>0x@((account as User)!.publicKey)</td>
                 </tr>
 
+            }
+            @if (poolToken != null)
+            {
+                <tr>
+                    <td>Pool token</td>
+                    <td>@(poolToken?.token?.name)</td>
+                </tr>
+                <tr>
+                    <td>Pair</td>
+                    <td>@LinkHelper.GetObjectLink(poolToken?.pair)</td>
+                </tr>
             }
         </tbody>
     </MudSimpleTable>
@@ -202,6 +214,7 @@
     public int nftPages = 0;
 
     private Account? account { get; set; }
+    private LoopringPoolToken? poolToken { get; set; }
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot> accountNFTSlots { get; set; } = new List<AccountNFTSlot>();
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
@@ -240,6 +253,22 @@
                     StateHasChanged();
                     account!.balances = await LoopringGraphQLService.GetAccountBalance(accountId, localCTS.Token);
                     localCTS.Token.ThrowIfCancellationRequested();
+                    if (account is Pool tempPool)
+                    {
+                        poolToken = await poolTokenCacheService.GetPoolToken(tempPool, localCTS.Token);
+                        localCTS.Token.ThrowIfCancellationRequested();
+                    }
+                    else
+                        poolToken = null;
+                    if (account.balances != null)
+                        foreach (var balance in account.balances)
+                        {
+                            if (balance.token == null)
+                                continue;
+                            LoopringPoolToken? poolToken = await poolTokenCacheService.GetPoolToken(balance.token);
+                            if (poolToken != null)
+                                balance.token = poolToken.token;
+                        }
                     balancesLoading = false;
                     StateHasChanged();
                 }
