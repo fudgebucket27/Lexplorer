@@ -1426,6 +1426,92 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<Swap?> GetSwapPairAndPool(Object theObject, CancellationToken cancellationToken = default)
+        {
+            if (theObject is Swap swap)
+                if ((swap.pair != null) && (swap.pool != null) && swap.pool.balances != null)
+                    return swap;
+
+            var swapQuery = @"
+            query swapQuery(
+                $where: Swap_filter
+              ) {
+                swaps(
+                  first: 1  
+                  where: $where
+                ) {
+                  id
+                  pool {
+                    id
+                    address
+                    __typename
+                    balances {
+                      __typename
+                      balance
+                      token
+                      {
+                        ...TokenFragment
+                      }
+                    }
+                  }
+                  pair {
+                    id
+                    __typename
+                    token0
+                    {
+                      ...TokenFragment
+                    }
+                    token1
+                    {
+                      ...TokenFragment
+                    }
+                  }
+                }
+             }"
+              + GraphQLFragments.TokenFragment;
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = swapQuery,
+                variables = new
+                {
+                    first = 1,
+                    where = new
+                    {
+                    }
+                }
+            });
+            JObject where = (jObject["variables"]!["where"] as JObject)!;
+            try
+            {
+                if (theObject is Swap swap2)
+                {
+                    where.Add(new JProperty("id", swap2.id));
+                }
+                else if (theObject is Pool pool)
+                {
+                    where.Add(new JProperty("pool", pool.id));
+                }
+                else if (theObject is Pair pair)
+                {
+                    where.Add(new JProperty("pair", pair.id));
+                }
+                else throw new ArgumentException($"GetSwapPairAndPool can only be called with swap, pool or pair, not {nameof(theObject)}");
+
+                request.AddStringBody(jObject.ToString(), ContentType.Json);
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["swaps"]!;
+                return result.ToObject<IList<Swap>>()?.FirstOrDefault<Swap>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();
