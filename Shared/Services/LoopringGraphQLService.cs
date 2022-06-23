@@ -1141,15 +1141,20 @@ namespace Lexplorer.Services
             ";
 
             string searchTermBytes = "";
-            //avoid query errors with search strings that cannot be converted to bytes
-            //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
-            //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
             if (BigInteger.TryParse(searchTerm, out BigInteger nftBigIntID))
-                //strip of any leading zeros
-                searchTermBytes = "0x" + nftBigIntID.ToString("X").TrimStart('0').ToLower();
-
+            {
+                //strip of any leading zeros (#173) but also ensure even number of bytes (#183)
+                searchTermBytes = nftBigIntID.ToString("X").ToLower().Trim('0');
+                if (searchTermBytes.Length % 2 == 1)
+                    searchTermBytes = "0x0" + searchTermBytes;
+                else
+                    searchTermBytes = "0x" + searchTermBytes;
+            }
             else
             {
+                //avoid query errors with search strings that cannot be converted to bytes
+                //extra searchTermBytes is only filled if it matches strict RegEx, starting with 0x (added if missing)
+                //and then any number of pairs "({2})+" of 0-9, a-f, A-F, end must be reached = $
                 searchTermBytes = (searchTerm.StartsWith("0x", StringComparison.InvariantCultureIgnoreCase) ? searchTerm : "0x" + searchTerm).ToLower();
                 if (!Regex.Match(searchTermBytes, "0x([a-f0-9]{2})+$").Success)
                     searchTermBytes = "";
@@ -1372,6 +1377,52 @@ namespace Lexplorer.Services
             {
                 Debug.WriteLine(ex.Message);
                 return new List<Transaction>();
+            }
+        }
+
+        public async Task<IList<NonFungibleToken>?> GetCollectionNFTs(string tokenAddress, int skip = 0, int first = 12, string orderBy = "mintedAt", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        {
+            var nonFungibleTokensQuery = @"
+                query nonFungibleTokens($where: NonFungibleToken_filter, $skip: Int, $first: Int, $orderDirection: OrderDirection, $orderBy: NonFungibleToken_orderBy) {
+                  nonFungibleTokens(where: $where, skip: $skip, first: $first, orderDirection: $orderDirection, orderBy: $orderBy) {
+                    ...NFTFragment
+                    __typename
+                  }
+                }
+            "
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.MintNFTFragmentWithoutNFT
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = nonFungibleTokensQuery,
+                variables = new
+                {
+                    where = new 
+                    {
+                        token_in = new List<string> { tokenAddress } //avoid invalid argument error with graph when using "token" string instead of "token_in"
+                    },
+                    skip = skip,
+                    first = first,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["nonFungibleTokens"];
+                return token!.ToObject<IList<NonFungibleToken>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
             }
         }
 

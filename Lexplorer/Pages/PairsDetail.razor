@@ -108,7 +108,7 @@
     private ApexChartOptions<PairDailyData> dailyVolumeChartOptions = new();
 
     private bool __isDarkMode = false;
-    [CascadingParameter]
+    [CascadingParameter(Name = "_isDarkMode")]
     protected bool _isDarkMode
     {
         get
