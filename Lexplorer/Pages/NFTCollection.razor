@@ -143,13 +143,13 @@
                     StateHasChanged();
                     foreach (var slot in collectionNFTSlots!)
                     {
-                        string nftMetadataLinkCacheKey = $"collection-{tokenAddress}-nftMetadataLink-{slot.nftID}";
+                        string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nftID}";
                         string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
                             async () => await EthereumService.GetMetadataLink(slot.nftID, tokenAddress, slot.nftType),
                             DateTimeOffset.UtcNow.AddHours(1));
                         if (string.IsNullOrEmpty(nftMetadataLink)) continue;
 
-                        string nftMetadataCacheKey = $"collection-{tokenAddress}-nftMetadata-{nftMetadataLink}";
+                        string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
                         var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
                             async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token),
                             DateTimeOffset.UtcNow.AddHours(1));
