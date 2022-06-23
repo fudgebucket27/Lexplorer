@@ -1375,7 +1375,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<IList<NonFungibleToken>?> GetCollectionNFTs(string tokenAddress, int skip = 0, int first = 12, string orderBy = "mintedAt", string orderDirection = "desc")
+        public async Task<IList<NonFungibleToken>?> GetCollectionNFTs(string tokenAddress, int skip = 0, int first = 12, string orderBy = "mintedAt", string orderDirection = "desc", CancellationToken cancellationToken = default)
         {
             var nonFungibleTokensQuery = @"
                 query nonFungibleTokens($where: NonFungibleToken_filter, $skip: Int, $first: Int, $orderDirection: OrderDirection, $orderBy: NonFungibleToken_orderBy) {

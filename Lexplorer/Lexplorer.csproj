@@ -27,6 +27,12 @@
     <PackageReference Include="Blazor-ApexCharts" Version="0.9.7-beta" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 
 </Project>

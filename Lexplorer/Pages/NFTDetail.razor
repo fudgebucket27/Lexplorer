@@ -84,6 +84,14 @@
                 <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
+        <tr>
+            <td colspan="2">
+                @if(nft?.token != null)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="goToCollectionPage">View collection</MudButton>
+                }
+            </td>
+        </tr>
     </tbody>
 </MudSimpleTable>
 
@@ -225,6 +233,13 @@
             Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
         }
     }
+    
+   
+    public void goToCollectionPage()
+    {
+        string URL = $"/collections/{nft?.token}";
+        NavigationManager.NavigateTo(URL);
+    } 
 
 }
 
