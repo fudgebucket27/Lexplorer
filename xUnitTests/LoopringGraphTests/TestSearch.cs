@@ -41,6 +41,17 @@ namespace xUnitTests.LoopringGraphTests
         }
 
         [Theory]
+        [InlineData("81111")]
+        [InlineData("77900")]     
+        public async void SearchAccount(string accountID)
+        {
+            var searchResult = await service.Search(accountID);
+            Assert.NotEmpty(searchResult);
+            Assert.IsType<User>(searchResult![0]);
+            Assert.Equal(accountID, (searchResult![0] as User)!.id);
+        }
+
+        [Theory]
         [InlineData("8d785aabf440e369aae5e63bed8a0f1f560b4caf")]
         public async void SearchL1Address(string address)
         {
