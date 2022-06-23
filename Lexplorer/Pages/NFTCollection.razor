@@ -91,21 +91,7 @@
     {
         get
         {
-            if(int.TryParse(pageNumber, out int np))
-            {
-                if(collectionNFTSlots.Count < pageSize)
-                {
-                    return np;
-                }
-                else
-                {
-                    return np + 1;
-                }
-            }
-            else
-            {
-                return 1;
-            }
+            return goToPage + ((collectionNFTSlots?.Count < pageSize) ? 0 : 1);
         }
     }
 
@@ -126,12 +112,8 @@
             try
             {
                 if (string.IsNullOrEmpty(tokenAddress)) return;
-                if (string.IsNullOrEmpty(pageNumber))
-                {
-                    pageNumber = "1";
-                }
 
-                string collectionNftKey = $"collection-{tokenAddress}-page-{pageNumber}";
+                string collectionNftKey = $"collection-{tokenAddress}-page-{goToPage}";
                 collectionNFTSlots = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
                     async () => await LoopringGraphQLService.GetCollectionNFTs(tokenAddress, (goToPage - 1) * pageSize, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
