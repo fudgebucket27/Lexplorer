@@ -390,18 +390,28 @@ namespace Lexplorer.Models
     {
         public Account? accountSeller { get; set; }
         public Account? accountBuyer { get; set; }
-        public AccountNFTSlot? slotSeller { get; set; }
-        public AccountNFTSlot? slotBuyer { get; set; }
         public Token? token { get; set; }
         public double realizedNFTPrice { get; set; }
         public double fillSA { get; set; }
         public double fillSB { get; set; }
-        public bool fillAmountBorSA { get; set; }
-        public bool fillAmountBorSB { get; set; }
-        public double fillBA { get; set; }
-        public double fillBB { get; set; }
         public double feeSeller { get; set; }
         public double feeBuyer { get; set; }
+        public int tokenIDAS { get; set; }
+
+        public bool isASelling {
+            get {
+                //https://github.com/Loopring/loopring-subgraph-v2/blob/c2319a3e9f5b23f3e685fc02110542e9ad3a1b31/src/utils/helpers/transactionProcessors/spotTrade.ts#L532
+                return (tokenIDAS > 32767);
+            }
+        }
+
+        public double NFTAmountSold
+        {
+            get
+            {
+                return isASelling ? fillSA : fillSB;
+            }
+        }
     }
     public class SwapNFT : TransactionNFT
     {

@@ -309,16 +309,16 @@
                 <td>Description</td>
                 <td>
                     User @LinkHelper.GetObjectLink(tradeNFT.accountBuyer)
-                    bought @tradeNFT.fillBB.ToString() NFT
+                    bought @tradeNFT.NFTAmountSold.ToString() NFT
                     at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and paid @TokenAmountConverter.ToString(tradeNFT.fillSB + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and paid @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
                     @(tradeNFT.feeBuyer > 0 ? $" including {@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} fees" : "")
                 </td>
                 <td>
                     User @LinkHelper.GetObjectLink(tradeNFT.accountSeller)
-                    sold @tradeNFT.fillSA.ToString() NFT
+                    sold @tradeNFT.NFTAmountSold.ToString() NFT
                     at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and received @TokenAmountConverter.ToString(tradeNFT.fillBA - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and received @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
                     @(tradeNFT.feeSeller > 0 ? $" paying {@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} in fees" : "")
                 </td>
             </tr>
@@ -334,13 +334,13 @@
             </tr>
             <tr>
                 <td>Bought</td>
-                <td>@tradeNFT.fillBB.ToString() NFT</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillBA, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@tradeNFT.NFTAmountSold.ToString() NFT</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
             </tr>
             <tr>
                 <td>Sold</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillSB, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-                <td>@tradeNFT.fillSA.ToString() NFT</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@tradeNFT.NFTAmountSold.ToString() NFT</td>
             </tr>
             <tr>
                 <td>Fee</td>

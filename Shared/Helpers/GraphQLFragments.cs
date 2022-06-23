@@ -307,6 +307,7 @@
             fillBA
             fillSB
             fillBB
+            tokenIDAS
             protocolFeeBuyer
             __typename
           }";
