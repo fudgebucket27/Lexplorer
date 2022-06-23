@@ -1375,6 +1375,52 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<IList<NonFungibleToken>?> GetCollectionNFTs(string tokenAddress, int skip = 0, int first = 12, string orderBy = "mintedAt", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        {
+            var nonFungibleTokensQuery = @"
+                query nonFungibleTokens($where: NonFungibleToken_filter, $skip: Int, $first: Int, $orderDirection: OrderDirection, $orderBy: NonFungibleToken_orderBy) {
+                  nonFungibleTokens(where: $where, skip: $skip, first: $first, orderDirection: $orderDirection, orderBy: $orderBy) {
+                    ...NFTFragment
+                    __typename
+                  }
+                }
+            "
+              + GraphQLFragments.NFTFragment
+              + GraphQLFragments.AccountFragment
+              + GraphQLFragments.MintNFTFragmentWithoutNFT
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = nonFungibleTokensQuery,
+                variables = new
+                {
+                    where = new 
+                    {
+                        token_in = new List<string> { tokenAddress } //avoid invalid argument error with graph when using "token" string instead of "token_in"
+                    },
+                    skip = skip,
+                    first = first,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["nonFungibleTokens"];
+                return token!.ToObject<IList<NonFungibleToken>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();
