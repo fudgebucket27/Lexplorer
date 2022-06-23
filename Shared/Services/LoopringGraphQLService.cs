@@ -1500,7 +1500,7 @@ namespace Lexplorer.Services
                 else throw new ArgumentException($"GetSwapPairAndPool can only be called with swap, pool or pair, not {nameof(theObject)}");
 
                 request.AddStringBody(jObject.ToString(), ContentType.Json);
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["swaps"]!;
                 return result.ToObject<IList<Swap>>()?.FirstOrDefault<Swap>();
@@ -1553,7 +1553,7 @@ namespace Lexplorer.Services
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["removes"]!;
                 return result.ToObject<IList<Remove>>()?.FirstOrDefault<Remove>();
