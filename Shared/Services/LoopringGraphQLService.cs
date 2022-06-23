@@ -1409,7 +1409,7 @@ namespace Lexplorer.Services
             });
             try
             {
-                var response = await _client.PostAsync(request);
+                var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken? token = jresponse["data"]!["nonFungibleTokens"];
                 return token!.ToObject<IList<NonFungibleToken>>();
