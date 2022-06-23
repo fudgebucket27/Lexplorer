@@ -1399,7 +1399,7 @@ namespace Lexplorer.Services
                 {
                     where = new 
                     {
-                        token_in = new List<string> { tokenAddress }
+                        token_in = new List<string> { tokenAddress } //avoid invalid argument error with graph when using "token" string instead of "token_in"
                     },
                     skip = skip,
                     first = first,
