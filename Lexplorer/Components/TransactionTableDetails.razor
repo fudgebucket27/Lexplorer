@@ -110,14 +110,14 @@
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(tradeNFT?.accountBuyer, ignoreUserIDForLink)</MudTd>
         @if (ignoreUserIDForLink == tradeNFT?.accountBuyer?.id)
         {
-            <MudTd DataLabel="Bought" Style="text-align:right">@tradeNFT?.fillBB.ToString() NFT</MudTd>
+            <MudTd DataLabel="Bought" Style="text-align:right">@tradeNFT?.NFTAmountSold.ToString() NFT</MudTd>
             <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeBuyer, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         else
         {
             <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
-            <MudTd DataLabel="Sold" Style="text-align:right">@tradeNFT?.fillSA.ToString() NFT</MudTd>
+            <MudTd DataLabel="Sold" Style="text-align:right">@tradeNFT?.NFTAmountSold.ToString() NFT</MudTd>
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeSeller, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         break;
