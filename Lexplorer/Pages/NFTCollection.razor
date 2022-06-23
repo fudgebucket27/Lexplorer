@@ -20,7 +20,7 @@
                                 MiddleCount="1" 
                                 ShowLastButton="true" 
                                 Selected="@goToPage"
-                                Count="@goToNextPage"
+                                Count="@calculatePageCount"
                                 SelectedChanged="@((int page) => goToPage = page)"/>
                         </MudToolBar>
                         </MudPaper>
@@ -56,7 +56,7 @@
                     MiddleCount="1" 
                     ShowLastButton="true" 
                     Selected="@goToPage"
-                    Count="@goToNextPage"
+                    Count="@calculatePageCount"
                     SelectedChanged="@((int page) => goToPage = page)"/>
                  </MudToolBar>
            </MudPaper>
@@ -87,11 +87,25 @@
         }
     }
 
-    public int goToNextPage
+    public int calculatePageCount
     {
         get
         {
-            return int.TryParse(pageNumber, out int np) ? np + 1 : 1;
+            if(int.TryParse(pageNumber, out int np))
+            {
+                if(collectionNFTSlots.Count < pageSize)
+                {
+                    return np;
+                }
+                else
+                {
+                    return np + 1;
+                }
+            }
+            else
+            {
+                return 1;
+            }
         }
     }
 
