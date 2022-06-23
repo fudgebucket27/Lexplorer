@@ -1,4 +1,4 @@
-﻿@page "/collections/{tokenAddress}"
+﻿@page "/nfts/collections/{tokenAddress}"
 @using System.Diagnostics
 @inject LoopringGraphQLService LoopringGraphQLService;
 @inject EthereumService EthereumService;
@@ -82,7 +82,7 @@
         set
         {
             pageNumber = value.ToString(); //set immediately for MudPagination to not switch forth and back
-            string URL = $"/collections/{tokenAddress}?pageNumber={value}";
+            string URL = $"/nfts/collections/{tokenAddress}?pageNumber={value}";
             NavigationManager.NavigateTo(URL);
         }
     }
