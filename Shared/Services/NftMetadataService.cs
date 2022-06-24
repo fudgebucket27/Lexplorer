@@ -8,6 +8,7 @@ using Lexplorer.Models;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace Lexplorer.Services
 {
@@ -60,7 +61,11 @@ namespace Lexplorer.Services
             {
                 request.Timeout = 10000; //we can't afford to wait forever here, 10s must be enough
                 var response = await _client.GetAsync(request, cancellationToken);
-                return JsonConvert.DeserializeObject<NftMetadata>(response.Content!);
+                var token = JToken.Parse(response.Content!);
+                var json = token.ToObject<NftMetadata>();
+                if ((token != null) && (json != null))
+                    json.JSONContent = token.ToString(Formatting.Indented);
+                return json;
             }
             catch (Exception e)
             {

@@ -1,0 +1,19 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudItem xs="12">
+            <MudTextField T="string" Variant="Variant.Outlined" Text="@JSON" Lines="20" ReadOnly="true" />
+        </MudItem>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(() => MudDialog?.Close())">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public string JSON { get; set; } = "";
+}
