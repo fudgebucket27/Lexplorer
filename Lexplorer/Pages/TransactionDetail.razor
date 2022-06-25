@@ -1,6 +1,7 @@
 ﻿@page "/transactions/{transactionId}"
 @inject IAppCache AppCache;
 @inject LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
 
 <PageTitle>The Lexplorer - @(transaction?.typeName ?? "Transaction") #@transactionId </PageTitle>
 
@@ -178,7 +179,7 @@
             </tr>
             <tr>
                 <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(add.amount, add.token?.decimals) @add.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(add.amount, addToken?.decimals) @addToken?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
@@ -199,7 +200,7 @@
             </tr>
             <tr>
                 <td>Amount</td>
-                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, remove.token?.decimals) @remove.token?.symbol</td>
+                <td colspan="2">@TokenAmountConverter.ToString(remove.amount, removeToken?.decimals) @removeToken?.symbol</td>
             </tr>
             <tr>
                 <td>Fee</td>
@@ -308,16 +309,16 @@
                 <td>Description</td>
                 <td>
                     User @LinkHelper.GetObjectLink(tradeNFT.accountBuyer)
-                    bought @tradeNFT.fillBB.ToString() NFT
+                    bought @tradeNFT.NFTAmountSold.ToString() NFT
                     at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and paid @TokenAmountConverter.ToString(tradeNFT.fillSB + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and paid @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice + tradeNFT.feeBuyer, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
                     @(tradeNFT.feeBuyer > 0 ? $" including {@TokenAmountConverter.ToString(tradeNFT.feeBuyer, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} fees" : "")
                 </td>
                 <td>
                     User @LinkHelper.GetObjectLink(tradeNFT.accountSeller)
-                    sold @tradeNFT.fillSA.ToString() NFT
+                    sold @tradeNFT.NFTAmountSold.ToString() NFT
                     at @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
-                    and received @TokenAmountConverter.ToString(tradeNFT.fillBA - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
+                    and received @TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice - tradeNFT.feeSeller, tradeNFT.token?.decimals) @tradeNFT.token?.symbol
                     @(tradeNFT.feeSeller > 0 ? $" paying {@TokenAmountConverter.ToString(tradeNFT.feeSeller, tradeNFT.token?.decimals)} {@tradeNFT.token?.symbol} in fees" : "")
                 </td>
             </tr>
@@ -333,13 +334,13 @@
             </tr>
             <tr>
                 <td>Bought</td>
-                <td>@tradeNFT.fillBB.ToString() NFT</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillBA, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@tradeNFT.NFTAmountSold.ToString() NFT</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
             </tr>
             <tr>
                 <td>Sold</td>
-                <td>@TokenAmountConverter.ToString(tradeNFT.fillSB, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
-                <td>@tradeNFT.fillSA.ToString() NFT</td>
+                <td>@TokenAmountConverter.ToString(tradeNFT.realizedNFTPrice, tradeNFT.token?.decimals) @tradeNFT.token?.symbol</td>
+                <td>@tradeNFT.NFTAmountSold.ToString() NFT</td>
             </tr>
             <tr>
                 <td>Fee</td>
@@ -369,7 +370,9 @@
     private Deposit? deposit { get { return transaction as Deposit; } }
     private Withdrawal? withdrawal { get { return transaction as Withdrawal; } }
     private Add? add { get { return transaction as Add; } }
+    private Token? addToken { get { return (add?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(add.token)?.token ?? add.token; } }
     private Remove? remove { get { return transaction as Remove; } }
+    private Token? removeToken { get { return (remove?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(remove.token)?.token ?? remove.token; } }
     private AmmUpdate? ammUpdate { get { return transaction as AmmUpdate; } }
     private MintNFT? mintNFT { get { return transaction as MintNFT; } }
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
@@ -385,7 +388,16 @@
         if (transaction?.id != transactionId)
         {
             transaction = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransaction(transactionId));
-            StateHasChanged();
+
+            Pool? pool = null;
+            if (transaction is Remove tempRemove)
+                pool = tempRemove.pool;
+            if (transaction is AmmUpdate tempAmmUpdate)
+                pool = tempAmmUpdate.pool;
+            if (transaction is Add tempAdd)
+                pool = tempAdd.pool;
+            if (pool != null)
+                await poolTokenCacheService.GetPoolToken(pool);
         }
     }
 }

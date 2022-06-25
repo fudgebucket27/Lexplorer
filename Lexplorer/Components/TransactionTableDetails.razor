@@ -1,4 +1,6 @@
-﻿@switch (TransactionData?.typeName)
+﻿@inject LoopringPoolTokenCacheService poolTokenCacheService;
+
+@switch (TransactionData?.typeName)
 {
     case "Deposit":
         <MudTd DataLabel="From Address"><L1AccountLink address="@deposit?.toAccount?.address" /></MudTd>
@@ -108,14 +110,14 @@
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(tradeNFT?.accountBuyer, ignoreUserIDForLink)</MudTd>
         @if (ignoreUserIDForLink == tradeNFT?.accountBuyer?.id)
         {
-            <MudTd DataLabel="Bought" Style="text-align:right">@tradeNFT?.fillBB.ToString() NFT</MudTd>
+            <MudTd DataLabel="Bought" Style="text-align:right">@tradeNFT?.NFTAmountSold.ToString() NFT</MudTd>
             <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeBuyer, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         else
         {
             <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.realizedNFTPrice, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
-            <MudTd DataLabel="Sold" Style="text-align:right">@tradeNFT?.fillSA.ToString() NFT</MudTd>
+            <MudTd DataLabel="Sold" Style="text-align:right">@tradeNFT?.NFTAmountSold.ToString() NFT</MudTd>
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeSeller, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         break;
@@ -123,13 +125,13 @@
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(add?.account, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(add?.pool, ignoreUserIDForLink)</MudTd>
         <MudTd></MudTd>
-        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(add?.amount, add?.token?.decimals) @add?.token?.symbol</MudTd>
+        <MudTd DataLabel="Sold" Style="text-align:right">@TokenAmountConverter.ToString(add?.amount, addToken?.decimals) @addToken?.symbol</MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(add?.fee, add?.feeToken?.decimals) @add?.feeToken?.symbol</MudTd>
         break;
     case "Remove":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(remove?.pool, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(remove?.account, ignoreUserIDForLink)</MudTd>
-        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(remove?.amount, remove?.token?.decimals) @remove?.token?.symbol</MudTd>
+        <MudTd DataLabel="Bought" Style="text-align:right">@TokenAmountConverter.ToString(remove?.amount, removeToken?.decimals) @removeToken?.symbol</MudTd>
         <MudTd></MudTd>
         <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(remove?.fee, remove?.feeToken?.decimals) @remove?.feeToken?.symbol</MudTd>
         break;
@@ -158,7 +160,9 @@
     public Deposit? deposit { get { return TransactionData as Deposit; } }
     public Withdrawal? withdrawal { get { return TransactionData as Withdrawal; } }
     private Add? add { get { return TransactionData as Add; } }
+    private Token? addToken { get { return (add?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(add.token)?.token ?? add.token; } }
     private Remove? remove { get { return TransactionData as Remove; } }
+    private Token? removeToken { get { return (remove?.token == null) ? null : poolTokenCacheService.GetExistingPoolToken(remove.token)?.token ?? remove.token; } }
     private AmmUpdate? ammUpdate { get { return TransactionData as AmmUpdate; } }
     public MintNFT? mintNFT { get { return TransactionData as MintNFT; } }
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }

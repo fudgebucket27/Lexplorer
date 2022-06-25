@@ -5,6 +5,7 @@
 @inject LoopringGraphQLService LoopringGraphQLService;
 @inject EthereumService EthereumService;
 @inject NftMetadataService NftMetadataService;
+@inject IDialogService DialogService;
 
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
@@ -84,11 +85,18 @@
                 <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
-        @if (nft?.token != null)
+        @if ((nft?.token ?? nftMetadata?.JSONContent) != null)
         {
             <tr>
                 <td colspan="2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="goToCollectionPage">View collection</MudButton>
+                    @if (nft?.token != null)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="goToCollectionPage" Class="mr-2">View collection</MudButton>
+                    }
+                    @if (nftMetadata?.JSONContent != null)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="showJSON" Class="mr-2">View Metadata</MudButton>
+                    }
                 </td>
             </tr>
         }
@@ -233,13 +241,23 @@
             Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
         }
     }
-    
-   
+
+
     public void goToCollectionPage()
     {
         string URL = $"/nfts/collections/{nft?.token}";
         NavigationManager.NavigateTo(URL);
-    } 
+    }
+
+    public void showJSON()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("JSON", nftMetadata?.JSONContent);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        DialogService.Show<NFTMetadataDialog>("NFT metadata JSON", parameters, options);
+    }
 
 }
 
