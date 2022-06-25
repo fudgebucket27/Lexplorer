@@ -41,7 +41,7 @@
     public int maxPageCount { get; set; } = 1;
 
     private CancellationTokenSource? cts;
-    private IList<NonFungibleToken>? collectionNFTSlots { get; set; } = new List<NonFungibleToken>();
+    private IList<AccountNFTSlot>? collectionNFTSlots { get; set; } = new List<AccountNFTSlot>();
     protected override async Task OnParametersSetAsync()
     {
         //quickly and early ensure that maxPageCount never get's smaller than the page we're on
@@ -60,11 +60,16 @@
                 if (string.IsNullOrEmpty(tokenAddress)) return;
 
                 string collectionNftKey = $"collection-{tokenAddress}-page-{goToPage}";
-                collectionNFTSlots = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
+                var collectionNFTs = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
                     async () => await LoopringGraphQLService.GetCollectionNFTs(tokenAddress, (goToPage - 1) * pageSize, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 localCTS.Token.ThrowIfCancellationRequested();
-                maxPageCount = Math.Max(maxPageCount, goToPage + (collectionNFTSlots?.Count < pageSize ? 0 : 1));
+                maxPageCount = Math.Max(maxPageCount, goToPage + (collectionNFTs?.Count < pageSize ? 0 : 1));
+
+                //transform list of nfts to list of accountsSlots with everything else empty/null
+                collectionNFTSlots = collectionNFTs?.
+                    Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList() ??
+                    new List<AccountNFTSlot>();
             }
             catch (OperationCanceledException)
             {
