@@ -14,6 +14,8 @@ namespace Lexplorer.Models
         public string? contentType { get; set; }
 
         public List<NftAttribute>? attributes { get; set; }
+
+        public string? JSONContent { get; set; }
     }
 
     public class NftAttribute
