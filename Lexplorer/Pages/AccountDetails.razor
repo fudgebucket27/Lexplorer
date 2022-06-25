@@ -230,17 +230,17 @@
                 localCTS.Token.ThrowIfCancellationRequested();
                 nftPages = (int)Math.Ceiling(decimal.Divide(totalNfts, nftPageSize));
 
-                string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
-                transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
-                    async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
-                    DateTimeOffset.UtcNow.AddMinutes(10));
-                localCTS.Token.ThrowIfCancellationRequested();
-                StateHasChanged();
-
                 string nftCacheKey = $"account{accountId}-nftSlots-page{nftPageNumber}";
                 accountNFTSlots = await AppCache.GetOrAddAsyncNonNull(nftCacheKey,
                     async () => await LoopringGraphQLService.GetAccountNFTs((gotoNFTPage - 1) * nftPageSize, nftPageSize, accountId, localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10)) ?? new List<AccountNFTSlot>();
+                localCTS.Token.ThrowIfCancellationRequested();
+                StateHasChanged();
+
+                string transactionCacheKey = $"account{accountId}-transactions-page{pageNumber}";
+                transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
+                    async () => await LoopringGraphQLService.GetAccountTransactions((gotoPage - 1) * pageSize, pageSize, accountId, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
                 localCTS.Token.ThrowIfCancellationRequested();
 
                 isLoading = false;
