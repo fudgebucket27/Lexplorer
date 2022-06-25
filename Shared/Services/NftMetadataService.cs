@@ -62,10 +62,10 @@ namespace Lexplorer.Services
                 request.Timeout = 10000; //we can't afford to wait forever here, 10s must be enough
                 var response = await _client.GetAsync(request, cancellationToken);
                 var token = JToken.Parse(response.Content!);
-                var json = token.ToObject<NftMetadata>();
-                if ((token != null) && (json != null))
-                    json.JSONContent = token.ToString(Formatting.Indented);
-                return json;
+                var metadata = token.ToObject<NftMetadata>();
+                if ((token != null) && (metadata != null))
+                    metadata.JSONContent = token.ToString(Formatting.Indented);
+                return metadata;
             }
             catch (Exception e)
             {
