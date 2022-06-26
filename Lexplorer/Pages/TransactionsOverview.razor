@@ -9,10 +9,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Latest transactions</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage=@(transactions!.Count < pageSize) />
         <MudSpacer />
         <MudSelect @bind-Value="@filterTransaction" T="string" Label="Filter by type">
             <MudSelectItem Value="@("All")" />
@@ -39,6 +36,8 @@
         <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
     </RowTemplate>
 </MudTable>
+<OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage=@(transactions!.Count < pageSize) IsOptionalBottomPager="true" />
+
 
 @code {
     [Parameter]
@@ -53,7 +52,9 @@
         }
         set
         {
-            navigateTo(value);
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
         }
     }
 
@@ -75,28 +76,16 @@
         set
         {
             type = (string.Equals(value ?? "All", "All", StringComparison.InvariantCultureIgnoreCase)) ? null : value;
-            navigateTo(gotoPage);
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(type), type);
+            NavigationManager.NavigateTo(URL);
         }
-    }
-
-    private void navigateTo(int page)
-    {
-        string URL = $"/transactions?pageNumber={page}";
-        if (type != null)
-            URL += $"&type={type}";
-        NavigationManager.NavigateTo(URL);
     }
 
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
 
-        if (string.IsNullOrEmpty(pageNumber))
-        {
-            pageNumber = "1";
-        }
-
-        string transactionCacheKey = $"transactions-page{pageNumber}-type{type}";
+        string transactionCacheKey = $"transactions-page{gotoPage}-type{type}";
         var transactionsData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
             async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, typeName: type),
             DateTimeOffset.UtcNow.AddMinutes(10));
@@ -105,4 +94,4 @@
         StateHasChanged();
     }
 
-    }
+}
