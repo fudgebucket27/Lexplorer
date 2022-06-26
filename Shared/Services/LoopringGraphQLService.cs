@@ -342,28 +342,8 @@ namespace Lexplorer.Services
                   id
                   internalID
                   block {
-                    id
-                    blockHash
                     timestamp
-                    transactionCount
-                    depositCount
-                    withdrawalCount
-                    transferCount
-                    addCount
-                    removeCount
-                    orderbookTradeCount
-                    swapCount
-                    accountUpdateCount
-                    ammUpdateCount
-                    signatureVerificationCount
-                    tradeNFTCount
-                    swapNFTCount
-                    withdrawalNFTCount
-                    transferNFTCount
-                    nftMintCount
-                    nftDataCount
                   }
-                  data
                   ...AddFragment
                   ...RemoveFragment
                   ...SwapFragment
@@ -379,30 +359,9 @@ namespace Lexplorer.Services
                   ...WithdrawalNFTFragment
                   ...TransferNFTFragment
                   ...MintNFTFragment
-                  ...DataNFTFragment
                 }
               }"
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.PoolFragment
-              + GraphQLFragments.AccountCreatedAtFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.AddFragment
-              + GraphQLFragments.RemoveFragment
-              + GraphQLFragments.SwapFragment
-              + GraphQLFragments.OrderBookTradeFragment
-              + GraphQLFragments.DepositFragment
-              + GraphQLFragments.WithdrawalFragment
-              + GraphQLFragments.TransferFragment
-              + GraphQLFragments.AccountUpdateFragment
-              + GraphQLFragments.AmmUpdateFragment
-              + GraphQLFragments.SignatureVerificationFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragment
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -659,12 +618,8 @@ namespace Lexplorer.Services
                     id
                     __typename
                     block {
-                      id
-                      blockHash
                       timestamp
-                      transactionCount
                     }
-                    data
                     ...AddFragment
                     ...RemoveFragment
                     ...SwapFragment
@@ -680,32 +635,11 @@ namespace Lexplorer.Services
                     ...WithdrawalNFTFragment
                     ...TransferNFTFragment
                     ...MintNFTFragment
-                    ...DataNFTFragment
                   }
                 }
              }
             "
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.PoolFragment
-              + GraphQLFragments.AccountCreatedAtFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.AddFragment
-              + GraphQLFragments.RemoveFragment
-              + GraphQLFragments.SwapFragment
-              + GraphQLFragments.OrderBookTradeFragment
-              + GraphQLFragments.DepositFragment
-              + GraphQLFragments.WithdrawalFragment
-              + GraphQLFragments.TransferFragment
-              + GraphQLFragments.AccountUpdateFragment
-              + GraphQLFragments.AmmUpdateFragment
-              + GraphQLFragments.SignatureVerificationFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragment
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");

@@ -28,5 +28,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportCointracking.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringPoolTokenCacheService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\LoopringPoolToken.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GraphQLTransactionListFragments.cs" />
   </ItemGroup>
 </Project>
