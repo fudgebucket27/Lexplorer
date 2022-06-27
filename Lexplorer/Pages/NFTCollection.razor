@@ -11,7 +11,7 @@
 <MudContainer Fixed="true" Class="px-0 extra-extra-extra-large">
     <MudText Typo="Typo.h6">NFT Contract Address <L1AccountLink address="@tokenAddress" shortenAddress="false" /></MudText>
     <br />
-    <NFTGrid @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageSize="@pageSize" PageCount="@maxPageCount" />
+    <NFTGrid @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
 </MudContainer>
 
 @code {
@@ -30,7 +30,6 @@
         }
         set
         {
-            pageNumber = value.ToString(); //set immediately for NFTGrid to not switch forth and back
             var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), value);
             NavigationManager.NavigateTo(URL);
         }
@@ -41,7 +40,7 @@
     public int maxPageCount { get; set; } = 1;
 
     private CancellationTokenSource? cts;
-    private IList<AccountNFTSlot>? collectionNFTSlots { get; set; } = new List<AccountNFTSlot>();
+    private IList<AccountNFTSlot>? collectionNFTSlots { get; set; }
     protected override async Task OnParametersSetAsync()
     {
         //quickly and early ensure that maxPageCount never get's smaller than the page we're on
@@ -68,8 +67,7 @@
 
                 //transform list of nfts to list of accountsSlots with everything else empty/null
                 collectionNFTSlots = collectionNFTs?.
-                    Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList() ??
-                    new List<AccountNFTSlot>();
+                    Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList();
             }
             catch (OperationCanceledException)
             {

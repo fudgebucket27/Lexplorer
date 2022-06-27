@@ -14,7 +14,7 @@
                                BoundaryCount="1"
                                MiddleCount="1"
                                ShowLastButton="true"
-                               Selected="@PageNumber"
+                               Selected="@_internalPage"
                                Count="@PageCount"
                                SelectedChanged="@((int page) => goToPage(page))" />
             </MudToolBar>
@@ -56,7 +56,7 @@
                                BoundaryCount="1"
                                MiddleCount="1"
                                ShowLastButton="true"
-                               Selected="@PageNumber"
+                               Selected="@_internalPage"
                                Count="@PageCount"
                                SelectedChanged="@((int page) => goToPage(page))" />
             </MudToolBar>
@@ -66,82 +66,96 @@
 </MudGrid>
 
 @code {
+    private int _loadedPage { get; set; } = 0;
+    //for Selected binding of MudPagination, we need update it immediately, but must not update
+    //our PageNumber because it's a [Parameter]
+    private int _internalPage { get; set; } = 1;
+
     [Parameter]
     public int PageNumber { get; set; }
+    [Parameter]
+    public EventCallback<int> PageNumberChanged { get; set; }
 
     [Parameter]
     public int PageCount { get; set; }
 
-    [Parameter]
-    public int PageSize { get; set; }
-
-    [Parameter]
-    public EventCallback<int> PageNumberChanged { get; set; }
-
     public async Task goToPage(int page)
     {
-        PageNumber = page;
-        await PageNumberChanged.InvokeAsync(PageNumber);
+        _internalPage = page;
+        if (PageNumber == page) return;
+        await PageNumberChanged.InvokeAsync(page);
     }
 
     [Parameter]
     public IList<AccountNFTSlot>? NFTSlots { get; set; } = new List<AccountNFTSlot>();
+    private IList<AccountNFTSlot>? _loadedNFTSlots { get; set; }
+
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts = null;
 
+    private async Task LoadNFTMetaData(CancellationToken cancellationToken = default)
+    {
+        foreach (var slot in NFTSlots!)
+        {
+            if (slot.nft == null) continue;
+            string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nft.nftID}";
+            string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
+                async () => await EthereumService.GetMetadataLink(slot.nft.nftID, slot.nft.token, slot.nft.nftType),
+                DateTimeOffset.UtcNow.AddHours(1));
+            cancellationToken.ThrowIfCancellationRequested();
+            if (string.IsNullOrEmpty(nftMetadataLink)) continue;
+
+            string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
+            var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
+                async () => await NftMetadataService.GetMetadata(nftMetadataLink, cancellationToken),
+                DateTimeOffset.UtcNow.AddHours(1));
+            cancellationToken.ThrowIfCancellationRequested();
+            if (nftMetadata == null) continue;
+
+            NFTdata.Add(slot.nft.nftID!, nftMetadata);
+            StateHasChanged();
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
-        //cancel any previous OnParametersSetAsync which might still be running
-        cts?.Cancel();
-
-        using (CancellationTokenSource localCTS = new CancellationTokenSource())
+        if ((_loadedPage != PageNumber) && (PageNumber > 0) && (_loadedNFTSlots != NFTSlots) && (NFTSlots != null))
         {
-            //give future calls a chance to cancel us; it is now safe to replace
-            //any previous value of cts, since we already cancelled it above
-            cts = localCTS;
-            try
+            //cancel any previous OnParametersSetAsync which might still be running
+            cts?.Cancel();
+
+            _internalPage = PageNumber;
+            _loadedPage = PageNumber;
+            _loadedNFTSlots = NFTSlots;
+            using (CancellationTokenSource localCTS = new CancellationTokenSource())
             {
-                NFTdata = new Dictionary<string, NftMetadata>();
-                if (NFTSlots != null)
+                //give future calls a chance to cancel us; it is now safe to replace
+                //any previous value of cts, since we already cancelled it above
+                cts = localCTS;
+                try
                 {
-                    StateHasChanged();
-                    foreach (var slot in NFTSlots!)
-                    {
-                        if (slot.nft == null) continue;
-                        string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nft.nftID}";
-                        string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
-                            async () => await EthereumService.GetMetadataLink(slot.nft.nftID, slot.nft.token, slot.nft.nftType),
-                            DateTimeOffset.UtcNow.AddHours(1));
-                        if (string.IsNullOrEmpty(nftMetadataLink)) continue;
-
-                        string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
-                        var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
-                            async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token),
-                            DateTimeOffset.UtcNow.AddHours(1));
-                        localCTS.Token.ThrowIfCancellationRequested();
-                        if (nftMetadata == null) continue;
-
-                        NFTdata.Add(slot.nft.nftID!, nftMetadata);
-                        StateHasChanged();
-                    }
+                    NFTdata = new Dictionary<string, NftMetadata>();
+                    await LoadNFTMetaData(localCTS.Token);
                 }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                }
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
             }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-            }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
         }
     }
 
     public void Dispose()
     {
         cts?.Cancel();
+        cts?.Dispose();
+        cts = null;
     }
 
     private NftMetadata? GetMetadata(string? nftID)
