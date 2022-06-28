@@ -496,4 +496,15 @@ namespace Lexplorer.Models
         public double weekNumber { get; set; }
     }
 
+    public class NftHolder
+    {
+        public MinimalAccount? Account { get; set; }
+        public int Balance { get; set; }
+    }
+
+    public class MinimalAccount
+    {
+        public string? Id { get; set; }
+        public string? Address { get; set; }
+    }
 }
