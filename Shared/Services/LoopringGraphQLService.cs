@@ -1499,6 +1499,60 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<List<NftHolder>> GetNftHolders(string nftId, int skip = 0, int first = 25, CancellationToken cancellationToken = default)
+        {
+            var nftHolders = @"
+            query nftHolders(
+                $skip: Int
+                $first: Int
+                $nftId: String
+            )
+            {
+                nonFungibleToken(
+                  id: $nftId
+                ) 
+                {
+                    slots(
+                        skip: $skip
+                        first: $first
+                    ) 
+                    {
+                        account {
+                            id
+                            address
+                        }
+                    balance
+                    }
+                }
+             }";
+            
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = nftHolders,
+                variables = new
+                {
+                    first = first,
+                    skip = skip,
+                    nftId = nftId
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["nonFungibleToken"]!["slots"]!;
+                return result.ToObject<List<NftHolder>>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return new List<NftHolder>();
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();
