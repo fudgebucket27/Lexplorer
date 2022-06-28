@@ -132,6 +132,28 @@
         <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
     </RowTemplate>
 </MudTable>
+<br />
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">NFT Holders</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage = 1)" />
+        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage -= 1)" />
+        <MudNumericField HideSpinButtons="true" @bind-Value="goToHolderPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(holders!.Count < pageSize) OnClick="@(() => goToHolderPage += 1)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Account Id</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Balance</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Account Id">@context.Account.Id</MudTd>
+        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context.Account.Id, context.Account.Address, true)</MudTd>
+        <MudTd DataLabel="Timestamp">@context.Balance</MudTd>
+    </RowTemplate>
+</MudTable>
 
 
 @code {
@@ -142,9 +164,15 @@
     [SupplyParameterFromQuery]
     public string pageNumber { get; set; } = "1";
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string nftHolderPageNumber { get; set; } = "1";
+
     private NonFungibleToken? nft;
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
+    private IList<NftHolder>? holders { get; set; } = new List<NftHolder>();
     public bool isLoading = true;
+    public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
 
     private NftMetadata? nftMetadata;
@@ -157,7 +185,20 @@
         }
         set
         {
-            string URL = $"/nfts/{nftId}?pageNumber={value}";
+            string URL = $"/nfts/{nftId}?pageNumber={value}&nftHolderPageNumber={nftHolderPageNumber}";
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
+    public int goToHolderPage
+    {
+        get
+        {
+            return int.Parse(nftHolderPageNumber ?? "1");
+        }
+        set
+        {
+            string URL = $"/nfts/{nftId}?pageNumber={pageNumber}&nftHolderPageNumber={value}";
             NavigationManager.NavigateTo(URL);
         }
     }
@@ -181,6 +222,7 @@
                 {
                     nft = null;
                     transactions = new List<Transaction>();
+                    holders = new List<NftHolder>();
                     pageNumber = "1";
                     StateHasChanged();
                 }
@@ -207,6 +249,15 @@
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 isLoading = false;
                 StateHasChanged();
+
+                // Get NFT Holders
+                string nftHoldersCacheKey = $"nft{nftId}-holders-page{nftHolderPageNumber}";
+                holders = await AppCache.GetOrAddAsyncNonNull(nftHoldersCacheKey,
+                    async () => await LoopringGraphQLService.GetNftHolders(nftId, (goToHolderPage - 1) * pageSize, pageSize, localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                isLoadingHolders = false;
+                StateHasChanged();
+                
 
                 //load the NFT metadata last - it might actually take the longest and other services are queried etc.
                 if (nftMetadata == null)
