@@ -75,7 +75,7 @@
             </MudTable>
         </MudTabPanel>
         <MudTabPanel Text="NFTs">
-            <NFTGrid @bind-PageNumber="@gotoNFTPage" NFTSlots="@accountNFTSlots" PageSize="@nftPageSize" PageCount="@nftPages" />
+            <NFTGrid @bind-PageNumber="@gotoNFTPage" NFTSlots="@accountNFTSlots" PageCount="@nftPages" />
         </MudTabPanel>
     </MudTabs>
 
@@ -146,8 +146,8 @@
         }
         set
         {
-            nftPageNumber = value.ToString(); //set immediately for MudPagination to not switch forth and back
-            string URL = $"/account/{accountId}?pageNumber={pageNumber}&nftPageNumber={value}";
+            if (gotoNFTPage == value) return;
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(nftPageNumber), value.ToString());
             NavigationManager.NavigateTo(URL);
         }
     }
@@ -162,7 +162,7 @@
     private Account? account { get; set; }
     private LoopringPoolToken? poolToken { get; set; }
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
-    private IList<AccountNFTSlot> accountNFTSlots { get; set; } = new List<AccountNFTSlot>();
+    private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private CancellationTokenSource? cts;
 
     protected override async Task OnParametersSetAsync()
@@ -183,7 +183,7 @@
                 {
                     account = null;
                     transactions = new List<Transaction>();
-                    accountNFTSlots = new List<AccountNFTSlot>();
+                    accountNFTSlots = null;
                     pageNumber = "1";
                     nftPageNumber = "1";
                     StateHasChanged();
