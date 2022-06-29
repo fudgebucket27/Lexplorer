@@ -495,5 +495,4 @@ namespace Lexplorer.Models
         public double weekEnd { get; set; }
         public double weekNumber { get; set; }
     }
-
 }
