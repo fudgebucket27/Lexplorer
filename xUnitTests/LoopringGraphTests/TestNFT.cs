@@ -77,8 +77,7 @@ namespace xUnitTests.LoopringGraphTests
             List<NftHolder> holders = await service.GetNftHolders(nftId);
             Assert.NotEmpty(holders);
 
-            Assert.IsType<NftHolder>(holders[0]);
-            Assert.Equal(25, holders.Count());
+            holders.ForEach(x => Assert.True(x.Balance >= 1));
         }
     }
 }
