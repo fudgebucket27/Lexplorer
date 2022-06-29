@@ -149,9 +149,9 @@
         <MudTh>Balance</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Account Id">@context.Account.id?</MudTd>
-        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context.Account.id, context.Account.address, true)</MudTd>
-        <MudTd DataLabel="Timestamp">@context.Balance</MudTd>
+        <MudTd DataLabel="Account Id">@context?.Account?.id</MudTd>
+        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.Account?.id, context?.Account?.address, true)</MudTd>
+        <MudTd DataLabel="Timestamp">@context?.Balance</MudTd>
     </RowTemplate>
 </MudTable>
 
