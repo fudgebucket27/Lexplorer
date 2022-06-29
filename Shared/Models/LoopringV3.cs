@@ -495,10 +495,4 @@ namespace Lexplorer.Models
         public double weekEnd { get; set; }
         public double weekNumber { get; set; }
     }
-
-    public class NftHolder
-    {
-        public Account? Account { get; set; }
-        public int Balance { get; set; }
-    }
 }

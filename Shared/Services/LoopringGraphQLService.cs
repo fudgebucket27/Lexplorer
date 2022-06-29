@@ -1499,7 +1499,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<List<NftHolder>> GetNftHolders(string nftId, int skip = 0, int first = 25, string orderBy = "balance", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25, string orderBy = "balance", string orderDirection = "desc", CancellationToken cancellationToken = default)
         {
             var nftHolders = @"
             query nftHolders(
@@ -1550,12 +1550,12 @@ namespace Lexplorer.Services
                 var response = await _client.PostAsync(request, cancellationToken);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken result = jresponse["data"]!["nonFungibleToken"]!["slots"]!;
-                return result.ToObject<List<NftHolder>>()!;
+                return result.ToObject<List<AccountNFTSlot>>()!;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return new List<NftHolder>();
+                return new List<AccountNFTSlot>();
             }
         }
 

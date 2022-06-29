@@ -149,9 +149,9 @@
         <MudTh>Balance</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Account Id">@context?.Account?.id</MudTd>
-        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.Account?.id, context?.Account?.address, true)</MudTd>
-        <MudTd DataLabel="Timestamp">@context?.Balance</MudTd>
+        <MudTd DataLabel="Account Id">@context?.account?.id</MudTd>
+        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.account?.id, context?.account?.address, true)</MudTd>
+        <MudTd DataLabel="Timestamp">@context?.balance</MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -170,7 +170,7 @@
 
     private NonFungibleToken? nft;
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
-    private IList<NftHolder>? holders { get; set; } = new List<NftHolder>();
+    private IList<AccountNFTSlot>? holders { get; set; } = new List<AccountNFTSlot>();
     public bool isLoading = true;
     public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
@@ -222,7 +222,7 @@
                 {
                     nft = null;
                     transactions = new List<Transaction>();
-                    holders = new List<NftHolder>();
+                    holders = new List<AccountNFTSlot>();
                     pageNumber = "1";
                     StateHasChanged();
                 }
