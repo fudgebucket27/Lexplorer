@@ -149,8 +149,8 @@
         <MudTh>Balance</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Account Id">@context.Account.Id</MudTd>
-        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context.Account.Id, context.Account.Address, true)</MudTd>
+        <MudTd DataLabel="Account Id">@context.Account.id</MudTd>
+        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context.Account.id, context.Account.address, true)</MudTd>
         <MudTd DataLabel="Timestamp">@context.Balance</MudTd>
     </RowTemplate>
 </MudTable>
@@ -253,7 +253,7 @@
                 // Get NFT Holders
                 string nftHoldersCacheKey = $"nft{nftId}-holders-page{nftHolderPageNumber}";
                 holders = await AppCache.GetOrAddAsyncNonNull(nftHoldersCacheKey,
-                    async () => await LoopringGraphQLService.GetNftHolders(nftId, (goToHolderPage - 1) * pageSize, pageSize, localCTS.Token),
+                    async () => await LoopringGraphQLService.GetNftHolders(nftId, (goToHolderPage - 1) * pageSize, pageSize, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 isLoadingHolders = false;
                 StateHasChanged();
