@@ -185,7 +185,7 @@
         }
         set
         {
-            string URL = $"/nfts/{nftId}?pageNumber={value}&nftHolderPageNumber={nftHolderPageNumber}";
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), value);
             NavigationManager.NavigateTo(URL);
         }
     }
@@ -198,7 +198,7 @@
         }
         set
         {
-            string URL = $"/nfts/{nftId}?pageNumber={pageNumber}&nftHolderPageNumber={value}";
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(nftHolderPageNumber), value);
             NavigationManager.NavigateTo(URL);
         }
     }
