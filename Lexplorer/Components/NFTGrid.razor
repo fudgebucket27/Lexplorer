@@ -34,7 +34,7 @@
                         { 
                             <MudChip Label="true" Color="Color.Primary" Class="ml-0">x @slot.balance.ToString("#,##0")</MudChip>
                         }
-                        <MudText Typo="Typo.body2">@metaData?.description</MudText>
+                        <MudText Typo="Typo.body2" Class="crop-text">@metaData?.description</MudText>
                     </MudCardContent>
                     <MudCardActions>
                         <MudButton Style="position:absolute;bottom:0;"
@@ -169,3 +169,11 @@
     }
 }
 
+<style>
+    .crop-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
