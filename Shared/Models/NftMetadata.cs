@@ -13,6 +13,9 @@ namespace Lexplorer.Models
         public string? animation_url { get; set; }
         public string? contentType { get; set; }
 
+        //found with GME minted NFTs
+        public string? collection_metadata { get; set; }
+
         public List<NftAttribute>? attributes { get; set; }
 
         public string? JSONContent { get; set; }
@@ -22,5 +25,18 @@ namespace Lexplorer.Models
     {
         public string? trait_type { get; set; }
         public object? value { get; set; } //value can be either string or int
+    }
+
+    public class NftCollectionMetadata
+    {
+        public string? name { get; set; }
+        public string? description { get; set; }
+
+        public string? thumbnail_uri { get; set; }
+        public string? banner_uri { get; set; }
+        public string? avatar_uri { get; set; }
+        public string? tile_uri { get; set; }
+
+        public string? JSONContent { get; set; }
     }
 }

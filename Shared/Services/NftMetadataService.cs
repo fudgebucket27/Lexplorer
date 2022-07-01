@@ -42,6 +42,26 @@ namespace Lexplorer.Services
             return link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
         }
 
+        public async Task<NftCollectionMetadata?> GetCollectionMetadata(string URL, CancellationToken cancellationToken = default)
+        {
+            var request = new RestRequest(URL);
+            try
+            {
+                request.Timeout = 10000; //we can't afford to wait forever here, 10s must be enough
+                var response = await _client.GetAsync(request, cancellationToken);
+                var token = JToken.Parse(response.Content!);
+                var metadata = token.ToObject<NftCollectionMetadata>();
+                if ((token != null) && (metadata != null))
+                    metadata.JSONContent = token.ToString(Formatting.Indented);
+                return metadata;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
         public async Task<NftMetadata?> GetMetadata(string link, CancellationToken cancellationToken = default)
         {
             link = MakeIPFSLink(link)!;
