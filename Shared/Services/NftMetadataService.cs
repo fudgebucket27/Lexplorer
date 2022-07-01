@@ -84,7 +84,12 @@ namespace Lexplorer.Services
                 var token = JToken.Parse(response.Content!);
                 var metadata = token.ToObject<NftMetadata>();
                 if ((token != null) && (metadata != null))
+                {
                     metadata.JSONContent = token.ToString(Formatting.Indented);
+                    var propToken = token["properties"];
+                    if (propToken != null)
+                        metadata.properties = propToken.ToObject<Dictionary<string, object>>();
+                }
                 return metadata;
             }
             catch (Exception e)
