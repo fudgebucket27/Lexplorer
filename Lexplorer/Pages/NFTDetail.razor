@@ -109,6 +109,7 @@
             <ChildContent>
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
                     <ToolBarContent>
+                        <MudSpacer />
                         <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
                         <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
                         <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
@@ -138,6 +139,7 @@
             <ChildContent>
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
                     <ToolBarContent>
+                        <MudSpacer />
                         <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage = 1)" />
                         <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage -= 1)" />
                         <MudNumericField HideSpinButtons="true" @bind-Value="goToHolderPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
