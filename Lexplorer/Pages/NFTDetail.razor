@@ -104,57 +104,72 @@
 </MudSimpleTable>
 
 <br />
-
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Transactions</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
-        <MudSpacer />
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Tx Id</MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>From</MudTh>
-        <MudTh>To</MudTh>
-        <MudTh Style="text-align:right">Bought</MudTh>
-        <MudTh Style="text-align:right">Sold</MudTh>
-        <MudTh Style="text-align:right">Fee</MudTh>
-        <MudTh>Verified At (UTC)</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
-        <MudTd DataLabel="Type">@context.typeName</MudTd>
-        <TransactionTableDetails TransactionData=@context />
-        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-    </RowTemplate>
-</MudTable>
-<br />
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">NFT Holders</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="goToHolderPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(holders!.Count < pageSize) OnClick="@(() => goToHolderPage += 1)" />
-        <MudSpacer />
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Account Id</MudTh>
-        <MudTh>Address</MudTh>
-        <MudTh>Balance</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Account Id">@context?.account?.id</MudTd>
-        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.account?.id, context?.account?.address, true)</MudTd>
-        <MudTd DataLabel="Timestamp">@context?.balance</MudTd>
-    </RowTemplate>
-</MudTable>
-
+<MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Transactions" DisableGutters="true" @bind-IsExpanded="txIsOpen" HideIcon="true">
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@(txIsOpen ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" class="mr-3"></MudIcon>
+                    <MudText>Transactions</MudText>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+                    <ToolBarContent>
+                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
+                        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+                        <MudSpacer />
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Tx Id</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>From</MudTh>
+                        <MudTh>To</MudTh>
+                        <MudTh Style="text-align:right">Bought</MudTh>
+                        <MudTh Style="text-align:right">Sold</MudTh>
+                        <MudTh Style="text-align:right">Fee</MudTh>
+                        <MudTh>Verified At (UTC)</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+                        <MudTd DataLabel="Type">@context.typeName</MudTd>
+                        <TransactionTableDetails TransactionData=@context />
+                        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </ChildContent>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Holders" DisableGutters="true" @bind-IsExpanded="holdersIsOpen" HideIcon="true">
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@(holdersIsOpen ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" class="mr-3"></MudIcon>
+                    <MudText>NFT Holders</MudText>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
+                    <ToolBarContent>
+                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage = 1)" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage -= 1)" />
+                        <MudNumericField HideSpinButtons="true" @bind-Value="goToHolderPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(holders!.Count < pageSize) OnClick="@(() => goToHolderPage += 1)" />
+                        <MudSpacer />
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Account Id</MudTh>
+                        <MudTh>Address</MudTh>
+                        <MudTh>Balance</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Account Id">@context?.account?.id</MudTd>
+                        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.account?.id, context?.account?.address, true)</MudTd>
+                        <MudTd DataLabel="Balance">@context?.balance</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </ChildContent>
+    </MudExpansionPanel>
+</MudExpansionPanels>
 
 @code {
     [Parameter]
@@ -174,7 +189,8 @@
     public bool isLoading = true;
     public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
-
+    bool txIsOpen;
+    bool holdersIsOpen;
     private NftMetadata? nftMetadata;
 
     public int gotoPage
