@@ -8,17 +8,13 @@
 
 <MudGrid>
     <MudItem xs="12" Class="d-flex justify-center">
-        <MudPaper Width="100%">
-            <MudToolBar Class="justify-center">
-                <MudPagination Size="Size.Small" ShowFirstButton="true"
+        <MudPagination Size="Size.Small" ShowFirstButton="true" Class="justify-center"
                                BoundaryCount="1"
                                MiddleCount="1"
                                ShowLastButton="true"
                                Selected="@_internalPage"
                                Count="@PageCount"
                                SelectedChanged="@((int page) => goToPage(page))" />
-            </MudToolBar>
-        </MudPaper>
     </MudItem>
     @if (NFTSlots != null && NFTSlots.Count > 0)
     {
@@ -50,19 +46,16 @@
         <MudText class="pa-3">No NFTs</MudText>
     }
     <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
-        <MudPaper Width="100%" Class="mx-4">
-            <MudToolBar Class="justify-center">
-                <MudPagination Size="Size.Small" ShowFirstButton="true"
-                               BoundaryCount="1"
-                               MiddleCount="1"
-                               ShowLastButton="true"
-                               Selected="@_internalPage"
-                               Count="@PageCount"
-                               SelectedChanged="@((int page) => goToPage(page))" />
-            </MudToolBar>
-        </MudPaper>
+        <MudItem xs="12" Class="d-flex justify-center">
+            <MudPagination Size="Size.Small" ShowFirstButton="true" Class="justify-center"
+                                   BoundaryCount="1"
+                                   MiddleCount="1"
+                                   ShowLastButton="true"
+                                   Selected="@_internalPage"
+                                   Count="@PageCount"
+                                   SelectedChanged="@((int page) => goToPage(page))" />
+        </MudItem>
     </MudHidden>
-    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 </MudGrid>
 
 @code {
