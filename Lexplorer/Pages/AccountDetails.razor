@@ -55,13 +55,7 @@
 
     <br />
     <MudExpansionPanels MultiExpansion="true">
-        <MudExpansionPanel Text="Token Balances" DisableGutters="true" @bind-IsExpanded="tokenIsOpen" HideIcon="true">
-            <TitleContent>
-                <div class="d-flex">
-                    <MudIcon Icon="@(tokenIsOpen ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" class="mr-3"></MudIcon>
-                    <MudText>Token Balances</MudText>
-                </div>
-            </TitleContent>
+        <LexpansionPanel Text="Token Balances">
             <ChildContent>
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading >
                     <HeaderContent>
@@ -80,14 +74,8 @@
                     </PagerContent>
                 </MudTable>
             </ChildContent>
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="Transactions" DisableGutters="true" @bind-IsExpanded="txIsOpen" HideIcon="true">
-            <TitleContent>
-                <div class="d-flex">
-                    <MudIcon Icon="@(txIsOpen ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" class="mr-3"></MudIcon>
-                    <MudText>Transactions</MudText>
-                </div>
-            </TitleContent>
+        </LexpansionPanel>
+        <LexpansionPanel Text="Transactions">
             <ChildContent>
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
                     <ToolBarContent>
@@ -119,18 +107,12 @@
                     </RowTemplate>
                 </MudTable>
             </ChildContent>
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="NFTs" DisableGutters="true" @bind-IsExpanded="nftIsOpen" HideIcon="true">
-            <TitleContent>
-                <div class="d-flex">
-                    <MudIcon Icon="@(nftIsOpen ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" class="mr-3"></MudIcon>
-                    <MudText>NFTs</MudText>
-                </div>
-            </TitleContent>
+        </LexpansionPanel>
+        <LexpansionPanel Text="NFTs">
             <ChildContent>
                 <NFTGrid @bind-PageNumber="@gotoNFTPage" NFTSlots="@accountNFTSlots" PageCount="@nftPages" />
             </ChildContent>
-        </MudExpansionPanel>
+        </LexpansionPanel>
     </MudExpansionPanels>
     <br />
 
@@ -176,9 +158,6 @@
         }
     }
 
-    bool tokenIsOpen;
-    bool txIsOpen;
-    bool nftIsOpen;
     public bool balancesLoading;
     public bool isLoading = true;
     public readonly int pageSize = 25;
