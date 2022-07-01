@@ -57,7 +57,7 @@
     <MudExpansionPanels MultiExpansion="true">
         <LexpansionPanel Text="Token Balances">
             <ChildContent>
-                <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading >
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@account?.balances" Hover="true" Loading=@balancesLoading>
                     <HeaderContent>
                         <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.token!.name!)">Token</MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<AccountTokenBalance, object>(x=>x.fBalance!)">Balance</MudTableSortLabel></MudTh>
@@ -73,6 +73,11 @@
                         }
                     </PagerContent>
                 </MudTable>
+            </ChildContent>
+        </LexpansionPanel>
+        <LexpansionPanel Text="NFTs">
+            <ChildContent>
+                <NFTGrid @bind-PageNumber="@gotoNFTPage" NFTSlots="@accountNFTSlots" PageCount="@nftPages" />
             </ChildContent>
         </LexpansionPanel>
         <LexpansionPanel Text="Transactions">
@@ -106,11 +111,6 @@
                         <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
                     </RowTemplate>
                 </MudTable>
-            </ChildContent>
-        </LexpansionPanel>
-        <LexpansionPanel Text="NFTs">
-            <ChildContent>
-                <NFTGrid @bind-PageNumber="@gotoNFTPage" NFTSlots="@accountNFTSlots" PageCount="@nftPages" />
             </ChildContent>
         </LexpansionPanel>
     </MudExpansionPanels>
