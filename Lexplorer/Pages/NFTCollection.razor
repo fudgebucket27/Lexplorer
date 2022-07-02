@@ -65,12 +65,10 @@
     <br />
 
     <br />
-    <NFTGrid @ref="nftGrid" @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
+    <NFTGrid @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
 </MudContainer>
 
 @code {
-    private NFTGrid nftGrid = default!;
-
     [Parameter]
     public string? tokenAddress { get; set; }
 
@@ -128,7 +126,7 @@
                     Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList();
                 StateHasChanged();
 
-                var metaData = await nftGrid.LoadNFTMetaData(collectionNFTSlots!.FirstOrDefault());
+                var metaData = await NFTGrid.LoadNFTMetaData(collectionNFTSlots!.FirstOrDefault(), EthereumService, NftMetadataService, AppCache, localCTS.Token);
                 if (string.IsNullOrEmpty(metaData?.collection_metadata)) return;
 
                 string collectionMetaDataKey = $"collectionMetadata-{tokenAddress}";

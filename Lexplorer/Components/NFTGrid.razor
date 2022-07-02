@@ -86,7 +86,8 @@
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts = null;
 
-    public async Task<NftMetadata?> LoadNFTMetaData(AccountNFTSlot? slot, CancellationToken cancellationToken = default)
+    public static async Task<NftMetadata?> LoadNFTMetaData(AccountNFTSlot? slot, EthereumService EthereumService,
+        NftMetadataService NftMetadataService, IAppCache AppCache, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(slot?.nft?.nftID)) return null;
 
@@ -110,7 +111,7 @@
     {
         foreach (var slot in NFTSlots!)
         {
-            var nftMetadata = await LoadNFTMetaData(slot, cancellationToken);
+            var nftMetadata = await LoadNFTMetaData(slot, EthereumService, NftMetadataService, AppCache, cancellationToken);
             if (nftMetadata == null) continue;
 
             NFTdata.Add(slot!.nft!.nftID!, nftMetadata);
@@ -146,7 +147,7 @@
                     Trace.WriteLine(e.StackTrace + "\n" + e.Message);
                 }
                 finally
-                { 
+                {
                     //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
                     //otherwise a new call has already replaced cts with it's own localCTS
                     Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
