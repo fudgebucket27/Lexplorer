@@ -58,24 +58,43 @@
             <td>Animation URL</td>
             <td Style="word-break:break-all;">@nftMetadata?.animation_url</td>
         </tr>
-        @if (nftMetadata?.attributes?.Count > 0)
+        @if ((nftMetadata?.attributes?.Count > 0) || (nftMetadata?.properties?.Count > 0))
         {
             <tr>
                 <td colspan="2">
-                    <MudExpansionPanels>
-                        <LexpansionPanel Text="Traits">
-                            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-                                <tbody>
-                                    @foreach (var trait in nftMetadata?.attributes!)
-                                    {
-                                        <tr>
-                                            <td>@trait.trait_type</td>
-                                            <td>@trait.value</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </MudSimpleTable>
-                        </LexpansionPanel>
+                    <MudExpansionPanels MultiExpansion="true">
+                        @if (nftMetadata?.attributes?.Count > 0)
+                        {
+                            <LexpansionPanel Text="Traits">
+                                <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                                    <tbody>
+                                        @foreach (var trait in nftMetadata?.attributes!)
+                                        {
+                                            <tr>
+                                                <td>@trait.trait_type</td>
+                                                <td>@trait.value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                            </LexpansionPanel>
+                        }
+                        @if (nftMetadata?.properties?.Count > 0)
+                        {
+                            <LexpansionPanel Text="Properties">
+                                <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                                    <tbody>
+                                        @foreach (var pair in nftMetadata?.properties!)
+                                        {
+                                            <tr>
+                                                <td>@pair.Key</td>
+                                                <td>@pair.Value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                            </LexpansionPanel>
+                        }
                     </MudExpansionPanels>
                 </td>
             </tr>

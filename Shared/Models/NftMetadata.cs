@@ -17,6 +17,7 @@ namespace Lexplorer.Models
         public string? collection_metadata { get; set; }
 
         public List<NftAttribute>? attributes { get; set; }
+        public Dictionary<string, object>? properties { get; set; }
 
         public string? JSONContent { get; set; }
     }
