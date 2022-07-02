@@ -180,7 +180,7 @@
         {
             //give future calls a chance to cancel us; it is now safe to replace
             //any previous value of cts, since we already cancelled it above
-            cts = localCTS;
+            Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
             try
             {
                 isLoading = true;
@@ -258,9 +258,12 @@
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            finally
+            { 
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
         }
     }
 
