@@ -88,6 +88,22 @@ namespace Lexplorer.Services
                     {
                         if (propToken is JObject)
                             metadata.properties = propToken.ToObject<Dictionary<string, object>>();
+                        else if (propToken is JArray jarr)
+                        {
+                            metadata.properties = new();
+                            foreach (var arrToken in jarr)
+                            {
+                                try
+                                {
+                                    if (arrToken is JObject obj)
+                                        metadata.properties.Add(obj["key"]!.ToString(), obj["value"]!.ToObject<object>()!);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {

@@ -116,10 +116,10 @@ namespace xUnitTests.NFTMetaDataTests
         public void TestCorrectJSONPropertiesKeyValuArray()
         {
             var meta = fixture.NMS.GetMetadataFromResponse(
-                "{\"name\":\"Test\",\"properties\":[{\"key\": \"test\", \"value\": \"value\"}]}");
+                "{\"name\":\"Test\",\"properties\":[{\"key\": \"test\", \"value\": \"value\"}, {\"invalid\": \"value\"}]}");
             Assert.NotNull(meta);
             Assert.Equal("Test", meta!.name);
-			Assert.Null(meta!.properties);
+            Assert.Equal("value", meta!.properties!["test"]);
         }
     }
 }
