@@ -101,6 +101,26 @@ namespace xUnitTests.NFTMetaDataTests
 			var contentType = await fixture.NMS.GetContentTypeFromURL(meta!.animation_url!);
 			Assert.Equal("text/html", contentType);
 		}
-	}
+
+        [Fact]
+		public void TestCorrectJSONPropertiesDictionary()
+        {
+			var meta = fixture.NMS.GetMetadataFromResponse(
+				"{\"name\":\"Test\",\"properties\":{\"test\": \"value\"}}");
+			Assert.NotNull(meta);
+			Assert.Equal("Test", meta!.name);
+			Assert.Equal("value", meta!.properties!["test"]);
+        }
+
+        [Fact]
+        public void TestCorrectJSONPropertiesKeyValuArray()
+        {
+            var meta = fixture.NMS.GetMetadataFromResponse(
+                "{\"name\":\"Test\",\"properties\":[{\"key\": \"test\", \"value\": \"value\"}, {\"invalid\": \"value\"}]}");
+            Assert.NotNull(meta);
+            Assert.Equal("Test", meta!.name);
+            Assert.Equal("value", meta!.properties!["test"]);
+        }
+    }
 }
 

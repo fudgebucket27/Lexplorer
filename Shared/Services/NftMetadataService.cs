@@ -74,6 +74,51 @@ namespace Lexplorer.Services
             return nmd;
         }
 
+        public NftMetadata? GetMetadataFromResponse(string response)
+        {
+            try
+            { 
+                var token = JToken.Parse(response!);
+                var metadata = token.ToObject<NftMetadata>();
+                if ((token != null) && (metadata != null))
+                {
+                    metadata.JSONContent = token.ToString(Formatting.Indented);
+                    var propToken = token["properties"];
+                    try
+                    {
+                        if (propToken is JObject)
+                            metadata.properties = propToken.ToObject<Dictionary<string, object>>();
+                        else if (propToken is JArray jarr)
+                        {
+                            metadata.properties = new();
+                            foreach (var arrToken in jarr)
+                            {
+                                try
+                                {
+                                    if (arrToken is JObject obj)
+                                        metadata.properties.Add(obj["key"]!.ToString(), obj["value"]!.ToObject<object>()!);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                    }
+                }
+                return metadata;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
         private async Task<NftMetadata?> GetMetadataFromURL(string URL, CancellationToken cancellationToken = default)
         {
             var request = new RestRequest(URL);
@@ -81,16 +126,7 @@ namespace Lexplorer.Services
             {
                 request.Timeout = 10000; //we can't afford to wait forever here, 10s must be enough
                 var response = await _client.GetAsync(request, cancellationToken);
-                var token = JToken.Parse(response.Content!);
-                var metadata = token.ToObject<NftMetadata>();
-                if ((token != null) && (metadata != null))
-                {
-                    metadata.JSONContent = token.ToString(Formatting.Indented);
-                    var propToken = token["properties"];
-                    if (propToken != null)
-                        metadata.properties = propToken.ToObject<Dictionary<string, object>>();
-                }
-                return metadata;
+                return GetMetadataFromResponse(response.Content!);
             }
             catch (Exception e)
             {
