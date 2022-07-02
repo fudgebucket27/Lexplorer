@@ -65,12 +65,10 @@
     <br />
 
     <br />
-    <NFTGrid @ref="nftGrid" @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
+    <NFTGrid @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
 </MudContainer>
 
 @code {
-    private NFTGrid nftGrid = default!;
-
     [Parameter]
     public string? tokenAddress { get; set; }
 
@@ -95,7 +93,7 @@
 
     public int maxPageCount { get; set; } = 1;
 
-    private CancellationTokenSource? cts;
+    private CancellationTokenSource? cts = null;
     private IList<AccountNFTSlot>? collectionNFTSlots { get; set; }
     private NftCollectionMetadata? collectionMetadata { get; set; }
 
@@ -109,11 +107,11 @@
 
         using (CancellationTokenSource localCTS = new CancellationTokenSource())
         {
-            //give future calls a chance to cancel us; it is now safe to replace
-            //any previous value of cts, since we already cancelled it above
-            cts = localCTS;
             try
             {
+                //give future calls a chance to cancel us; it is now safe to replace
+                //any previous value of cts, since we already cancelled it above
+                Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
                 if (string.IsNullOrEmpty(tokenAddress)) return;
 
                 string collectionNftKey = $"collection-{tokenAddress}-page-{goToPage}";
@@ -128,7 +126,7 @@
                     Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList();
                 StateHasChanged();
 
-                var metaData = await nftGrid.LoadNFTMetaData(collectionNFTSlots!.FirstOrDefault());
+                var metaData = await NFTGrid.LoadNFTMetaData(collectionNFTSlots!.FirstOrDefault(), EthereumService, NftMetadataService, AppCache, localCTS.Token);
                 if (string.IsNullOrEmpty(metaData?.collection_metadata)) return;
 
                 string collectionMetaDataKey = $"collectionMetadata-{tokenAddress}";
@@ -145,9 +143,12 @@
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            finally
+            {
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
         }
     }
 

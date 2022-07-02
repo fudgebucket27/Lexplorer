@@ -86,7 +86,8 @@
     private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
     private CancellationTokenSource? cts = null;
 
-    public async Task<NftMetadata?> LoadNFTMetaData(AccountNFTSlot? slot, CancellationToken cancellationToken = default)
+    public static async Task<NftMetadata?> LoadNFTMetaData(AccountNFTSlot? slot, EthereumService EthereumService,
+        NftMetadataService NftMetadataService, IAppCache AppCache, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(slot?.nft?.nftID)) return null;
 
@@ -110,7 +111,7 @@
     {
         foreach (var slot in NFTSlots!)
         {
-            var nftMetadata = await LoadNFTMetaData(slot, cancellationToken);
+            var nftMetadata = await LoadNFTMetaData(slot, EthereumService, NftMetadataService, AppCache, cancellationToken);
             if (nftMetadata == null) continue;
 
             NFTdata.Add(slot!.nft!.nftID!, nftMetadata);
@@ -132,7 +133,7 @@
             {
                 //give future calls a chance to cancel us; it is now safe to replace
                 //any previous value of cts, since we already cancelled it above
-                cts = localCTS;
+                Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
                 try
                 {
                     NFTdata = new Dictionary<string, NftMetadata>();
@@ -145,18 +146,22 @@
                 {
                     Trace.WriteLine(e.StackTrace + "\n" + e.Message);
                 }
-                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-                //otherwise a new call has already replaced cts with it's own localCTS
-                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+                finally
+                {
+                    //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                    //otherwise a new call has already replaced cts with it's own localCTS
+                    Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+                }
             }
         }
     }
 
     public void Dispose()
     {
+        //just cancel any OnParametersSetAsync that might be running
+        //do not dispose cts here, it's just a copy of localCTS whose
+        //lifetime is managed within OnParametersSetAsync
         cts?.Cancel();
-        cts?.Dispose();
-        cts = null;
     }
 
     private NftMetadata? GetMetadata(string? nftID)
