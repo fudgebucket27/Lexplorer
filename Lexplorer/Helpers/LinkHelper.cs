@@ -17,7 +17,13 @@
         public static MarkupString CreateUserLink(string? id, string? address, bool shortenAddress = true, string?
             ignoreId = null, bool includeAccountId = false)
         {
-            if (address == null) return new MarkupString();
+            if (address == null)
+            {
+                //abuse GetObjectLink if we have id only 
+                if ((id != null) && (id != ignoreId))
+                    return GetObjectLink(new Account() { id = id });
+                return new MarkupString();
+            }
 
             string link = (shortenAddress && (address.Length > 6)) ? string.Format("{0}...{1}", address.Substring(0, 5), address.Substring(address.Length - 6, 6)) : address;
             if (includeAccountId)

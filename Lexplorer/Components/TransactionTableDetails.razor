@@ -121,6 +121,13 @@
             <MudTd DataLabel="Fee" Style="text-align:right">@TokenAmountConverter.ToString(tradeNFT?.feeSeller, tradeNFT?.token?.decimals) @tradeNFT?.token?.symbol</MudTd>
         }
         break;
+    case "DataNFT":
+        <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(dataNFT?.accountID, null, false, ignoreUserIDForLink, true)</MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        <MudTd></MudTd>
+        break;
     case "Add":
         <MudTd DataLabel="From Address">@LinkHelper.CreateUserLink(add?.account, ignoreUserIDForLink)</MudTd>
         <MudTd DataLabel="To Address">@LinkHelper.CreateUserLink(add?.pool, ignoreUserIDForLink)</MudTd>
@@ -168,6 +175,7 @@
     public TransferNFT? transferNFT { get { return TransactionData as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return TransactionData as WithdrawalNFT; } }
     public TradeNFT? tradeNFT { get { return TransactionData as TradeNFT; } }
+    public DataNFT? dataNFT { get { return TransactionData as DataNFT; } }
 
     [Parameter]
     public string? ignoreUserIDForLink { get; set; }

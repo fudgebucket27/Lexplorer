@@ -359,6 +359,7 @@ namespace Lexplorer.Services
                   ...WithdrawalNFTFragment
                   ...TransferNFTFragment
                   ...MintNFTFragment
+                  ...DataNFTFragment
                 }
               }"
               + GraphQLTransactionListFragments.AllFragments;
@@ -635,6 +636,7 @@ namespace Lexplorer.Services
                     ...WithdrawalNFTFragment
                     ...TransferNFTFragment
                     ...MintNFTFragment
+                    ...DataNFTFragment
                   }
                 }
              }

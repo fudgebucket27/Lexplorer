@@ -277,6 +277,13 @@ namespace Lexplorer.Helpers
             __typename
           }";
 
+        public static string DataNFT = @"
+          fragment DataNFTFragment on DataNFT {
+            id
+            accountID
+            __typename
+          }";
+
         public static string AllFragments =
             Account
               + Token
@@ -294,7 +301,8 @@ namespace Lexplorer.Helpers
               + SwapNFT
               + WithdrawalNFT
               + TransferNFT
-              + MintNFT;
+              + MintNFT
+              + DataNFT;
 
     }
 }

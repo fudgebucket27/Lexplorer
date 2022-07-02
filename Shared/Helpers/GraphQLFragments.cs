@@ -410,7 +410,15 @@
 
         public static string DataNFTFragment = @"
         fragment DataNFTFragment on DataNFT {
+            id
             __typename
+            accountID
+            tokenID
+            minter
+            tokenAddress
+            nftID
+            nftType
+            data
           }";
     }
 }
