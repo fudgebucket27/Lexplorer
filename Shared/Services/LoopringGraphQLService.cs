@@ -1257,21 +1257,13 @@ namespace Lexplorer.Services
                     ...SwapNFTFragment
                     ...WithdrawalNFTFragment
                     ...TransferNFTFragment
-                    ...MintNFTFragmentWithoutNFT
+                    ...MintNFTFragment
                     ...DataNFTFragment
                   }
                 }
              }
             "
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragmentWithoutNFT
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
