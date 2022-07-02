@@ -154,9 +154,10 @@
 
     public void Dispose()
     {
+        //just cancel any OnParametersSetAsync that might be running
+        //do not dispose cts here, it's just a copy of localCTS whose
+        //lifetime is managed within OnParametersSetAsync
         cts?.Cancel();
-        cts?.Dispose();
-        cts = null;
     }
 
     private NftMetadata? GetMetadata(string? nftID)
