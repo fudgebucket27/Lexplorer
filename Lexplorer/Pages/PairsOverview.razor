@@ -11,10 +11,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Pairs</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@((pairs?.Count ?? pageSize) < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@((pairs?.Count ?? pageSize) < pageSize)" />
         <MudSpacer />
     </ToolBarContent>
     <HeaderContent>
@@ -23,9 +20,10 @@
         <MudTh Style="text-align:right">Volume 7D</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <Lexplorer.Components.PairsTableDetails pair="@context" uniswapTokens="@uniswapTokens"/>
+        <Lexplorer.Components.PairsTableDetails pair="@context" uniswapTokens="@uniswapTokens" />
     </RowTemplate>
 </MudTable>
+<OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@((pairs?.Count ?? pageSize) < pageSize)" IsOptionalBottomPager="true" />
 
 @code {
     private List<Lexplorer.Models.Pair>? pairs { get; set; } = new();
@@ -43,14 +41,10 @@
         }
         set
         {
-            navigateTo(value);
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
         }
-    }
-
-    private void navigateTo(int page)
-    {
-        string URL = $"/pairs?pageNumber={page}";
-        NavigationManager.NavigateTo(URL);
     }
 
     public bool isLoading = true;
