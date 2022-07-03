@@ -79,5 +79,22 @@ namespace xUnitTests.LoopringGraphTests
 
             holders.ForEach(x => Assert.True(x.balance >= 1));
         }
+
+        [Theory]
+        [InlineData("23927-115", null, "0x8fedb5c10580fec718e7461be0fb19a1ff23023e")]
+        [InlineData("23927-114", "0x8c8144eba5e352b6bc1b7f9a15b7f5272952450d", null)]
+        public async void GetDataNFTTransaction(string transactionId, string? minter, string? tokenAddress)
+        {
+            var t = await service.GetTransaction(transactionId);
+            Assert.NotNull(t);
+            Assert.IsType<DataNFT>(t);
+
+            DataNFT dt = (DataNFT)t!;
+            Assert.NotNull(dt.accountID);
+            Assert.NotNull(dt.nftID);
+            Assert.NotEqual(0, dt.tokenID);
+            Assert.Equal(minter, dt.minter);
+            Assert.Equal(tokenAddress, dt.tokenAddress);
+        }
     }
 }

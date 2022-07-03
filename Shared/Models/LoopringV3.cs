@@ -432,6 +432,31 @@ namespace Lexplorer.Models
 
     }
 
+    public class DataNFT : TransactionNFT
+    {
+        public string? accountID { get; set; }
+        public string? minter { get; set; }
+        public string? tokenAddress { get; set; }
+        public string? nftID { get; set; }
+        public int tokenID { get; set; }
+        public int nftType { get; set; }
+        public string nftTypeName
+        {
+            get
+            {
+                switch (nftType)
+                {
+                    case 0:
+                        return "ERC1155";
+                    case 1:
+                        return "ERC721";
+                    default:
+                        return "unknown";
+                }
+            }
+        }
+    }
+
     public class TransactionsData
     {
         public Proxy? proxy { get; set; }

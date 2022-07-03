@@ -355,6 +355,30 @@
                 </tr>
             }
         }
+        @if (dataNFT != null)
+        {
+            <tr>
+                <td>Account</td>
+                <td colspan="2">@LinkHelper.CreateUserLink(dataNFT?.accountID, null, false, null, true)</td>
+            </tr>
+            <tr>
+                <td>Minter</td>
+                <td colspan="2">@dataNFT?.minter</td>
+            </tr>
+            <tr>
+                <td>TokenID</td>
+                <td colspan="2">@dataNFT?.tokenID</td>
+            </tr>
+            <tr>
+                <td>Token address</td>
+                <td colspan="2">@dataNFT?.tokenAddress</td>
+            </tr>
+            <tr>
+                <td>NFT type @dataNFT?.nftTypeName</td>
+                <td colspan="2">@dataNFT?.nftID</td>
+            </tr>
+
+        }
         <tr>
             <td>Raw Data</td>
             <td colspan="2"><MudTextField T="string" Variant="Variant.Filled" ReadOnly="true" Text="@transaction?.data" Lines="3" /></td>
@@ -378,6 +402,7 @@
     private TransferNFT? transferNFT { get { return transaction as TransferNFT; } }
     public WithdrawalNFT? withdrawalNFT { get { return transaction as WithdrawalNFT; } }
     public TradeNFT? tradeNFT { get { return transaction as TradeNFT; } }
+    public DataNFT? dataNFT { get { return transaction as DataNFT; } }
 
     [Parameter]
     public string transactionId { get; set; } = "";
