@@ -137,6 +137,7 @@
             Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
             try
             {
+                transactions = new List<Transaction>();
                 isBlockLoading = true;
                 string blockCacheKey = $"blockDetailOverview-{blockId}";
                 block = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
@@ -144,9 +145,9 @@
                     DateTimeOffset.UtcNow.AddMinutes(5));
                 if (block == null) return;
                 isBlockLoading = false;
+                isTransactionLoading = true;
                 StateHasChanged();
 
-                isTransactionLoading = true;
                 string transactionDatacacheKey = $"blockDetailTransactions-{blockId}-page{gotoPage}";
                 var transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
                     async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockId: blockNumber, cancellationToken: localCTS.Token),
