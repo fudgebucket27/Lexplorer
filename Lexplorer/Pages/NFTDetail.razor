@@ -129,10 +129,7 @@
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
                     <ToolBarContent>
                         <MudSpacer />
-                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-                        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+                        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" />
                         <MudSpacer />
                     </ToolBarContent>
                     <HeaderContent>
@@ -152,6 +149,7 @@
                         <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" IsOptionalBottomPager="true" />
             </ChildContent>
     </LexpansionPanel>
     <LexpansionPanel Text="Holders">
@@ -159,10 +157,7 @@
                 <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
                     <ToolBarContent>
                         <MudSpacer />
-                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage = 1)" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(goToHolderPage == 1) OnClick="@(() => goToHolderPage -= 1)" />
-                        <MudNumericField HideSpinButtons="true" @bind-Value="goToHolderPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(holders!.Count < pageSize) OnClick="@(() => goToHolderPage += 1)" />
+                        <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
                         <MudSpacer />
                     </ToolBarContent>
                     <HeaderContent>
@@ -176,6 +171,7 @@
                         <MudTd DataLabel="Balance">@context?.balance</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" IsOptionalBottomPager="true" />
             </ChildContent>
     </LexpansionPanel>
 </MudExpansionPanels>

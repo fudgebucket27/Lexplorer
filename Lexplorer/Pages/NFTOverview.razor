@@ -9,10 +9,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Latest NFTs</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(nfts?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(nfts?.Count < pageSize)" />
         <MudSpacer />
     </ToolBarContent>
     <HeaderContent>
@@ -26,6 +23,7 @@
         <MudTd DataLabel="MintedBy">@LinkHelper.GetObjectLink(context.mintedAtTransaction?.minter)</MudTd>
     </RowTemplate>
 </MudTable>
+<OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(nfts?.Count < pageSize)" IsOptionalBottomPager="true" />
 
 @code {
     [Parameter]
@@ -40,7 +38,9 @@
         }
         set
         {
-            navigateTo(value);
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
         }
     }
 
@@ -48,12 +48,6 @@
     public readonly int pageSize = 25;
 
     private IList<NonFungibleToken>? nfts { get; set; } = new List<NonFungibleToken>();
-
-    private void navigateTo(int page)
-    {
-        string URL = $"/nfts?pageNumber={page}";
-        NavigationManager.NavigateTo(URL);
-    }
 
     protected override async Task OnParametersSetAsync()
     {

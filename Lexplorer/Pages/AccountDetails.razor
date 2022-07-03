@@ -87,10 +87,7 @@
                         <MudText Typo="Typo.h6" Class="d-none d-sm-flex">Transactions</MudText>
                         <MudText Typo="Typo.h6" Class="d-flex d-sm-none d-xs-none">Tx's</MudText>
                         <MudSpacer />
-                        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-                        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-                        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+                        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" />
                         <MudSpacer />
                         <MudIconButton Icon="@Icons.Filled.Download" OnClick="ShowCSVOptions" />
                     </ToolBarContent>
@@ -111,6 +108,7 @@
                         <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
                     </RowTemplate>
                 </MudTable>
+                <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" IsOptionalBottomPager="true" />
             </ChildContent>
         </LexpansionPanel>
     </MudExpansionPanels>
@@ -135,7 +133,8 @@
         }
         set
         {
-            string URL = $"/account/{accountId}?pageNumber={value}&nftPageNumber={nftPageNumber}";
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
             NavigationManager.NavigateTo(URL);
         }
     }
