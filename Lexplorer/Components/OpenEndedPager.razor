@@ -1,0 +1,55 @@
+﻿@if (IsOptionalBottomPager)
+{
+    <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
+        <MudPaper Width="100%">
+            <MudToolBar Class="justify-center">
+                <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(internalPageNumber == 1) OnClick="@(() => internalPageNumber = 1)" />
+                <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(internalPageNumber == 1) OnClick="@(() => internalPageNumber -= 1)" />
+                <MudNumericField HideSpinButtons="true" @bind-Value="internalPageNumber" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+                <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@IsLastPage OnClick="@(() => internalPageNumber += 1)" />
+            </MudToolBar>
+        </MudPaper>
+    </MudHidden>
+}
+else
+{
+    <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(internalPageNumber == 1) OnClick="@(() => internalPageNumber = 1)" />
+    <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(internalPageNumber == 1) OnClick="@(() => internalPageNumber -= 1)" />
+    <MudNumericField HideSpinButtons="true" @bind-Value="internalPageNumber" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
+    <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@IsLastPage OnClick="@(() => internalPageNumber += 1)" />
+}
+
+@code {
+    [Parameter]
+    public bool IsOptionalBottomPager { get; set; } = false;
+
+    private int _internalPageNumber = 1;
+    private int internalPageNumber {
+        get
+        {
+            return _internalPageNumber;
+        }
+        set
+        {
+            _internalPageNumber = value;
+            if (PageNumber != _internalPageNumber)
+                PageNumberChanged.InvokeAsync(_internalPageNumber);
+        }
+    }
+
+    [Parameter]
+    public int PageNumber { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageNumberChanged { get; set; }
+
+    [Parameter]
+    public bool IsLastPage { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _internalPageNumber = PageNumber;
+    }
+
+}

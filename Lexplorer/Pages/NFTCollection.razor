@@ -5,64 +5,67 @@
 @inject NftMetadataService NftMetadataService;
 @inject NavigationManager NavigationManager;
 @inject IAppCache AppCache;
+@inject IDialogService DialogService;
 
 <PageTitle>The Lexplorer - NFT Collection</PageTitle>
 
 <MudContainer Fixed="true" Class="px-0 extra-extra-extra-large">
-    <MudText Typo="Typo.h6">NFT Contract Address <L1AccountLink address="@tokenAddress" shortenAddress="false" /></MudText>
-    <br />
-    <MudGrid>
-        <MudItem xs="12" Class="d-flex justify-center">
-            <MudPaper Width="100%" >
-            <MudToolBar Class="justify-center">
-                <MudPagination Size="Size.Small" ShowFirstButton="true" 
-                                BoundaryCount="1" 
-                                MiddleCount="1" 
-                                ShowLastButton="true" 
-                                Selected="@goToPage"
-                                Count="@calculatePageCount"
-                                SelectedChanged="@((int page) => goToPage = page)"/>
-                        </MudToolBar>
-                        </MudPaper>
-                    </MudItem>
-        @if (collectionNFTSlots != null && collectionNFTSlots.Count > 0)
-        {
-            @foreach (var slot in collectionNFTSlots!)
+    <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+        <tbody>
+            <tr>
+                <td colspan="2">
+                    <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                        <MudText Typo="Typo.h6">@($"NFT collection: {collectionMetadata?.name ?? tokenAddress}")</MudText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Contract address</td>
+                <td><L1AccountLink address="@tokenAddress" shortenAddress="false" /></td>
+            </tr>
+            @if (collectionMetadata != null)
             {
-                var metaData = GetMetadata(slot.nftID);
-                <MudItem xs="12" sm="4" md="4" lg="2">
-                    <MudCard Style="height:100%;position:relative" Class="ma-1 border-solid">
-                           <MudCardMedia Image="@NftMetadataService.MakeIPFSLink(metaData?.image)" Style="object-fit:contain" />
-                           <MudCardContent>
-                               <MudText Typo="Typo.h6">@metaData?.name</MudText>
-                               <MudText Typo="Typo.body2">@metaData?.description</MudText>
-                           </MudCardContent>
-                           <MudCardActions>
-                               <MudButton Style="position:absolute;bottom:0;" Variant="Variant.Text" Color="Color.Primary" Link=@LinkHelper.GetObjectLinkAddress(slot)?.Item1>Go to NFT</MudButton>
-                           </MudCardActions>
-                    </MudCard>
-                </MudItem>
+                <tr>
+                    <td>Description</td>
+                    <td>@collectionMetadata?.description</td>
+                </tr>
+                <tr>
+                    <td>Thumbnail</td>
+                    <td Style="word-break:break-all;">@collectionMetadata?.thumbnail_uri</td>
+                </tr>
+                <tr>
+                    <td>Banner</td>
+                    <td Style="word-break:break-all;">@collectionMetadata?.banner_uri</td>
+                </tr>
+                <tr>
+                    <td>Avatar</td>
+                    <td Style="word-break:break-all;">@collectionMetadata?.avatar_uri</td>
+                </tr>
+                <tr>
+                    <td>Tile</td>
+                    <td Style="word-break:break-all;">@collectionMetadata?.tile_uri</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img src="@NftMetadataService.MakeIPFSLink(collectionMetadata?.thumbnail_uri)" class="nft" />
+                    </td>
+                </tr>
             }
-        }
-        else
-        {
-            <MudText class="pa-3">No NFTs</MudText>
-        }
-        <MudHidden Breakpoint="Breakpoint.MdAndDown" Invert="true">
-            <MudPaper Width="100%" Class="mx-4">
-                <MudToolBar Class="justify-center">
-                    <MudPagination Size="Size.Small" ShowFirstButton="true" 
-                    BoundaryCount="1" 
-                    MiddleCount="1" 
-                    ShowLastButton="true" 
-                    Selected="@goToPage"
-                    Count="@calculatePageCount"
-                    SelectedChanged="@((int page) => goToPage = page)"/>
-                 </MudToolBar>
-           </MudPaper>
-       </MudHidden>
-       <MudDivider DividerType="DividerType.Middle" Class="my-6"/>
-    </MudGrid>
+            @if ((collectionMetadata?.JSONContent) != null)
+            {
+                <tr>
+                    <td colspan="2">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="showJSON" Class="mr-2">View Metadata</MudButton>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+
+    <br />
+
+    <br />
+    <NFTGrid @bind-PageNumber="@goToPage" NFTSlots="@collectionNFTSlots" PageCount="@maxPageCount" />
 </MudContainer>
 
 @code {
@@ -81,67 +84,56 @@
         }
         set
         {
-            pageNumber = value.ToString(); //set immediately for MudPagination to not switch forth and back
-            string URL = $"/nfts/collections/{tokenAddress}?pageNumber={value}";
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), value);
             NavigationManager.NavigateTo(URL);
         }
     }
 
-    public int calculatePageCount
-    {
-        get
-        {
-            return goToPage + ((collectionNFTSlots?.Count < pageSize) ? 0 : 1);
-        }
-    }
-
     public readonly int pageSize = 12; //6 per row
-    private CancellationTokenSource? cts;
-    private IList<NonFungibleToken>? collectionNFTSlots { get; set; } = new List<NonFungibleToken>();
-    private Dictionary<string, NftMetadata> NFTdata { get; set; } = new Dictionary<string, NftMetadata>();
+
+    public int maxPageCount { get; set; } = 1;
+
+    private CancellationTokenSource? cts = null;
+    private IList<AccountNFTSlot>? collectionNFTSlots { get; set; }
+    private NftCollectionMetadata? collectionMetadata { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
+        //quickly and early ensure that maxPageCount never get's smaller than the page we're on
+        maxPageCount = Math.Max(maxPageCount, goToPage);
+
         //cancel any previous OnParametersSetAsync which might still be running
         cts?.Cancel();
 
         using (CancellationTokenSource localCTS = new CancellationTokenSource())
         {
-            //give future calls a chance to cancel us; it is now safe to replace
-            //any previous value of cts, since we already cancelled it above
-            cts = localCTS;
             try
             {
+                //give future calls a chance to cancel us; it is now safe to replace
+                //any previous value of cts, since we already cancelled it above
+                Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
                 if (string.IsNullOrEmpty(tokenAddress)) return;
 
                 string collectionNftKey = $"collection-{tokenAddress}-page-{goToPage}";
-                collectionNFTSlots = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
+                var collectionNFTs = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
                     async () => await LoopringGraphQLService.GetCollectionNFTs(tokenAddress, (goToPage - 1) * pageSize, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 localCTS.Token.ThrowIfCancellationRequested();
-                Dictionary<string, NftMetadata> localNFTdata = new Dictionary<string, NftMetadata>();
-                NFTdata = localNFTdata;
-                if (collectionNFTSlots != null)
-                {
-                    StateHasChanged();
-                    foreach (var slot in collectionNFTSlots!)
-                    {
-                        string nftMetadataLinkCacheKey = $"nftMetadataLink-{slot.nftID}";
-                        string? nftMetadataLink = await AppCache.GetOrAddAsyncNonNull(nftMetadataLinkCacheKey,
-                            async () => await EthereumService.GetMetadataLink(slot.nftID, tokenAddress, slot.nftType),
-                            DateTimeOffset.UtcNow.AddHours(1));
-                        if (string.IsNullOrEmpty(nftMetadataLink)) continue;
+                maxPageCount = Math.Max(maxPageCount, goToPage + (collectionNFTs?.Count < pageSize ? 0 : 1));
 
-                        string nftMetadataCacheKey = $"nftMetadata-{nftMetadataLink}";
-                        var nftMetadata = await AppCache.GetOrAddAsyncNonNull(nftMetadataCacheKey,
-                            async () => await NftMetadataService.GetMetadata(nftMetadataLink, localCTS.Token),
-                            DateTimeOffset.UtcNow.AddHours(1));
-                        localCTS.Token.ThrowIfCancellationRequested();
-                        if (nftMetadata == null) continue;
+                //transform list of nfts to list of accountsSlots with everything else empty/null
+                collectionNFTSlots = collectionNFTs?.
+                    Select(NFT => new AccountNFTSlot() { nft = NFT }).ToList();
+                StateHasChanged();
 
-                        localNFTdata.Add(slot.nftID!, nftMetadata);
-                        StateHasChanged();
-                    }
-                }
+                var metaData = await NFTGrid.LoadNFTMetaData(collectionNFTSlots!.FirstOrDefault(), EthereumService, NftMetadataService, AppCache, localCTS.Token);
+                if (string.IsNullOrEmpty(metaData?.collection_metadata)) return;
+
+                string collectionMetaDataKey = $"collectionMetadata-{tokenAddress}";
+                collectionMetadata = await AppCache.GetOrAddAsyncNonNull(collectionNftKey,
+                    async () => await NftMetadataService.GetCollectionMetadata(metaData.collection_metadata!, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                localCTS.Token.ThrowIfCancellationRequested();
                 StateHasChanged();
             }
             catch (OperationCanceledException)
@@ -151,20 +143,23 @@
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            finally
+            {
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
         }
     }
 
-    private NftMetadata? GetMetadata(string? nftID)
+    public void showJSON()
     {
-        NftMetadata? data = null;
-        if (nftID != null)
-        {
-            NFTdata.TryGetValue(nftID, out data);
-        }
-        return data;
+        var parameters = new DialogParameters();
+        parameters.Add("JSON", collectionMetadata?.JSONContent);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        DialogService.Show<NFTMetadataDialog>("NFT collection metadata JSON", parameters, options);
     }
 
- }
+}

@@ -342,28 +342,8 @@ namespace Lexplorer.Services
                   id
                   internalID
                   block {
-                    id
-                    blockHash
                     timestamp
-                    transactionCount
-                    depositCount
-                    withdrawalCount
-                    transferCount
-                    addCount
-                    removeCount
-                    orderbookTradeCount
-                    swapCount
-                    accountUpdateCount
-                    ammUpdateCount
-                    signatureVerificationCount
-                    tradeNFTCount
-                    swapNFTCount
-                    withdrawalNFTCount
-                    transferNFTCount
-                    nftMintCount
-                    nftDataCount
                   }
-                  data
                   ...AddFragment
                   ...RemoveFragment
                   ...SwapFragment
@@ -382,27 +362,7 @@ namespace Lexplorer.Services
                   ...DataNFTFragment
                 }
               }"
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.PoolFragment
-              + GraphQLFragments.AccountCreatedAtFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.AddFragment
-              + GraphQLFragments.RemoveFragment
-              + GraphQLFragments.SwapFragment
-              + GraphQLFragments.OrderBookTradeFragment
-              + GraphQLFragments.DepositFragment
-              + GraphQLFragments.WithdrawalFragment
-              + GraphQLFragments.TransferFragment
-              + GraphQLFragments.AccountUpdateFragment
-              + GraphQLFragments.AmmUpdateFragment
-              + GraphQLFragments.SignatureVerificationFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragment
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -659,12 +619,8 @@ namespace Lexplorer.Services
                     id
                     __typename
                     block {
-                      id
-                      blockHash
                       timestamp
-                      transactionCount
                     }
-                    data
                     ...AddFragment
                     ...RemoveFragment
                     ...SwapFragment
@@ -685,27 +641,7 @@ namespace Lexplorer.Services
                 }
              }
             "
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.PoolFragment
-              + GraphQLFragments.AccountCreatedAtFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.AddFragment
-              + GraphQLFragments.RemoveFragment
-              + GraphQLFragments.SwapFragment
-              + GraphQLFragments.OrderBookTradeFragment
-              + GraphQLFragments.DepositFragment
-              + GraphQLFragments.WithdrawalFragment
-              + GraphQLFragments.TransferFragment
-              + GraphQLFragments.AccountUpdateFragment
-              + GraphQLFragments.AmmUpdateFragment
-              + GraphQLFragments.SignatureVerificationFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragment
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -1321,21 +1257,13 @@ namespace Lexplorer.Services
                     ...SwapNFTFragment
                     ...WithdrawalNFTFragment
                     ...TransferNFTFragment
-                    ...MintNFTFragmentWithoutNFT
+                    ...MintNFTFragment
                     ...DataNFTFragment
                   }
                 }
              }
             "
-              + GraphQLFragments.AccountFragment
-              + GraphQLFragments.TokenFragment
-              + GraphQLFragments.NFTFragment
-              + GraphQLFragments.TradeNFTFragment
-              + GraphQLFragments.SwapNFTFragment
-              + GraphQLFragments.WithdrawalNFTFragment
-              + GraphQLFragments.TransferNFTFragment
-              + GraphQLFragments.MintNFTFragmentWithoutNFT
-              + GraphQLFragments.DataNFTFragment;
+              + GraphQLTransactionListFragments.AllFragments;
 
             var request = new RestRequest();
             request.AddHeader("Content-Type", "application/json");
@@ -1562,6 +1490,66 @@ namespace Lexplorer.Services
             {
                 Debug.WriteLine(ex.Message);
                 return null;
+            }
+        }
+
+        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25, string orderBy = "balance", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        {
+            var nftHolders = @"
+            query nftHolders(
+                $skip: Int
+                $first: Int
+                $nftId: String
+                $orderBy: String
+                $orderDirection: String
+            )
+            {
+                nonFungibleToken(
+                    id: $nftId
+                ) 
+                {
+                    slots(
+                        skip: $skip
+                        first: $first
+                        orderBy: $orderBy
+                        orderDirection: $orderDirection
+                    ) 
+                    {
+                        account {
+                            id
+                            address
+                        }
+                    balance
+                    }
+                }
+             }";
+            
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            JObject jObject = JObject.FromObject(new
+            {
+                query = nftHolders,
+                variables = new
+                {
+                    first = first,
+                    skip = skip,
+                    nftId = nftId,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            request.AddStringBody(jObject.ToString(), ContentType.Json);
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken result = jresponse["data"]!["nonFungibleToken"]!["slots"]!;
+                return result.ToObject<List<AccountNFTSlot>>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return new List<AccountNFTSlot>();
             }
         }
 

@@ -2,6 +2,8 @@
 using Xunit;
 using Lexplorer.Services;
 using Lexplorer.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace xUnitTests.LoopringGraphTests
 {
@@ -66,6 +68,33 @@ namespace xUnitTests.LoopringGraphTests
         {
             var nfts = await service.GetCollectionNFTs(tokenAddress);
             Assert.NotEmpty(nfts);
+        }
+
+        [Fact]
+        public async void GetNftHolders_WhenPassingValidNftId_ExpectListOfHolders()
+        {
+            string nftId = "0xf5ca5e167819d449270dae6fa22208085a2c03d9-0-0xcd56d4e1dba6edf425aa3e0f901d9f1645887539-0x33f5b90cdf6271026f4a0e4817de618268e6e391320a4ad834ea54fd87032fcb-2";
+            List<AccountNFTSlot> holders = await service.GetNftHolders(nftId);
+            Assert.NotEmpty(holders);
+
+            holders.ForEach(x => Assert.True(x.balance >= 1));
+        }
+
+        [Theory]
+        [InlineData("23927-115", null, "0x8fedb5c10580fec718e7461be0fb19a1ff23023e")]
+        [InlineData("23927-114", "0x8c8144eba5e352b6bc1b7f9a15b7f5272952450d", null)]
+        public async void GetDataNFTTransaction(string transactionId, string? minter, string? tokenAddress)
+        {
+            var t = await service.GetTransaction(transactionId);
+            Assert.NotNull(t);
+            Assert.IsType<DataNFT>(t);
+
+            DataNFT dt = (DataNFT)t!;
+            Assert.NotNull(dt.accountID);
+            Assert.NotNull(dt.nftID);
+            Assert.NotEqual(0, dt.tokenID);
+            Assert.Equal(minter, dt.minter);
+            Assert.Equal(tokenAddress, dt.tokenAddress);
         }
     }
 }

@@ -58,10 +58,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Transactions in block #@block?.data?.block?.id</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions?.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
+        <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(transactions?.Count < pageSize)" />
         <MudSpacer />
     </ToolBarContent>
     <HeaderContent>
@@ -81,6 +78,7 @@
         <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block?.data?.block?.timestamp)</MudTd>
     </RowTemplate>
 </MudTable>
+<OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(transactions?.Count < pageSize)" IsOptionalBottomPager="true" />
 
 @code {
     private Lexplorer.Models.Block? block;
@@ -101,7 +99,10 @@
         }
         set
         {
-            navigateTo(value, 1);
+            //blockNumber is not a query parameter, but a component (routing) parameter
+            //have not found a way to get the modified URL without knowing it
+            var URL = $"/blocks/{value.ToString()}";
+            NavigationManager.NavigateTo(URL);
         }
     }
 
@@ -113,14 +114,10 @@
         }
         set
         {
-            navigateTo(blockId, value);
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
         }
-    }
-
-    private void navigateTo(int block, int page)
-    {
-        string URL = $"blocks/{block}?pageNumber={page}";
-        NavigationManager.NavigateTo(URL);
     }
 
     public bool isTransactionLoading = true;
@@ -137,11 +134,10 @@
         {
             //give future calls a chance to cancel us; it is now safe to replace
             //any previous value of cts, since we already cancelled it above
+            Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
             try
             {
-
-                cts = localCTS;
-
+                transactions = new List<Transaction>();
                 isBlockLoading = true;
                 string blockCacheKey = $"blockDetailOverview-{blockId}";
                 block = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
@@ -149,9 +145,9 @@
                     DateTimeOffset.UtcNow.AddMinutes(5));
                 if (block == null) return;
                 isBlockLoading = false;
+                isTransactionLoading = true;
                 StateHasChanged();
 
-                isTransactionLoading = true;
                 string transactionDatacacheKey = $"blockDetailTransactions-{blockId}-page{gotoPage}";
                 var transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
                     async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockId: blockNumber, cancellationToken: localCTS.Token),
@@ -168,9 +164,12 @@
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            finally
+            { 
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
         }
     }
 }

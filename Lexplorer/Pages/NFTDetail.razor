@@ -58,24 +58,43 @@
             <td>Animation URL</td>
             <td Style="word-break:break-all;">@nftMetadata?.animation_url</td>
         </tr>
-        @if (nftMetadata?.attributes?.Count > 0)
+        @if ((nftMetadata?.attributes?.Count > 0) || (nftMetadata?.properties?.Count > 0))
         {
             <tr>
                 <td colspan="2">
-                    <MudExpansionPanels>
-                        <MudExpansionPanel Text="Traits">
-                            <MudSimpleTable Dense="true" Striped="true" Bordered="true">
-                                <tbody>
-                                    @foreach (var trait in nftMetadata?.attributes!)
-                                    {
-                                        <tr>
-                                            <td>@trait.trait_type</td>
-                                            <td>@trait.value</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </MudSimpleTable>
-                        </MudExpansionPanel>
+                    <MudExpansionPanels MultiExpansion="true">
+                        @if (nftMetadata?.attributes?.Count > 0)
+                        {
+                            <LexpansionPanel Text="Traits">
+                                <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                                    <tbody>
+                                        @foreach (var trait in nftMetadata?.attributes!)
+                                        {
+                                            <tr>
+                                                <td>@trait.trait_type</td>
+                                                <td>@trait.value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                            </LexpansionPanel>
+                        }
+                        @if (nftMetadata?.properties?.Count > 0)
+                        {
+                            <LexpansionPanel Text="Properties">
+                                <MudSimpleTable Dense="true" Striped="true" Bordered="true">
+                                    <tbody>
+                                        @foreach (var pair in nftMetadata?.properties!)
+                                        {
+                                            <tr>
+                                                <td>@pair.Key</td>
+                                                <td>@pair.Value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                            </LexpansionPanel>
+                        }
                     </MudExpansionPanels>
                 </td>
             </tr>
@@ -104,35 +123,58 @@
 </MudSimpleTable>
 
 <br />
-
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Transactions</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage = 1)" />
-        <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(gotoPage == 1) OnClick="@(() => gotoPage -= 1)" />
-        <MudNumericField HideSpinButtons="true" @bind-Value="gotoPage" Label="Page" Variant="Variant.Outlined" Min="1" Margin="Margin.Dense" Class="flex-grow-0" Style="width:50px;" />
-        <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(transactions!.Count < pageSize) OnClick="@(() => gotoPage += 1)" />
-        <MudSpacer />
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Tx Id</MudTh>
-        <MudTh>Type</MudTh>
-        <MudTh>From</MudTh>
-        <MudTh>To</MudTh>
-        <MudTh Style="text-align:right">Bought</MudTh>
-        <MudTh Style="text-align:right">Sold</MudTh>
-        <MudTh Style="text-align:right">Fee</MudTh>
-        <MudTh>Verified At (UTC)</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
-        <MudTd DataLabel="Type">@context.typeName</MudTd>
-        <TransactionTableDetails TransactionData=@context />
-        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-    </RowTemplate>
-</MudTable>
-
+<MudExpansionPanels MultiExpansion="true">
+    <LexpansionPanel Text="Transactions">
+            <ChildContent>
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" />
+                        <MudSpacer />
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Tx Id</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>From</MudTh>
+                        <MudTh>To</MudTh>
+                        <MudTh Style="text-align:right">Bought</MudTh>
+                        <MudTh Style="text-align:right">Sold</MudTh>
+                        <MudTh Style="text-align:right">Fee</MudTh>
+                        <MudTh>Verified At (UTC)</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+                        <MudTd DataLabel="Type">@context.typeName</MudTd>
+                        <TransactionTableDetails TransactionData=@context />
+                        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" IsOptionalBottomPager="true" />
+            </ChildContent>
+    </LexpansionPanel>
+    <LexpansionPanel Text="Holders">
+            <ChildContent>
+                <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
+                    <ToolBarContent>
+                        <MudSpacer />
+                        <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
+                        <MudSpacer />
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Account Id</MudTh>
+                        <MudTh>Address</MudTh>
+                        <MudTh>Balance</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Account Id">@context?.account?.id</MudTd>
+                        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.account?.id, context?.account?.address, true)</MudTd>
+                        <MudTd DataLabel="Balance">@context?.balance</MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" IsOptionalBottomPager="true" />
+            </ChildContent>
+    </LexpansionPanel>
+</MudExpansionPanels>
 
 @code {
     [Parameter]
@@ -142,11 +184,16 @@
     [SupplyParameterFromQuery]
     public string pageNumber { get; set; } = "1";
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string nftHolderPageNumber { get; set; } = "1";
+
     private NonFungibleToken? nft;
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
+    private IList<AccountNFTSlot>? holders { get; set; } = new List<AccountNFTSlot>();
     public bool isLoading = true;
+    public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
-
     private NftMetadata? nftMetadata;
 
     public int gotoPage
@@ -157,7 +204,20 @@
         }
         set
         {
-            string URL = $"/nfts/{nftId}?pageNumber={value}";
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), value);
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
+    public int goToHolderPage
+    {
+        get
+        {
+            return int.Parse(nftHolderPageNumber ?? "1");
+        }
+        set
+        {
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(nftHolderPageNumber), value);
             NavigationManager.NavigateTo(URL);
         }
     }
@@ -173,7 +233,7 @@
         {
             //give future calls a chance to cancel us; it is now safe to replace
             //any previous value of cts, since we already cancelled it above
-            cts = localCTS;
+            Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
             try
             {
                 isLoading = true;
@@ -181,6 +241,7 @@
                 {
                     nft = null;
                     transactions = new List<Transaction>();
+                    holders = new List<AccountNFTSlot>();
                     pageNumber = "1";
                     StateHasChanged();
                 }
@@ -207,6 +268,15 @@
                     DateTimeOffset.UtcNow.AddMinutes(10));
                 isLoading = false;
                 StateHasChanged();
+
+                // Get NFT Holders
+                string nftHoldersCacheKey = $"nft{nftId}-holders-page{nftHolderPageNumber}";
+                holders = await AppCache.GetOrAddAsyncNonNull(nftHoldersCacheKey,
+                    async () => await LoopringGraphQLService.GetNftHolders(nftId, (goToHolderPage - 1) * pageSize, pageSize, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddMinutes(10));
+                isLoadingHolders = false;
+                StateHasChanged();
+
 
                 //load the NFT metadata last - it might actually take the longest and other services are queried etc.
                 if (nftMetadata == null)
@@ -236,9 +306,12 @@
             {
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
-            //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
-            //otherwise a new call has already replaced cts with it's own localCTS
-            Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            finally
+            {
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
         }
     }
 
