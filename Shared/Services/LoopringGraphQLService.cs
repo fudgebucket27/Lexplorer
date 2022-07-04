@@ -1650,6 +1650,57 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<List<AccountTokenBalance>?> GetWhales(string tokenId, int first = 25, int skip = 0, CancellationToken cancellationToken = default)
+        {
+            var tokenQuery = @"
+            query whales(
+                $tokenId: String
+                $first: Int
+                $skip: Int
+            ){
+                accountTokenBalances(
+                    orderDirection: desc
+                    orderBy: balance
+                    where: {token_: {id: $tokenId}}
+                    first: $first
+                    skip: $skip
+                ) {
+                    balance
+                    account {
+                        address
+                        id
+                        __typename
+                    }
+                }
+            }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = tokenQuery,
+                variables = new
+                {
+                    tokenId,
+                    first,
+                    skip
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? jtoken = jresponse["data"]!["accountTokenBalances"];
+                return jtoken!.ToObject<List<AccountTokenBalance>>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();
