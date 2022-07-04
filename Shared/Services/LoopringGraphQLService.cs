@@ -931,7 +931,6 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request);
-                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken? token = jresponse["data"]!["pair"];
                 return token!.ToObject<Pair>();
@@ -1005,7 +1004,6 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request);
-                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
                 JObject jresponse = JObject.Parse(response.Content!);
                 JToken? token = jresponse["data"]!["pair"]!["dailyEntities"];
                 return token!.ToObject<IList<PairDailyData>>();
