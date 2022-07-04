@@ -1650,7 +1650,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<List<AccountTokenBalance>?> GetWhales(string tokenId, int first = 25, int skip = 0, CancellationToken cancellationToken = default)
+        public async Task<List<AccountTokenBalance>?> GetBalancesForTokenAsync(string tokenId, int first = 25, int skip = 0, CancellationToken cancellationToken = default)
         {
             var tokenQuery = @"
             query whales(

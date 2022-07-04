@@ -125,7 +125,7 @@
             token.decimals = poolToken.token.decimals;
         }
 
-        whales = await LoopringGraphQLService.GetWhales(token.id!, pageSize, (gotoPage - 1) * pageSize);
+        whales = await LoopringGraphQLService.GetBalancesForTokenAsync(token.id!, pageSize, (gotoPage - 1) * pageSize);
         isLoading = false;
         StateHasChanged();
     }

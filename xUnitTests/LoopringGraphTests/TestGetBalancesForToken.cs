@@ -9,12 +9,12 @@ using Xunit;
 namespace xUnitTests.LoopringGraphTests;
 
 [Collection("LoopringGraphQL collection")]
-public class TestGetWhales
+public class TestGetBalancesForToken
 {
     GraphQLTestsFixture fixture;
     LoopringGraphQLService service;
 
-    public TestGetWhales(GraphQLTestsFixture fixture)
+    public TestGetBalancesForToken(GraphQLTestsFixture fixture)
     {
         this.fixture = fixture;
         service = fixture!.LGS;
@@ -23,7 +23,7 @@ public class TestGetWhales
     [Fact]
     public async void GetWhales()
     {
-        var whales = await service.GetWhales("1", first: 25);
+        var whales = await service.GetBalancesForTokenAsync("1", first: 25);
         Assert.NotEmpty(whales);
         Assert.Equal(25, whales!.Count);
         whales.ForEach(x => Assert.NotNull(x.balance));
