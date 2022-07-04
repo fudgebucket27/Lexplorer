@@ -26,6 +26,6 @@ public class TestGetBalancesForToken
         var whales = await service.GetBalancesForTokenAsync("1", first: 25);
         Assert.NotEmpty(whales);
         Assert.Equal(25, whales!.Count);
-        whales.ForEach(x => Assert.NotNull(x.balance));
+        whales.ForEach(x => Assert.NotNull(x?.balance));
     }
 }
