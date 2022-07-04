@@ -41,14 +41,59 @@
     </tbody>
 </MudSimpleTable>
 
+<br />
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@whales" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Whales</MudText>
+        <MudSpacer />
+        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(whales!.Count < pageSize)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>L1 address</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Balance</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Account Id">@LinkHelper.GetObjectLink(context?.account)</MudTd>
+        <MudTd DataLabel="Address"><L1AccountLink address="@context?.account?.address" /></MudTd>
+        <MudTd DataLabel="Type">@context?.account?.typeName</MudTd>
+        <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, token!.decimals) @token?.symbol</MudTd>
+    </RowTemplate>
+</MudTable>
+<OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(whales!.Count < pageSize)" IsOptionalBottomPager="true" />
+
 
 @code {
     [Parameter]
     public string tokenId { get; set; } = "";
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    public int gotoPage
+    {
+        get
+        {
+            return int.TryParse(pageNumber, out int np) ? np : 1;
+        }
+        set
+        {
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
     private Token? token { get; set; }
     private LoopringPoolToken? poolToken { get; set; }
     private UniswapToken? uniswapToken { get; set; }
+    private IList<AccountTokenBalance>? whales { get; set; } = new List<AccountTokenBalance>();
+    public readonly int pageSize = 25;
+    bool isLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -79,6 +124,9 @@
             token.symbol = poolToken.token.symbol;
             token.decimals = poolToken.token.decimals;
         }
+
+        whales = await LoopringGraphQLService.GetWhales(token.id!, pageSize, (gotoPage - 1) * pageSize);
+        isLoading = false;
         StateHasChanged();
     }
 }
