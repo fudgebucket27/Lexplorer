@@ -50,6 +50,9 @@
             else if (linkedObject is Pair pair)
                 return new Tuple<string, string>($"pairs/{pair.id}",
                     $"{pair.token0?.symbol} / {pair.token1?.symbol}");
+            else if (linkedObject is Token token)
+                return new Tuple<string, string>($"tokens/{token.id}",
+                    $"{token?.failSafeSymbol}");
             else
                 return null;
         }
