@@ -45,7 +45,7 @@
 
 <MudTable Dense="true" Striped="true" Bordered="true" Items="@whales" Hover="true" Loading=@isLoading>
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Whales</MudText>
+        <MudText Typo="Typo.h6">Top Holders</MudText>
         <MudSpacer />
         <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(whales!.Count < pageSize)" />
         <MudSpacer />
@@ -125,7 +125,10 @@
             token.decimals = poolToken.token.decimals;
         }
 
-        whales = await LoopringGraphQLService.GetBalancesForTokenAsync(token.id!, pageSize, (gotoPage - 1) * pageSize);
+        string whalesTokenCacheKey = $"TokenHolders-{gotoPage}";
+        whales = await AppCache.GetOrAddAsyncNonNull(whalesTokenCacheKey,
+            async () => await LoopringGraphQLService.GetBalancesForTokenAsync(token.id!, pageSize, (gotoPage - 1) * pageSize, cancellationToken: CancellationToken.None),
+            DateTimeOffset.UtcNow.AddHours(1));
         isLoading = false;
         StateHasChanged();
     }
