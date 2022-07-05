@@ -1650,10 +1650,10 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<List<AccountTokenBalance>?> GetBalancesForTokenAsync(string tokenId, int first = 25, int skip = 0, CancellationToken cancellationToken = default)
+        public async Task<List<AccountTokenBalance>?> GetTokenHolders(string tokenId, int skip = 0, int first = 25, CancellationToken cancellationToken = default)
         {
-            var tokenQuery = @"
-            query whales(
+            var tokenHoldersQuery = @"
+            query tokenHolders(
                 $tokenId: String
                 $first: Int
                 $skip: Int
@@ -1661,7 +1661,7 @@ namespace Lexplorer.Services
                 accountTokenBalances(
                     orderDirection: desc
                     orderBy: balance
-                    where: {token_: {id: $tokenId}}
+                    where: {token: $tokenId}
                     first: $first
                     skip: $skip
                 ) {
@@ -1679,7 +1679,7 @@ namespace Lexplorer.Services
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(new
             {
-                query = tokenQuery,
+                query = tokenHoldersQuery,
                 variables = new
                 {
                     tokenId,

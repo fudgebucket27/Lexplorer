@@ -39,5 +39,14 @@ namespace xUnitTests.LoopringGraphTests
             Assert.Equal(tokenAddress, token!.address);
         }
 
+        [Fact]
+        public async void GetLRCTokenHolders()
+        {
+            var holders = await service.GetTokenHolders("1", first: 25);
+            Assert.NotEmpty(holders);
+            Assert.Equal(25, holders!.Count);
+            holders.ForEach(x => Assert.NotNull(x?.balance));
+        }
+
     }
 }

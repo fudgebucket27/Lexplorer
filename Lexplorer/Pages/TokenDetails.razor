@@ -43,11 +43,11 @@
 
 <br />
 
-<MudTable Dense="true" Striped="true" Bordered="true" Items="@whales" Hover="true" Loading=@isLoading>
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@tokenHolders" Hover="true" Loading=@isLoading>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Top Holders</MudText>
         <MudSpacer />
-        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(whales!.Count < pageSize)" />
+        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(tokenHolders?.Count < pageSize)" />
         <MudSpacer />
     </ToolBarContent>
     <HeaderContent>
@@ -63,7 +63,7 @@
         <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, token!.decimals) @token?.symbol</MudTd>
     </RowTemplate>
 </MudTable>
-<OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(whales!.Count < pageSize)" IsOptionalBottomPager="true" />
+<OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(tokenHolders?.Count < pageSize)" IsOptionalBottomPager="true" />
 
 
 @code {
@@ -91,7 +91,7 @@
     private Token? token { get; set; }
     private LoopringPoolToken? poolToken { get; set; }
     private UniswapToken? uniswapToken { get; set; }
-    private IList<AccountTokenBalance>? whales { get; set; } = new List<AccountTokenBalance>();
+    private IList<AccountTokenBalance>? tokenHolders { get; set; } = new List<AccountTokenBalance>();
     public readonly int pageSize = 25;
     bool isLoading = true;
 
@@ -125,9 +125,9 @@
             token.decimals = poolToken.token.decimals;
         }
 
-        string whalesTokenCacheKey = $"TokenHolders-{gotoPage}";
-        whales = await AppCache.GetOrAddAsyncNonNull(whalesTokenCacheKey,
-            async () => await LoopringGraphQLService.GetBalancesForTokenAsync(token.id!, pageSize, (gotoPage - 1) * pageSize, cancellationToken: CancellationToken.None),
+        string tokenHoldersCacheKey = $"tokenHolders-{tokenId}-{gotoPage}";
+        tokenHolders = await AppCache.GetOrAddAsyncNonNull(tokenHoldersCacheKey,
+            async () => await LoopringGraphQLService.GetTokenHolders(token.id!, (gotoPage - 1) * pageSize, pageSize, cancellationToken: CancellationToken.None),
             DateTimeOffset.UtcNow.AddHours(1));
         isLoading = false;
         StateHasChanged();
