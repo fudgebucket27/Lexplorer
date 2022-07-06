@@ -1,0 +1,102 @@
+﻿@page "/tokens"
+@using System.Diagnostics; 
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject IAppCache AppCache;
+@inject NavigationManager NavigationManager;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
+
+<PageTitle>The Lexplorer - Tokens</PageTitle>
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@tokens" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Tokens</MudText>
+        <MudSpacer />
+        <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@((tokens?.Count ?? pageSize) < pageSize)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Token</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Traded volume</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Token">@LinkHelper.GetObjectLink(context)</MudTd>
+        <MudTd DataLabel="Name">@context.name</MudTd>
+        <MudTd DataLabel="Address">@context.address</MudTd>
+        <MudTd DataLabel="Traded volume">@TokenAmountConverter.ToStringWithExponent(context.tradedVolume, context.decimals, 1)</MudTd>
+    </RowTemplate>
+</MudTable>
+<OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@((tokens?.Count ?? pageSize) < pageSize)" IsOptionalBottomPager="true" />
+
+@code {
+    private List<Token>? tokens { get; set; } = new();
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    public int gotoPage
+    {
+        get
+        {
+            return Int32.Parse(pageNumber ?? "1");
+        }
+        set
+        {
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
+    public bool isLoading = true;
+    public readonly int pageSize = 10;
+    private CancellationTokenSource? cts;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //cancel any previous OnParametersSetAsync which might still be running
+        cts?.Cancel();
+
+        using (CancellationTokenSource localCTS = new CancellationTokenSource())
+        {
+            //give future calls a chance to cancel us; it is now safe to replace
+            //any previous value of cts, since we already cancelled it above
+            Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
+            try
+            {
+                isLoading = true;
+                string tokensCacheKey = $"tokens-page{gotoPage}";
+                tokens = await AppCache.GetOrAddAsyncNonNull(tokensCacheKey,
+                    async () => await LoopringGraphQLService.GetTokens((gotoPage - 1) * pageSize, pageSize, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddHours(1));
+                if (tokens == null) return;
+                foreach (var token in tokens!)
+                {
+                    var poolToken = await poolTokenCacheService.GetPoolToken(token, localCTS.Token);
+                    if (poolToken?.token == null) continue;
+
+                    //replace properties
+                    token.name = poolToken.token.name;
+                    token.symbol = poolToken.token.symbol;
+                    token.decimals = poolToken.token.decimals;
+                }
+                isLoading = false;
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            }
+            finally
+            {
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
+            }
+        }
+    }
+}

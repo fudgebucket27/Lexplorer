@@ -43,7 +43,7 @@
             {
                 <tr>
                     <td>Pool token</td>
-                    <td>@(poolToken?.token?.name)</td>
+                    <td>@LinkHelper.GetObjectLink(poolToken?.token)</td>
                 </tr>
                 <tr>
                     <td>Pair</td>
@@ -64,7 +64,7 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd Style="text-align:right" DataLabel="Token">@context.token!.name</MudTd>
-                        <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals) @context.token.symbol</MudTd>
+                        <MudTd DataLabel="Balance">@TokenAmountConverter.ToString(context.balance, context.token!.decimals) @LinkHelper.GetObjectLink(context.token)</MudTd>
                     </RowTemplate>
                     <PagerContent>
                         @if (account?.balances?.Count > 10)

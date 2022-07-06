@@ -1,0 +1,141 @@
+﻿@page "/tokens/{tokenId}"
+@using Lexplorer.Components;
+@using Lexplorer.Helpers;
+@using Lexplorer.Models;
+@using System.Diagnostics
+@inject IAppCache AppCache;
+@inject NavigationManager NavigationManager;
+@inject LoopringGraphQLService LoopringGraphQLService;
+@inject LoopringPoolTokenCacheService poolTokenCacheService;
+@inject UniswapGraphQLService UniswapGraphQLService;
+
+<PageTitle>The Lexplorer - token @(token?.symbol) </PageTitle>
+
+<MudSimpleTable Dense="true" Striped="true" Bordered="true">
+    <tbody>
+        <tr>
+            <td colspan="2">
+                <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
+                    <MudText Typo="Typo.h6">Token @token?.symbol (@token?.name)</MudText>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Total volume</td>
+            <td>@TokenAmountConverter.ToStringWithExponent(token?.tradedVolume ?? 0, token?.decimals ?? 0, 1) @token?.symbol </td>
+        </tr>
+        @if (uniswapToken != null)
+        {
+            <tr>
+                <td>Price</td>
+                <td>@uniswapToken.data?.tokenDayDatas?.FirstOrDefault()?.priceUSD.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+            </tr>
+        }
+        @if (poolToken != null)
+        {
+            <tr>
+                <td>Pool</td>
+                <td>@LinkHelper.GetObjectLink(poolToken.pool) @poolToken.token?.name</td>
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+
+<br />
+
+<MudTable Dense="true" Striped="true" Bordered="true" Items="@tokenHolders" Hover="true" Loading=@isLoading>
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Top Holders</MudText>
+        <MudSpacer />
+        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(tokenHolders?.Count < pageSize)" />
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Account Id</MudTh>
+        <MudTh>L1 address</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh Style="text-align:right">Balance</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Account Id">@LinkHelper.GetObjectLink(context?.account)</MudTd>
+        <MudTd DataLabel="Address"><L1AccountLink address="@context?.account?.address" /></MudTd>
+        <MudTd DataLabel="Type">@context?.account?.typeName</MudTd>
+        <MudTd Style="text-align:right" DataLabel="Balance">@TokenAmountConverter.ToStringWithExponent(context.balance, token?.decimals ?? 0, 1)</MudTd>
+    </RowTemplate>
+</MudTable>
+<OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(tokenHolders?.Count < pageSize)" IsOptionalBottomPager="true" />
+
+
+@code {
+    [Parameter]
+    public string tokenId { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string pageNumber { get; set; } = "1";
+
+    public int gotoPage
+    {
+        get
+        {
+            return int.TryParse(pageNumber, out int np) ? np : 1;
+        }
+        set
+        {
+            pageNumber = value.ToString();
+            var URL = NavigationManager.GetUriWithQueryParameter(nameof(pageNumber), pageNumber);
+            NavigationManager.NavigateTo(URL);
+        }
+    }
+
+    private Token? token { get; set; }
+    private LoopringPoolToken? poolToken { get; set; }
+    private UniswapToken? uniswapToken { get; set; }
+    private IList<AccountTokenBalance>? tokenHolders { get; set; } = new List<AccountTokenBalance>();
+    public readonly int pageSize = 25;
+    bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (token?.id != tokenId)
+        {
+            isLoading = true;
+            poolToken = null;
+            uniswapToken = null;
+            tokenHolders = new List<AccountTokenBalance>();
+            string tokenCacheKey = $"token-{tokenId}";
+            token = await AppCache.GetOrAddAsyncNonNull(tokenCacheKey,
+                async () => await LoopringGraphQLService.GetToken(tokenId),
+                DateTimeOffset.UtcNow.AddHours(1));
+            if (token == null) return;
+            StateHasChanged();
+            poolToken = await poolTokenCacheService.GetPoolToken(token);
+            if (poolToken?.token == null)
+            {
+                if (token.id != "0")  //we cannot get the ETH price that way, ETH has no token address
+                { 
+                    string uniswapTokenCacheKey = $"uniSwapTokenPrice-{token.address}";
+                    uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey,
+                        async () => await UniswapGraphQLService.GetTokenPrice(token.address!),
+                        DateTimeOffset.UtcNow.AddHours(1));
+                }
+            }
+            else
+            {
+                //normally we would just replace the token with poolToken.token, but currently that would loose tradedVolume
+                token.name = poolToken.token.name;
+                token.symbol = poolToken.token.symbol;
+                token.decimals = poolToken.token.decimals;
+                StateHasChanged();
+            }
+        }
+
+        isLoading = true;
+        string tokenHoldersCacheKey = $"tokenHolders-{tokenId}-{gotoPage}";
+        tokenHolders = await AppCache.GetOrAddAsyncNonNull(tokenHoldersCacheKey,
+            async () => await LoopringGraphQLService.GetTokenHolders(token.id!, (gotoPage - 1) * pageSize, pageSize),
+            DateTimeOffset.UtcNow.AddHours(1));
+        isLoading = false;
+        StateHasChanged();
+    }
+}

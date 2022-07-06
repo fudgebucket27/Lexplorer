@@ -1553,6 +1553,154 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<List<Token>?> GetTokens(int skip = 0, int first = 10, string orderBy = "tradedVolume",
+            string orderDirection = "desc", CancellationToken cancellationToken = default)
+        {
+            var tokensQuery = @"
+             query tokens(
+                $skip: Int
+                $first: Int
+                $orderBy: Token_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                tokens(
+                  skip: $skip
+                  first: $first
+                  orderBy: $orderBy
+                  orderDirection: $orderDirection
+                ) {
+                  id
+                  name
+                  symbol
+                  decimals
+                  address
+                  tradedVolume
+                }
+              }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = tokensQuery,
+                variables = new
+                {
+                    skip = skip,
+                    first = first,
+                    orderBy = orderBy,
+                    orderDirection = orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                return jresponse["data"]!["tokens"]!.ToObject<List<Token>>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Token?> GetToken(string tokenID)
+        {
+            var tokenQuery = @"
+             query token(
+                $tokenID: ID!
+              ) {
+                token(
+                  id: $tokenID
+                ) {
+                  id
+                  name
+                  symbol
+                  decimals
+                  address
+                  tradedVolume
+                  tradedVolumeSwap
+                  tradedVolumeOrderbook
+                }
+              }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = tokenQuery,
+                variables = new
+                {
+                    tokenID
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? jtoken = jresponse["data"]!["token"];
+                return jtoken!.ToObject<Token>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<List<AccountTokenBalance>?> GetTokenHolders(string tokenId, int skip = 0, int first = 25, CancellationToken cancellationToken = default)
+        {
+            var tokenHoldersQuery = @"
+            query tokenHolders(
+                $tokenId: String
+                $first: Int
+                $skip: Int
+            ){
+                accountTokenBalances(
+                    orderDirection: desc
+                    orderBy: balance
+                    where: {token: $tokenId}
+                    first: $first
+                    skip: $skip
+                ) {
+                    balance
+                    account {
+                        address
+                        id
+                        __typename
+                    }
+                }
+            }
+            ";
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = tokenHoldersQuery,
+                variables = new
+                {
+                    tokenId,
+                    first,
+                    skip
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request, cancellationToken);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? jtoken = jresponse["data"]!["accountTokenBalances"];
+                return jtoken!.ToObject<List<AccountTokenBalance>>()!;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

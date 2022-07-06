@@ -134,6 +134,10 @@ namespace Lexplorer.Models
         public string? id { get; set; }
         public string? name { get; set; }
         public string? symbol { get; set; }
+        public double tradedVolume { get; set; }
+        public double tradedVolumeSwap { get; set; }
+        public double tradedVolumeOrderbook { get; set; }
+        public string failSafeSymbol => string.IsNullOrEmpty(symbol) ? $"Token ({id})" : symbol;
     }
 
     public class AccountTokenBalance
