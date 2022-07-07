@@ -24,9 +24,8 @@ namespace xUnitTests.LoopringGraphTests
         public async void GetPairs()
         {
             var pairs = await service.GetPairs(0, 10);
-            Assert.NotNull(pairs?.data);
-            Assert.NotEmpty(pairs!.data!.pairs);
-            Assert.Equal(10, pairs!.data!.pairs!.Count);
+            Assert.NotEmpty(pairs);
+            Assert.Equal(10, pairs!.Count);
         }
 
         [Theory]

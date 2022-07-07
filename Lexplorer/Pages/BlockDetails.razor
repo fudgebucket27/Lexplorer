@@ -14,8 +14,8 @@
                 <div>
                     <MudIconButton Icon="@Icons.Filled.FirstPage" Disabled=@(blockId == 1) OnClick="@(() => blockId = 1)" />
                     <MudIconButton Icon="@Icons.Filled.NavigateBefore" Disabled=@(blockId == 1) OnClick="@(() => blockId -= 1)" />
-                    <MudText Typo="Typo.h6" Inline="true">Block #@block?.data?.block?.id</MudText>
-                    <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (block?.data?.proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
+                    <MudText Typo="Typo.h6" Inline="true">Block #@block?.id</MudText>
+                    <MudIconButton Icon="@Icons.Filled.NavigateNext" Disabled=@(blockId == (proxy?.blockCount ?? 0)) OnClick="@(() => blockId += 1)" />
                 </div>
             </td>
         </tr>
@@ -29,24 +29,24 @@
         }
         <tr>
             <td>Block Hash</td>
-            <td>@block?.data?.block?.blockHash</td>
+            <td>@block?.blockHash</td>
         </tr>
         <tr>
             <td>Block Size</td>
-            <td>@block?.data?.block?.blockSize</td>
+            <td>@block?.blockSize</td>
         </tr>
         <tr>
             <td>L1 Transaction Hash</td>
-            <td><L1TransactionLink txHash="@block?.data?.block?.txHash" shortenHash="false"></L1TransactionLink></td>
+            <td><L1TransactionLink txHash="@block?.txHash" shortenHash="false"></L1TransactionLink></td>
         </tr>
         <tr>
             <td>Verified At (UTC)</td>
-            <td>@TimestampConverter.ToUTCString(block?.data?.block?.timestamp!)</td>
+            <td>@TimestampConverter.ToUTCString(block?.timestamp!)</td>
         </tr>
         <tr>
             <td>Raw Data</td>
             <td>
-                <MudTextField T="string" Variant="Variant.Filled" Text="@block?.data?.block?.data" Lines="5" ReadOnly="true" />
+                <MudTextField T="string" Variant="Variant.Filled" Text="@block?.data" Lines="5" ReadOnly="true" />
             </td>
         </tr>
     </tbody>
@@ -56,7 +56,7 @@
 
 <MudTable Dense="true" Items="@transactions" Hover="true" Loading="@isTransactionLoading">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Transactions in block #@block?.data?.block?.id</MudText>
+        <MudText Typo="Typo.h6">Transactions in block #@block?.id</MudText>
         <MudSpacer />
         <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(transactions?.Count < pageSize)" />
         <MudSpacer />
@@ -75,13 +75,14 @@
         <MudTd DataLabel="Tx Id">@LinkHelper.GetObjectLink(context)</MudTd>
         <MudTd DataLabel="Type">@context.typeName</MudTd>
         <TransactionTableDetails TransactionData=@context />
-        <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block?.data?.block?.timestamp)</MudTd>
+        <MudTd DataLabel="Time">@TimestampConverter.ToUTCString(@block?.timestamp)</MudTd>
     </RowTemplate>
 </MudTable>
 <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(transactions?.Count < pageSize)" IsOptionalBottomPager="true" />
 
 @code {
     private Lexplorer.Models.Block? block;
+    private Proxy? proxy;
     private List<Transaction>? transactions = new();
 
     [Parameter]
@@ -140,19 +141,20 @@
                 transactions = new List<Transaction>();
                 isBlockLoading = true;
                 string blockCacheKey = $"blockDetailOverview-{blockId}";
-                block = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
+                var blockDTO = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
                     async () => await LoopringGraphQLService.GetBlockDetails(blockId, localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(5));
+                block = blockDTO?.block;
+                proxy = blockDTO?.proxy;
                 if (block == null) return;
                 isBlockLoading = false;
                 isTransactionLoading = true;
                 StateHasChanged();
 
                 string transactionDatacacheKey = $"blockDetailTransactions-{blockId}-page{gotoPage}";
-                var transactionData = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
+                transactions = await AppCache.GetOrAddAsyncNonNull(transactionDatacacheKey,
                     async () => await LoopringGraphQLService.GetTransactions((gotoPage - 1) * pageSize, pageSize, blockId: blockNumber, cancellationToken: localCTS.Token),
-                    DateTimeOffset.UtcNow.AddMinutes(5));
-                transactions = transactionData?.data?.transactions ?? new List<Transaction>();
+                    DateTimeOffset.UtcNow.AddMinutes(5)) ?? new List<Transaction>();
                 isTransactionLoading = false;
                 StateHasChanged();
 

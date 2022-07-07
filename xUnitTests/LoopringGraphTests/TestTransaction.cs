@@ -32,11 +32,10 @@ namespace xUnitTests.LoopringGraphTests
         public async void TestGetTransations(string? typeName)
         {
             var transactions = await service.GetTransactions(0, 5, typeName: typeName);
-            Assert.NotNull(transactions);
-            Assert.NotEmpty(transactions?.data?.transactions);
+            Assert.NotEmpty(transactions);
             if (!string.IsNullOrEmpty(typeName))
             {
-                foreach (var transaction in transactions?.data?.transactions!)
+                foreach (var transaction in transactions!)
                 {
                     Assert.Equal(typeName, transaction.typeName);
                 }
@@ -48,8 +47,7 @@ namespace xUnitTests.LoopringGraphTests
         public async void TestGetBlockTransations(string? blockId)
         {
             var transactions = await service.GetTransactions(0, 5, blockId: blockId);
-            Assert.NotNull(transactions);
-            Assert.NotEmpty(transactions?.data?.transactions);
+            Assert.NotEmpty(transactions);
         }
     }
 }
