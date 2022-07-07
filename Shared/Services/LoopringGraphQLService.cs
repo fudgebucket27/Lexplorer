@@ -819,7 +819,7 @@ namespace Lexplorer.Services
 
             return count;
         }
-        public async Task<Pairs?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
+        public async Task<List<Pair>?> GetPairs(int skip = 0, int first = 10, string orderBy = "tradedVolumeToken0Swap", string orderDirection = "desc")
         {
             var pairsQuery = @"
              query pairs(
@@ -878,8 +878,9 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request);
-                var data = JsonConvert.DeserializeObject<Pairs>(response.Content!);
-                return data;
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? jtoken = jresponse["data"]!["pairs"];
+                return jtoken!.ToObject<List<Pair>>()!;
             }
             catch (Exception ex)
             {

@@ -187,8 +187,7 @@
         transactionData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
         StateHasChanged();
         string pairsCacheKey = $"homepage-pairs";
-        var pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
-        pairs = pairsData?.data?.pairs;
+        pairs = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
         foreach (var pair in pairs!)
         {
             if (string.IsNullOrEmpty(pair.token1?.address)) continue;

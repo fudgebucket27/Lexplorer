@@ -58,10 +58,9 @@
         }
         isLoading = true;
         string pairsCacheKey = $"pairsOverview-pairs-page{pageNumber}";
-        var pairsData = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey,
+        pairs = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey,
             async () => await LoopringGraphQLService.GetPairs((gotoPage - 1) * pageSize, pageSize),
             DateTimeOffset.UtcNow.AddHours(1));
-        pairs = pairsData?.data?.pairs;
         if (pairs == null) return;
         foreach (var pair in pairs!)
         {

@@ -472,16 +472,6 @@ namespace Lexplorer.Models
         public TransactionsData? data { get; set; }
     }
 
-    public class Pairs
-    {
-        public PairsData? data { get; set; }
-    }
-
-    public class PairsData
-    {
-        public List<Pair>? pairs { get; set; }
-    }
-
     public class PairEntity
     {
         public string? id { get; set; }
