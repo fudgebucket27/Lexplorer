@@ -19,7 +19,7 @@ namespace Lexplorer.Models
         }
     }
 
-    public class BlockDetail
+    public class Block
     {
         [JsonProperty("__typename")]
         public string? typeName { get; set; }
@@ -52,27 +52,18 @@ namespace Lexplorer.Models
         public long withdrawalNFTCount { get; set; }
     }
 
-    public class BlockData
+    public class BlockAndProxyDTO
     {
-        public BlockDetail? block { get; set; }
+        public Block? block { get; set; }
         public Proxy? proxy { get; set; }
     }
 
-    public class Block
+    public class BlocksAndProxyDTO
     {
-        public BlockData? data { get; set; }
-    }
-
-    public class BlocksData
-    {
-        public List<BlockDetail>? blocks { get; set; }
+        public List<Block>? blocks { get; set; }
         public Proxy? proxy { get; set; }
     }
 
-    public class Blocks
-    {
-        public BlocksData? data { get; set; }
-    }
     public class Proxy
     {
         public long accountUpdateCount { get; set; }
@@ -190,7 +181,7 @@ namespace Lexplorer.Models
         [JsonProperty(PropertyName = "__typename")]
         public string? typeName { get; set; }
         public string? data { get; set; }
-        public BlockDetail? block { get; set; }
+        public Block? block { get; set; }
         public List<AccountTokenBalance>? tokenBalances { get; set; }
         public List<Account>? accounts { get; set; }
         public string? verifiedAt
@@ -459,17 +450,6 @@ namespace Lexplorer.Models
                 }
             }
         }
-    }
-
-    public class TransactionsData
-    {
-        public Proxy? proxy { get; set; }
-        public List<Transaction>? transactions { get; set; }
-    }
-
-    public class Transactions
-    {
-        public TransactionsData? data { get; set; }
     }
 
     public class PairEntity

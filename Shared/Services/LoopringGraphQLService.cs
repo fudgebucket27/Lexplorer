@@ -33,7 +33,7 @@ namespace Lexplorer.Services
             _client = new RestClient(baseUrl);
         }
 
-        public async Task<Blocks?> GetBlocks(int skip, int first, string orderBy = "internalID",
+        public async Task<BlocksAndProxyDTO?> GetBlocks(int skip, int first, string orderBy = "internalID",
             string orderDirection = "desc", string? blockTimestamp = null, bool gte = true)
         {
             var blocksQuery = @"
@@ -107,8 +107,8 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request);
-                var data = JsonConvert.DeserializeObject<Blocks>(response.Content!);
-                return data;
+                var jtoken = JToken.Parse(response.Content!);
+                return jtoken["data"]!.ToObject<BlocksAndProxyDTO>();
             }
             catch (Exception ex)
             {
@@ -175,7 +175,7 @@ namespace Lexplorer.Services
 
         }
 
-        public async Task<Block?> GetBlockDetails(int blockId, CancellationToken cancellationToken = default)
+        public async Task<BlockAndProxyDTO?> GetBlockDetails(int blockId, CancellationToken cancellationToken = default)
         {
             var blockQuery = @"
             query block($id: ID!) {
@@ -219,8 +219,8 @@ namespace Lexplorer.Services
                 }
             });
             var response = await _client.PostAsync(request, cancellationToken);
-            var data = JsonConvert.DeserializeObject<Block>(response.Content!);
-            return data;
+            var jToken = JToken.Parse(response.Content!);
+            return jToken["data"]!.ToObject<BlockAndProxyDTO>();
         }
 
         public async Task<Transaction?> GetTransaction(string transactionId)
@@ -303,7 +303,7 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<Transactions?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default)
+        public async Task<List<Transaction>?> GetTransactions(int skip, int first, string? blockId = null, string? typeName = null, CancellationToken cancellationToken = default)
         {
             var transactionsQuery = @"
               query transactions(
@@ -313,25 +313,6 @@ namespace Lexplorer.Services
                 $orderDirection: OrderDirection
                 $whereFilter: Transaction_filter
               ) {
-                proxy(id: 0) {
-                  transactionCount
-                  depositCount
-                  withdrawalCount
-                  transferCount
-                  addCount
-                  removeCount
-                  orderbookTradeCount
-                  swapCount
-                  accountUpdateCount
-                  ammUpdateCount
-                  signatureVerificationCount
-                  tradeNFTCount
-                  swapNFTCount
-                  withdrawalNFTCount
-                  transferNFTCount
-                  nftMintCount
-                  nftDataCount
-                }
                 transactions(
                   skip: $skip
                   first: $first
@@ -425,8 +406,8 @@ namespace Lexplorer.Services
             try
             {
                 var response = await _client.PostAsync(request, cancellationToken);
-                var data = JsonConvert.DeserializeObject<Transactions>(response.Content!);
-                return data;
+                var jtoken = JToken.Parse(response.Content!);
+                return jtoken["data"]!["transactions"]!.ToObject<List<Transaction>>();
             }
             catch (Exception ex)
             {
@@ -1021,7 +1002,7 @@ namespace Lexplorer.Services
         {
                 { "accounts", typeof(Account) },
                 { "accountsByAddress", typeof(Account) },
-                { "blocks", typeof(BlockDetail) },
+                { "blocks", typeof(Block) },
                 { "transactions", typeof(Transaction) },
                 { "nonFungibleTokens", typeof(NonFungibleToken) },
                 { "nonFungibleTokensBynftID", typeof(NonFungibleToken) },

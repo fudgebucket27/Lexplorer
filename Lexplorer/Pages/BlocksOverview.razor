@@ -28,7 +28,8 @@
 <OpenEndedPager @bind-PageNumber="@gotoPage" IsLastPage="@(blocks?.Count < pageSize)" IsOptionalBottomPager="true" />
 
 @code {
-    private List<BlockDetail>? blocks = new List<BlockDetail>();
+    private List<Lexplorer.Models.Block>? blocks = new();
+    private Proxy? proxy;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -56,10 +57,11 @@
     {
         isLoading = true;
         string blockCacheKey = $"blocks-{gotoPage}";
-        var blockData = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
+        var blocksDTO = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
             async () => await LoopringGraphQLService.GetBlocks((gotoPage - 1) * pageSize, pageSize),
             DateTimeOffset.UtcNow.AddMinutes(10));
-        blocks = blockData?.data?.blocks ?? new List<BlockDetail>();
+        blocks = blocksDTO?.blocks ?? new();
+        proxy = blocksDTO?.proxy;
         isLoading = false;
         StateHasChanged();
     }

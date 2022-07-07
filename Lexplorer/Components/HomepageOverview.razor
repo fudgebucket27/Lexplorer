@@ -6,14 +6,14 @@
 
     <MudGrid>
         <MudItem sm="12">
-            <p hidden="@(transactionData != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /></p>
+            <p hidden="@(proxy != null)"><MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" /></p>
         </MudItem>
         <MudItem xs="12" md="6" lg="4">
             <MudCard Style="height:100%;position:relative">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Transactions</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.transactionCount.ToString("N0")
+                        @proxy?.transactionCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TransactionCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -24,7 +24,7 @@
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total Blocks</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.blockCount.ToString("N0")
+                        @proxy?.blockCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.BlockCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -35,7 +35,7 @@
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">Total L2 Accounts</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.userCount.ToString("N0")
+                        @proxy?.userCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.UserCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -70,7 +70,7 @@
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Mint Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.nftMintCount.ToString("N0")
+                        @proxy?.nftMintCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.NFTMintCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -81,7 +81,7 @@
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Trade Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.tradeNFTCount.ToString("N0")
+                        @proxy?.tradeNFTCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TradeNFTCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -92,7 +92,7 @@
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Align="Align.Center">NFT Transfer Count</MudText>
                     <MudText Typo="Typo.body1" Align="Align.Center">
-                        @blockData?.data?.proxy?.transferNFTCount.ToString("N0")
+                        @proxy?.transferNFTCount.ToString("N0")
                         <MudText Color="Color.Primary">+@dailyCount.TransferNFTCount.ToString("N0") in 24 hours</MudText>
                     </MudText>
                 </MudCardContent>
@@ -102,7 +102,7 @@
 
     <MudGrid>
         <MudItem xs="12" sm="12" md="12">
-            <MudTable Dense="true" Items="@transactionData?.data?.transactions" Hover="true">
+            <MudTable Dense="true" Items="@transactions" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Latest Transactions</MudText>
                 </ToolBarContent>
@@ -120,13 +120,13 @@
                     <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
                     <MudTd DataLabel="Type">@context.typeName</MudTd>
                     <TransactionTableDetails TransactionData=@context />
-                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blockData?.data?.blocks?[0].timestamp)</MudTd>
+                    <MudTd DataLabel="Timestamp">@TimestampConverter.ToUTCString(@blocks?[0].timestamp)</MudTd>
                 </RowTemplate>
             </MudTable>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="GoToTransactionOverviewPage">View more transactions</MudButton>
         </MudItem>
         <MudItem xs="12" sm="12" md="6">
-            <MudTable Dense="true" Items="@blockData?.data?.blocks" Hover="true">
+            <MudTable Dense="true" Items="@blocks" Hover="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Latest Blocks</MudText>
                 </ToolBarContent>
@@ -164,8 +164,9 @@
     </MudGrid>
 @code
 {
-    private Blocks? blockData;
-    private Transactions? transactionData;
+    private List<Lexplorer.Models.Block>? blocks;
+    private List<Transaction>? transactions;
+    private Proxy? proxy;
     private List<Lexplorer.Models.Pair>? pairs { get; set; } = new();
     private Dictionary<string, UniswapToken> uniswapTokens = new();
     private LoopStatsDailyCount dailyCount { get; set; } = new();
@@ -177,14 +178,22 @@
     protected override async Task OnInitializedAsync()
     {
         string dailyCacheKey = "homepage-daily";
-        dailyCount = await AppCache.GetOrAddAsyncNonNull(dailyCacheKey, async () => await LoopStatsService.GetDailyCount(), DateTimeOffset.UtcNow.AddMinutes(10));
+        dailyCount = await AppCache.GetOrAddAsyncNonNull(dailyCacheKey,
+            async () => await LoopStatsService.GetDailyCount(),
+            DateTimeOffset.UtcNow.AddMinutes(10));
         string blockCacheKey = $"homepage-block";
-        blockData = await AppCache.GetOrAddAsyncNonNull(blockCacheKey, async () => await LoopringGraphQLService.GetBlocks(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
+        var blockAndProxyDTO = await AppCache.GetOrAddAsyncNonNull(blockCacheKey,
+            async () => await LoopringGraphQLService.GetBlocks(0, 10),
+            DateTimeOffset.UtcNow.AddMinutes(10));
+        blocks = blockAndProxyDTO?.blocks;
+        proxy = blockAndProxyDTO?.proxy;
         CalculateAverageBlockTime();
         CalculateLastBlockSubmitted();
         StateHasChanged();
         string transactionCacheKey = $"homepage-transaction";
-        transactionData = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey, async () => await LoopringGraphQLService.GetTransactions(0, 10), DateTimeOffset.UtcNow.AddMinutes(10));
+        transactions = await AppCache.GetOrAddAsyncNonNull(transactionCacheKey,
+            async () => await LoopringGraphQLService.GetTransactions(0, 10),
+            DateTimeOffset.UtcNow.AddMinutes(10));
         StateHasChanged();
         string pairsCacheKey = $"homepage-pairs";
         pairs = await AppCache.GetOrAddAsyncNonNull(pairsCacheKey, async () => await LoopringGraphQLService.GetPairs(), DateTimeOffset.UtcNow.AddHours(1));
@@ -207,20 +216,20 @@
         long transactionCount = 0;
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         List<long> timeBetweenBlocks = new List<long>();
-        foreach (var block in blockData!.data!.blocks!)
+        foreach (var block in blocks!)
         {
             transactionCount += block.transactionCount;
             timeBetweenBlocks.Add(currentTime - long.Parse(block.timestamp!));
             currentTime = long.Parse(block.timestamp!);
         }
-        averageTransactions = transactionCount / blockData.data.blocks.Count;
+        averageTransactions = transactionCount / blocks.Count;
         averageBlockTime = Math.Floor(timeBetweenBlocks.Average() / 60);
     }
 
     private void CalculateLastBlockSubmitted()
     {
         long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-        long timeSinceLastBlock = currentTime - long.Parse(blockData!.data!.blocks![0].timestamp!);
+        long timeSinceLastBlock = currentTime - long.Parse(blocks![0].timestamp!);
         lastBlockSubmittedTime = Math.Floor((double)timeSinceLastBlock / 60);
     }
 
