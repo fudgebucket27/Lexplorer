@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace xUnitTests.NFTMetaDataTests
+namespace xUnitTests.EthereumServiceTests
 {
     [Collection("EthereumTests collection")]
     public class TestEthereumService
