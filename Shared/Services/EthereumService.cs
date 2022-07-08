@@ -57,5 +57,39 @@ namespace Lexplorer.Services
                 return null;
             }
         }
+
+        public async Task<string?> GetTokenNameFromAddress(string address)
+        {
+            try
+            {
+                const string abi = "function name() public view returns (string)";
+                var tokenContract = web3.Eth.GetContract(abi, address);
+                var function = tokenContract.GetFunction("name");
+                var name = await function.CallAsync<string>();
+                return name;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetTokenSymbolFromAddress(string address)
+        {
+            try
+            {
+                const string abi = "function symbol() public view returns (string)";
+                var tokenContract = web3.Eth.GetContract(abi, address);
+                var function = tokenContract.GetFunction("symbol");
+                var name = await function.CallAsync<string>();
+                return name;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
     }
 }
