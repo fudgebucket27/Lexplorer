@@ -10,6 +10,7 @@ namespace Lexplorer.Services
     public class EthereumService
     {
         public const string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+        private Web3 web3 = new("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
 
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
         {
@@ -26,8 +27,6 @@ namespace Lexplorer.Services
 
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, string? contractABI, string? functionName)
         {
-
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
             try
             {
                 var contract = web3.Eth.GetContract(contractABI, tokenAddress);
@@ -46,7 +45,6 @@ namespace Lexplorer.Services
         public async Task<string?> GetEthAddressFromEns(string? ens)
         {
 
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
             var ensService = new ENSService(web3);
            
             try
