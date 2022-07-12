@@ -65,8 +65,18 @@ namespace Lexplorer.Services
                 const string abi = "function name() public view returns (string)";
                 var tokenContract = web3.Eth.GetContract(abi, address);
                 var function = tokenContract.GetFunction("name");
-                var name = await function.CallAsync<string>();
-                return name;
+                string tokenName = "";
+                try
+                {
+                    tokenName = await function.CallAsync<string>();
+                }
+                catch (Exception)
+                {
+                    //try alternative ABI returning bytes32?! See maker token
+                    var tempResBytes = await function.CallRawAsync(function.CreateCallInput());
+                    tokenName = System.Text.Encoding.ASCII.GetString(tempResBytes).TrimEnd((Char)0);
+                }
+                return tokenName;
             }
             catch (Exception e)
             {
@@ -82,8 +92,19 @@ namespace Lexplorer.Services
                 const string abi = "function symbol() public view returns (string)";
                 var tokenContract = web3.Eth.GetContract(abi, address);
                 var function = tokenContract.GetFunction("symbol");
-                var name = await function.CallAsync<string>();
-                return name;
+                string tokenSymbol = "";
+                try
+                {
+                    tokenSymbol = await function.CallAsync<string>();
+                }
+                catch (Exception)
+                {
+                    //try alternative ABI returning bytes32?! See maker token
+                    var tempResBytes = await function.CallRawAsync(function.CreateCallInput());
+                    tokenSymbol = System.Text.Encoding.ASCII.GetString(tempResBytes).TrimEnd((Char)0);
+                }
+
+                return tokenSymbol;
             }
             catch (Exception e)
             {
