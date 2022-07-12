@@ -21,8 +21,8 @@ namespace Lexplorer.Services
 
 		private void AddCachedPoolToken(LoopringPoolToken token)
         {
-            token.token!.name = $"LP-{token.pair!.token0!.symbol!.ToUpper()}-{token.pair!.token1!.symbol!.ToUpper()}";
-            token.token!.symbol = token.token.name;
+            token.token!.name = $"AMM-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
+            token.token!.symbol = $"LP-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
             token.token!.decimals = 8; //seems to be contant, see https://github.com/Loopring/protocols/blob/release_loopring_3.6.3/packages/loopring_v3/contracts/amm/PoolToken.sol
             poolTokensByTokenID.Add(token.token!.id!, token);
 			poolTokensByPairTokenIDs.Add(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token);
