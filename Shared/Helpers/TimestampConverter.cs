@@ -15,9 +15,7 @@ namespace Lexplorer.Helpers
         public static DateTime? ToUTCDateTime(string? unixTimeStamp)
         {
             if (unixTimeStamp == null) return null;
-            // Unix timestamp is seconds past epoch
-            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return dateTime.AddSeconds(double.Parse(unixTimeStamp)).ToLocalTime().ToUniversalTime();
+            return DateTimeOffset.FromUnixTimeSeconds(long.Parse(unixTimeStamp)).UtcDateTime;
         }
 
         public static double? ToTimeStamp(DateTime? dateTimeUTC)
