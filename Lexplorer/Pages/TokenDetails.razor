@@ -9,26 +9,30 @@
 @inject LoopringPoolTokenCacheService poolTokenCacheService;
 @inject UniswapGraphQLService UniswapGraphQLService;
 
-<PageTitle>The Lexplorer - token @(token?.symbol) </PageTitle>
+<PageTitle>The Lexplorer - token @(token?.failSafeSymbol) </PageTitle>
 
 <MudSimpleTable Dense="true" Striped="true" Bordered="true">
     <tbody>
         <tr>
             <td colspan="2">
                 <div class="mud-toolbar mud-toolbar-gutters mud-table-toolbar">
-                    <MudText Typo="Typo.h6">Token @token?.symbol (@token?.name)</MudText>
+                    <MudText Typo="Typo.h6">Token @token?.failSafeSymbol (@token?.name)</MudText>
                 </div>
             </td>
+        </tr>
+        <tr>
+            <td>Address</td>
+            <td><L1AccountLink address="@token?.address" /></td>
         </tr>
         <tr>
             <td>Total volume</td>
             <td>@TokenAmountConverter.ToStringWithExponent(token?.tradedVolume ?? 0, token?.decimals ?? 0, 1) @token?.symbol </td>
         </tr>
-        @if (uniswapToken != null)
+        @if ((uniswapToken?.data?.tokenDayDatas?.Count ?? 0) > 0)
         {
             <tr>
                 <td>Price</td>
-                <td>@uniswapToken.data?.tokenDayDatas?.FirstOrDefault()?.priceUSD.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                <td>@uniswapToken?.data?.tokenDayDatas?.FirstOrDefault()?.priceUSD.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
             </tr>
         }
         @if (poolToken != null)
