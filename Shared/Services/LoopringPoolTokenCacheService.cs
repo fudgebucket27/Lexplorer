@@ -9,14 +9,26 @@ namespace Lexplorer.Services
 	public class LoopringPoolTokenCacheService
 	{
         private readonly LoopringGraphQLService _loopringService;
+        private readonly EthereumService _ethereumService;
 
-		private readonly Dictionary<string, LoopringPoolToken> poolTokensByTokenID = new ();
+        private readonly Dictionary<string, LoopringPoolToken> poolTokensByTokenID = new ();
         private readonly Dictionary<Tuple<string, string>, LoopringPoolToken> poolTokensByPairTokenIDs = new ();
         private readonly Dictionary<string, LoopringPoolToken> poolTokensByPoolID = new();
 
-        public LoopringPoolTokenCacheService(LoopringGraphQLService loopringService)
+        private bool disableCaching { get; set; } = false; //for tests
+        public void DisableCache() => disableCaching = true;
+        public void EnableCache()
+        {
+            disableCaching = false;
+            poolTokensByTokenID.Clear();
+            poolTokensByPairTokenIDs.Clear();
+            poolTokensByPoolID.Clear();
+        }
+
+        public LoopringPoolTokenCacheService(LoopringGraphQLService loopringService, EthereumService ethereumService)
 		{
 			_loopringService = loopringService;
+            _ethereumService = ethereumService;
         }
 
 		private void AddCachedPoolToken(LoopringPoolToken token)
@@ -24,6 +36,7 @@ namespace Lexplorer.Services
             token.token!.name = $"AMM-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
             token.token!.symbol = $"LP-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
             token.token!.decimals = 8; //seems to be contant, see https://github.com/Loopring/protocols/blob/release_loopring_3.6.3/packages/loopring_v3/contracts/amm/PoolToken.sol
+            if (disableCaching) return;
             poolTokensByTokenID.Add(token.token!.id!, token);
 			poolTokensByPairTokenIDs.Add(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token);
 			poolTokensByPoolID.Add(token.pool!.id!, token);
