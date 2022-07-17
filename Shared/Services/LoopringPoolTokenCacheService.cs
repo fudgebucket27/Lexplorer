@@ -95,7 +95,7 @@ namespace Lexplorer.Services
             return poolToken;
         }
 
-        private async Task<LoopringPoolToken?> GetPoolTokenFromContract(Token token)
+        private async Task<LoopringPoolToken?> GetPoolTokenFromContract(Token token, Pool? tokenPool = default, Pair? tokenPair = default)
         {
             //no chance to get pool token via graph, so ask the contract if we have the address
             if (token.address == null) return null;
@@ -114,6 +114,8 @@ namespace Lexplorer.Services
 
             var poolToken = new LoopringPoolToken();
             poolToken.token = token;
+            poolToken.pool = tokenPool;
+            poolToken.pair = tokenPair;
             AddCachedPoolToken(poolToken, false);
             return poolToken;
         }
@@ -159,7 +161,7 @@ namespace Lexplorer.Services
                     pool.balances = await _loopringService.GetAccountBalance(pool.id, cancellationToken);
                 foreach (var balance in pool.balances!)
                 {
-                    token = await GetPoolTokenFromContract(balance.token!);
+                    token = await GetPoolTokenFromContract(balance.token!, pool);
                     if (token != null) return token;
                 }
             }

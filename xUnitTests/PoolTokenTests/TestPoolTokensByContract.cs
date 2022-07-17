@@ -75,6 +75,10 @@ namespace xUnitTests.PoolTokenTests
             Assert.NotNull(poolTokenViaPool!.token);
             Assert.Equal(tokenID, poolTokenViaPool!.token!.id);
             Assert.Equal(expectedSymbol, poolTokenViaPool!.token!.symbol);
+
+            Assert.NotNull(poolTokenViaPool.pool);
+            Assert.Equal(poolID, poolTokenViaPool.pool!.id);
+
             fixture.LPTCS.DisableCache();
         }
 
