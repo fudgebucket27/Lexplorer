@@ -50,6 +50,7 @@ namespace xUnitTests.PoolTokenTests
 
         [Theory]
         [InlineData("0-1", "0", "ETH", "1", "LRC", "LP-ETH-LRC")]
+        [InlineData("0-3", "0", "ETH", "3", "USDT", "LP-ETH-USDT")]
         public async void TestPoolTokenByPair(string pairID, string tokenID0, string tokenSymbol0, string tokenID1, string tokenSymbol1, string expectedSymbol)
         {
             var pair = new Pair();

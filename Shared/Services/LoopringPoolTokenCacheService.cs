@@ -31,11 +31,14 @@ namespace Lexplorer.Services
             _ethereumService = ethereumService;
         }
 
-		private void AddCachedPoolToken(LoopringPoolToken token)
+		private void AddCachedPoolToken(LoopringPoolToken token, bool touchUpToken = true)
         {
-            token.token!.name = $"AMM-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
-            token.token!.symbol = $"LP-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
-            token.token!.decimals = 8; //seems to be contant, see https://github.com/Loopring/protocols/blob/release_loopring_3.6.3/packages/loopring_v3/contracts/amm/PoolToken.sol
+            if (touchUpToken)
+            {
+                token.token!.name = $"AMM-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
+                token.token!.symbol = $"LP-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
+                token.token!.decimals = 8; //seems to be contant, see https://github.com/Loopring/protocols/blob/release_loopring_3.6.3/packages/loopring_v3/contracts/amm/PoolToken.sol
+            }
             if (disableCaching) return;
 
             poolTokensByTokenID.AddOrUpdate(token.token!.id!, token, (key, oldvalue) => token);
@@ -92,6 +95,29 @@ namespace Lexplorer.Services
             return poolToken;
         }
 
+        private async Task<LoopringPoolToken?> GetPoolTokenFromContract(Token token)
+        {
+            //no chance to get pool token via graph, so ask the contract if we have the address
+            if (token.address == null) return null;
+
+            //if we already have a name then we're not a pool token
+            if (!string.IsNullOrEmpty(token.name)) return null;
+
+            token.name = await _ethereumService.GetTokenNameFromAddress(token.address);
+            if (token.name == null) return null;
+            token.symbol = await _ethereumService.GetTokenSymbolFromAddress(token.address);
+            if (token.symbol == null) return null;
+            token.decimals = 8; //fix for now, could be retrieved from contract as well!
+
+            //add safety-check to avoid generating pool tokens for normal tokens
+            if (!token.symbol!.Contains("LP", StringComparison.InvariantCultureIgnoreCase)) return null;
+
+            var poolToken = new LoopringPoolToken();
+            poolToken.token = token;
+            AddCachedPoolToken(poolToken, false);
+            return poolToken;
+        }
+
         public async Task<LoopringPoolToken?> GetPoolToken(Token token, CancellationToken cancellationToken = default)
         {
             LoopringPoolToken? poolToken = GetExistingPoolToken(token);
@@ -100,12 +126,13 @@ namespace Lexplorer.Services
 
             //now how to do this??? -> get any Remove transaction with this tokenID
             //but we have Removes with regular tokens as well, so only do this if token has no name
-            if (!string.IsNullOrEmpty(token.name))
-                return null;
-            Remove? remove = await _loopringService.GetAnyRemoveWithTokenID(token!.id!, cancellationToken);
-            if (remove?.pool == null)
-                return null;
-            return await AddPoolToken(remove.pool, cancellationToken);
+            if (string.IsNullOrEmpty(token.name))
+            {
+                Remove? remove = await _loopringService.GetAnyRemoveWithTokenID(token!.id!, cancellationToken);
+                if (remove?.pool != null)
+                    return await AddPoolToken(remove.pool, cancellationToken);
+            }
+            return await GetPoolTokenFromContract(token);
         }
 
         private async Task<LoopringPoolToken?> AddPoolToken(Object theObject, CancellationToken cancellationToken = default)
@@ -122,7 +149,21 @@ namespace Lexplorer.Services
                 token.pool = swap.pool;
                 AddCachedPoolToken(token);
             }
-            return token!;
+            //if we failed to find a swap, check if we can find the pool token from the pool
+            //balances by querying the contract
+            if ((token == null) && (theObject is Pool pool))
+            {
+                if (pool?.id == null) return null;
+
+                if (pool!.balances == null) 
+                    pool.balances = await _loopringService.GetAccountBalance(pool.id, cancellationToken);
+                foreach (var balance in pool.balances!)
+                {
+                    token = await GetPoolTokenFromContract(balance.token!);
+                    if (token != null) return token;
+                }
+            }
+            return token;
         }
 
         private Token? FindPoolToken(Swap swap)
