@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Lexplorer.Models;
@@ -11,9 +11,9 @@ namespace Lexplorer.Services
         private readonly LoopringGraphQLService _loopringService;
         private readonly EthereumService _ethereumService;
 
-        private readonly Dictionary<string, LoopringPoolToken> poolTokensByTokenID = new ();
-        private readonly Dictionary<Tuple<string, string>, LoopringPoolToken> poolTokensByPairTokenIDs = new ();
-        private readonly Dictionary<string, LoopringPoolToken> poolTokensByPoolID = new();
+        private readonly ConcurrentDictionary<string, LoopringPoolToken> poolTokensByTokenID = new ();
+        private readonly ConcurrentDictionary<Tuple<string, string>, LoopringPoolToken> poolTokensByPairTokenIDs = new ();
+        private readonly ConcurrentDictionary<string, LoopringPoolToken> poolTokensByPoolID = new();
 
         private bool disableCaching { get; set; } = false; //for tests
         public void DisableCache() => disableCaching = true;
@@ -37,9 +37,12 @@ namespace Lexplorer.Services
             token.token!.symbol = $"LP-{token.pair!.token0!.failSafeSymbol!.ToUpper()}-{token.pair!.token1!.failSafeSymbol!.ToUpper()}";
             token.token!.decimals = 8; //seems to be contant, see https://github.com/Loopring/protocols/blob/release_loopring_3.6.3/packages/loopring_v3/contracts/amm/PoolToken.sol
             if (disableCaching) return;
-            poolTokensByTokenID.Add(token.token!.id!, token);
-			poolTokensByPairTokenIDs.Add(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token);
-			poolTokensByPoolID.Add(token.pool!.id!, token);
+
+            poolTokensByTokenID.AddOrUpdate(token.token!.id!, token, (key, oldvalue) => token);
+            if ((token.pair?.token0 != null) && (token.pair?.token1 != null))
+			    poolTokensByPairTokenIDs.AddOrUpdate(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token, (key, oldvalue) => token);
+            if (token.pool?.id != null)
+			    poolTokensByPoolID.AddOrUpdate(token.pool!.id!, token, (key, oldvalue) => token);
         }
 
         private LoopringPoolToken? GetCachedPoolToken(string token0ID, string token1ID)
