@@ -6,14 +6,15 @@ using Lexplorer.Models;
 
 namespace Lexplorer.Services
 {
-	public class LoopringPoolTokenCacheService
-	{
+    public class LoopringPoolTokenCacheService
+    {
         private readonly LoopringGraphQLService _loopringService;
         private readonly EthereumService _ethereumService;
 
-        private readonly ConcurrentDictionary<string, LoopringPoolToken> poolTokensByTokenID = new ();
-        private readonly ConcurrentDictionary<Tuple<string, string>, LoopringPoolToken> poolTokensByPairTokenIDs = new ();
+        private readonly ConcurrentDictionary<string, LoopringPoolToken> poolTokensByTokenID = new();
+        private readonly ConcurrentDictionary<Tuple<string, string>, LoopringPoolToken> poolTokensByPairTokenIDs = new();
         private readonly ConcurrentDictionary<string, LoopringPoolToken> poolTokensByPoolID = new();
+        private readonly ConcurrentDictionary<string, Token> tokenDetailsFetchedFromContract = new();
 
         private bool disableCaching { get; set; } = false; //for tests
         public void DisableCache() => disableCaching = true;
@@ -23,15 +24,16 @@ namespace Lexplorer.Services
             poolTokensByTokenID.Clear();
             poolTokensByPairTokenIDs.Clear();
             poolTokensByPoolID.Clear();
+            tokenDetailsFetchedFromContract.Clear();
         }
 
         public LoopringPoolTokenCacheService(LoopringGraphQLService loopringService, EthereumService ethereumService)
-		{
-			_loopringService = loopringService;
+        {
+            _loopringService = loopringService;
             _ethereumService = ethereumService;
         }
 
-		private void AddCachedPoolToken(LoopringPoolToken token, bool touchUpToken = true)
+        private void AddCachedPoolToken(LoopringPoolToken token, bool touchUpToken = true)
         {
             if (touchUpToken)
             {
@@ -43,9 +45,9 @@ namespace Lexplorer.Services
 
             poolTokensByTokenID.AddOrUpdate(token.token!.id!, token, (key, oldvalue) => token);
             if ((token.pair?.token0 != null) && (token.pair?.token1 != null))
-			    poolTokensByPairTokenIDs.AddOrUpdate(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token, (key, oldvalue) => token);
+                poolTokensByPairTokenIDs.AddOrUpdate(new(token.pair!.token0!.id!, token.pair!.token1!.id!), token, (key, oldvalue) => token);
             if (token.pool?.id != null)
-			    poolTokensByPoolID.AddOrUpdate(token.pool!.id!, token, (key, oldvalue) => token);
+                poolTokensByPoolID.AddOrUpdate(token.pool!.id!, token, (key, oldvalue) => token);
         }
 
         private LoopringPoolToken? GetCachedPoolToken(string token0ID, string token1ID)
@@ -95,31 +97,6 @@ namespace Lexplorer.Services
             return poolToken;
         }
 
-        private async Task<LoopringPoolToken?> GetPoolTokenFromContract(Token token, Pool? tokenPool = default, Pair? tokenPair = default)
-        {
-            //no chance to get pool token via graph, so ask the contract if we have the address
-            if (token.address == null) return null;
-
-            //if we already have a name then we're not a pool token
-            if (!string.IsNullOrEmpty(token.name)) return null;
-
-            token.name = await _ethereumService.GetTokenNameFromAddress(token.address);
-            if (token.name == null) return null;
-            token.symbol = await _ethereumService.GetTokenSymbolFromAddress(token.address);
-            if (token.symbol == null) return null;
-            token.decimals = 8; //fix for now, could be retrieved from contract as well!
-
-            //add safety-check to avoid generating pool tokens for normal tokens
-            if (!token.symbol!.Contains("LP", StringComparison.InvariantCultureIgnoreCase)) return null;
-
-            var poolToken = new LoopringPoolToken();
-            poolToken.token = token;
-            poolToken.pool = tokenPool;
-            poolToken.pair = tokenPair;
-            AddCachedPoolToken(poolToken, false);
-            return poolToken;
-        }
-
         public async Task<LoopringPoolToken?> GetPoolToken(Token token, CancellationToken cancellationToken = default)
         {
             LoopringPoolToken? poolToken = GetExistingPoolToken(token);
@@ -132,7 +109,11 @@ namespace Lexplorer.Services
             {
                 Remove? remove = await _loopringService.GetAnyRemoveWithTokenID(token!.id!, cancellationToken);
                 if (remove?.pool != null)
-                    return await AddPoolToken(remove.pool, cancellationToken);
+                {
+                    poolToken = await AddPoolToken(remove.pool, cancellationToken);
+                    if (poolToken?.token?.id == token.id)
+                        return poolToken;
+                }
             }
             return await GetPoolTokenFromContract(token);
         }
@@ -147,6 +128,9 @@ namespace Lexplorer.Services
                 if (poolToken == null) return null;
                 token = new LoopringPoolToken();
                 token.token = poolToken;
+                //fill in token details if they are missing! happens with LP-MKR-ETH, pool 57, token 154
+                swap.pair!.token0 = await FetchTokenDetailsFromContract(swap.pair!.token0!);
+                swap.pair!.token1 = await FetchTokenDetailsFromContract(swap.pair!.token1!);
                 token.pair = swap.pair;
                 token.pool = swap.pool;
                 AddCachedPoolToken(token);
@@ -188,6 +172,48 @@ namespace Lexplorer.Services
                     poolToken = balance.token!;
             }
             return ((token0Found) && (token1Found)) ? poolToken : null;
+        }
+
+        public async Task<Token?> FetchTokenDetailsFromContract(Token? token)
+        {
+            //no chance to get pool token via graph, so ask the contract if we have the address
+            if (token?.address == null) return token;
+
+            //if we already have a name then there's nothing to do
+            if (!string.IsNullOrEmpty(token.name)) return token;
+
+            if (tokenDetailsFetchedFromContract.TryGetValue(token.id!, out Token? existToken))
+            {
+                token.name = existToken.name;
+                token.symbol = existToken.symbol;
+            }
+            else
+            {
+                token.name = await _ethereumService.GetTokenNameFromAddress(token.address);
+                if (token.name == null) return token;
+                token.symbol = await _ethereumService.GetTokenSymbolFromAddress(token.address);
+                if (token.symbol == null) return token;
+                token.decimals = 8; //fix for now, could be retrieved from contract as well!
+
+                if (!disableCaching)
+                    tokenDetailsFetchedFromContract.AddOrUpdate(token.id!, token, (key, oldvalue) => token);
+            }
+            return token;
+        }
+
+        private async Task<LoopringPoolToken?> GetPoolTokenFromContract(Token? token, Pool? tokenPool = default, Pair? tokenPair = default)
+        {
+            token = await FetchTokenDetailsFromContract(token);
+
+            //add safety-check to avoid generating pool tokens for normal tokens
+            if (!(token?.symbol?.Contains("LP", StringComparison.InvariantCultureIgnoreCase) ?? false)) return null;
+
+            var poolToken = new LoopringPoolToken();
+            poolToken.token = token;
+            poolToken.pool = tokenPool;
+            poolToken.pair = tokenPair;
+            AddCachedPoolToken(poolToken, false);
+            return poolToken;
         }
 
     }
