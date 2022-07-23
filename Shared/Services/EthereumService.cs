@@ -10,6 +10,7 @@ namespace Lexplorer.Services
     public class EthereumService
     {
         public const string CF_NFTTokenAddress = "0xB25f6D711aEbf954fb0265A3b29F7b9Beba7E55d";
+        private Web3 web3 = new("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
 
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, int? nftType)
         {
@@ -26,8 +27,6 @@ namespace Lexplorer.Services
 
         public async Task<string?> GetMetadataLink(string? tokenId, string? tokenAddress, string? contractABI, string? functionName)
         {
-
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
             try
             {
                 var contract = web3.Eth.GetContract(contractABI, tokenAddress);
@@ -46,12 +45,66 @@ namespace Lexplorer.Services
         public async Task<string?> GetEthAddressFromEns(string? ens)
         {
 
-            var web3 = new Web3("https://mainnet.infura.io/v3/53173af3389645d18c3bcac2ee9a751c");
             var ensService = new ENSService(web3);
            
             try
             {
                 return await ensService.ResolveAddressAsync(ens);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetTokenNameFromAddress(string address)
+        {
+            try
+            {
+                const string abi = "function name() public view returns (string)";
+                var tokenContract = web3.Eth.GetContract(abi, address);
+                var function = tokenContract.GetFunction("name");
+                string tokenName = "";
+                try
+                {
+                    tokenName = await function.CallAsync<string>();
+                }
+                catch (Exception)
+                {
+                    //try alternative ABI returning bytes32?! See maker token
+                    var tempResBytes = await function.CallRawAsync(function.CreateCallInput());
+                    tokenName = System.Text.Encoding.ASCII.GetString(tempResBytes).TrimEnd((Char)0);
+                }
+                return tokenName;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetTokenSymbolFromAddress(string address)
+        {
+            try
+            {
+                const string abi = "function symbol() public view returns (string)";
+                var tokenContract = web3.Eth.GetContract(abi, address);
+                var function = tokenContract.GetFunction("symbol");
+                string tokenSymbol = "";
+                try
+                {
+                    tokenSymbol = await function.CallAsync<string>();
+                }
+                catch (Exception)
+                {
+                    //try alternative ABI returning bytes32?! See maker token
+                    var tempResBytes = await function.CallRawAsync(function.CreateCallInput());
+                    tokenSymbol = System.Text.Encoding.ASCII.GetString(tempResBytes).TrimEnd((Char)0);
+                }
+
+                return tokenSymbol;
             }
             catch (Exception e)
             {

@@ -152,6 +152,8 @@
                 async () => await LoopringGraphQLService.GetPair(pairId),
                 DateTimeOffset.UtcNow.AddHours(1));
             if (pair == null) return;
+            pair.token0 = await poolTokenCacheService.FetchTokenDetailsFromContract(pair.token0);
+            pair.token1 = await poolTokenCacheService.FetchTokenDetailsFromContract(pair.token1);
             StateHasChanged();
             poolToken = await poolTokenCacheService.GetPoolToken(pair);
             StateHasChanged();

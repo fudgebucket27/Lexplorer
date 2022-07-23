@@ -28,6 +28,10 @@
 
   <ItemGroup>
     <None Remove="NFTMetaDataTests\" />
+    <None Remove="PoolTokenTests\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PoolTokenTests\" />
   </ItemGroup>
   <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 
