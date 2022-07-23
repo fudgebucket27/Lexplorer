@@ -1006,6 +1006,7 @@ namespace Lexplorer.Services
                 { "transactions", typeof(Transaction) },
                 { "nonFungibleTokens", typeof(NonFungibleToken) },
                 { "nonFungibleTokensBynftID", typeof(NonFungibleToken) },
+                { "tokens", typeof(Token) },
         };
         public async Task<IList<object>?> Search(string searchTerm)
         {
@@ -1052,6 +1053,13 @@ namespace Lexplorer.Services
                   id
                   __typename
                   nftID
+                }
+                tokens(where: {symbol_contains_nocase: $searchTerm}
+                ) {
+                  id
+                  __typename
+                  symbol
+                  name
                 }
               }
             ";
