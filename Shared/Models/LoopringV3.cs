@@ -123,6 +123,8 @@ namespace Lexplorer.Models
         public string? address { get; set; }
         public int decimals { get; set; }
         public string? id { get; set; }
+        [JsonProperty("__typename")]
+        public string? typeName { get; set; }
         public string? name { get; set; }
         public string? symbol { get; set; }
         public double tradedVolume { get; set; }

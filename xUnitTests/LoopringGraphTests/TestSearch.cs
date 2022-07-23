@@ -75,5 +75,17 @@ namespace xUnitTests.LoopringGraphTests
             if (!skipContainsID)
                 Assert.Contains(nftid, (searchResult![0] as NonFungibleToken)!.id, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        [Theory]
+        [InlineData("LRC")]
+        [InlineData("eth")]
+        public async void SearchToken(string tokenSymbol)
+        {
+            var searchResult = await service.Search(tokenSymbol);
+            Assert.NotEmpty(searchResult);
+            Assert.IsType<Token>(searchResult![0]);
+            Assert.Contains(tokenSymbol, (searchResult![0] as Token)!.symbol, StringComparison.InvariantCultureIgnoreCase);
+        }
+
     }
 }
