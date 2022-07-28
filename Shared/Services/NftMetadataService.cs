@@ -153,17 +153,21 @@ namespace Lexplorer.Services
         {
             link = MakeIPFSLink(link)!;
             var request = new RestRequest(link, Method.Head);
-            try
-            {
+
             request.Timeout = 20000; //we can't afford to wait forever here, 20s must be enough
             var response = await _client.HeadAsync(request, cancellationToken); //Send head request so we only get header not the content
-                return response?.ContentType;
-            }
-            catch (Exception e)
+
+            //in case of an error, make a full request with a shorter timeout to get the actual error message in response.Content
+            if (!response.IsSuccessful)
             {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
-                return null;
+                request.Timeout = 1000;
+                response = await _client.GetAsync(request, cancellationToken);
+                var errMsg = response.Content;
+                if (string.IsNullOrEmpty(errMsg))
+                    errMsg = response.StatusDescription;
+                throw new Exception(errMsg);
             }
+            return response?.ContentType;
         }
 
     }

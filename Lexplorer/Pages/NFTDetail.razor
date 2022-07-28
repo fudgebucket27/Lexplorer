@@ -300,8 +300,19 @@
                     if (!string.IsNullOrEmpty(nftMetadata?.animation_url))
                     {
                         string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
-                        nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
-                            async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        try
+                        {
+                            nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
+                                async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            nftMetadata!.Error = String.Join(System.Environment.NewLine, nftMetadata.Error, e.Message);
+                        }
                     }
                     StateHasChanged();
                 }
