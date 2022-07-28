@@ -39,7 +39,21 @@ namespace Lexplorer.Services
         {
             if (link == null) return null;
 
-            return link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
+            var modLink = link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
+
+            //try to recover from mismints by escaping the filename part of the URL
+            //unfortunately Uri() will not fix this as it's not considered part of the data string, so we have to explicitly
+            //split at the last slash and explicitly escape the filename portion
+            var idx = modLink.LastIndexOf("/");
+            if (idx != -1)
+            {
+                var fileNamePortion = modLink.Substring(idx + 1);
+                if (!Uri.IsWellFormedUriString(fileNamePortion, UriKind.Relative))
+                    fileNamePortion = Uri.EscapeDataString(fileNamePortion);
+                modLink = modLink.Substring(0, idx + 1) + fileNamePortion;
+            }
+
+            return modLink;
         }
 
         public async Task<NftCollectionMetadata?> GetCollectionMetadata(string URL, CancellationToken cancellationToken = default)
