@@ -69,7 +69,10 @@ namespace Lexplorer.Services
             //loopring deployed two different contracts for the nfts so some
             //metadata.json needs to be referenced directly while others are in a folder in ipfs
             NftMetadata? nmd = await GetMetadataFromURL(link, cancellationToken);
-            if (nmd == null)
+            var trySubFolder = (nmd == null);
+            if (!trySubFolder)
+                trySubFolder = ((nmd?.Error != null) && (nmd.JSONContent?.Contains("metadata.json") ?? false));
+            if (trySubFolder)
                 nmd = await GetMetadataFromURL(link + "/metadata.json", cancellationToken);
             return nmd;
         }
@@ -77,9 +80,20 @@ namespace Lexplorer.Services
         public NftMetadata? GetMetadataFromResponse(string response)
         {
             try
-            { 
-                var token = JToken.Parse(response!);
-                var metadata = token.ToObject<NftMetadata>();
+            {
+                JToken? token = null;
+                try
+                {
+                    token = JToken.Parse(response!);
+                }
+                catch (Exception e)
+                {
+                    var metadataError = new NftMetadata();
+                    metadataError.Error = e.Message;
+                    metadataError.JSONContent = response;
+                    return metadataError;
+                }
+                var metadata = token?.ToObject<NftMetadata>();
                 if ((token != null) && (metadata != null))
                 {
                     metadata.JSONContent = token.ToString(Formatting.Indented);
@@ -141,8 +155,8 @@ namespace Lexplorer.Services
             var request = new RestRequest(link, Method.Head);
             try
             {
-                request.Timeout = 20000; //we can't afford to wait forever here, 20s must be enough
-                var response = await _client.HeadAsync(request, cancellationToken); //Send head request so we only get header not the content
+            request.Timeout = 20000; //we can't afford to wait forever here, 20s must be enough
+            var response = await _client.HeadAsync(request, cancellationToken); //Send head request so we only get header not the content
                 return response?.ContentType;
             }
             catch (Exception e)

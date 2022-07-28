@@ -23,6 +23,7 @@ namespace Lexplorer.Models
         public Dictionary<string, object>? properties { get; set; }
 
         public string? JSONContent { get; set; }
+        public string? Error { get; set; }
     }
 
     public class NftAttribute

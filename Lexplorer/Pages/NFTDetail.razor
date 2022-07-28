@@ -104,6 +104,14 @@
                 <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
+        @if (nftMetadata?.Error != null)
+        {
+            <tr>
+                <td colspan="2">
+                    <MudAlert Severity="Severity.Error"> @nftMetadata?.Error </MudAlert>
+                </td>
+            </tr>
+        }
         @if ((nft?.token ?? nftMetadata?.JSONContent) != null)
         {
             <tr>

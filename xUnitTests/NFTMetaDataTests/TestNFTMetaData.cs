@@ -29,6 +29,7 @@ namespace xUnitTests.NFTMetaDataTests
 
 			var meta = await fixture.NMS.GetMetadata(link!);
 			Assert.NotNull(meta);
+			Assert.Null(meta!.Error);
         }
 
 		[Theory]
