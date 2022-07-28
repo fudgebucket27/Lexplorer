@@ -17,6 +17,7 @@ using System.Linq;
 namespace Lexplorer.Services
 {
     using DomainsDictionary = Dictionary<string, ENS.SourceType>;
+    using AddressDomainsDictionary = Dictionary<string, Dictionary<string, ENS.SourceType>>;
 
     public class ENSCacheService : IDisposable
     {
@@ -141,5 +142,68 @@ namespace Lexplorer.Services
             JToken? jtoken = jresponse["data"]!["accounts"];
             return jtoken!.ToObject<List<ENS.Account>>()!;
         }
-	}
+
+        public AddressDomainsDictionary? GetCachedENS(ref List<string>? addressList, AddressDomainsDictionary? existingENSDictionary = default)
+        {
+            if ((addressList?.Count ?? 0) == 0) return existingENSDictionary;
+
+            Dictionary<string, DomainsDictionary>? retValue = null;
+            if (existingENSDictionary != null)
+                retValue = new(existingENSDictionary);
+            for (int i = addressList!.Count - 1; i >= 0; i--)
+            {
+                var address = addressList[i];
+                if (ensEntries.TryGetValue(address, out DomainsDictionary? dd))
+                {
+                    if (retValue == null)
+                        retValue = new();
+                    retValue.TryAdd(address, dd);
+                    addressList.RemoveAt(i);
+                }
+                else if (ensAlreadyLookedUp.Contains(address))
+                    addressList.RemoveAt(i);
+            }
+            return retValue;
+        }
+
+        public async Task<AddressDomainsDictionary?> ReverseLookupAddressList(List<string>? addressList,
+            AddressDomainsDictionary? existingENSDictionary, CancellationToken cancellationToken = default)
+        {
+            if ((addressList?.Count ?? 0) == 0) return existingENSDictionary;
+
+            //get the already cached ones, just to be sure - they'll get removed from addressList
+            Dictionary<string, DomainsDictionary>? retValue = GetCachedENS(ref addressList, existingENSDictionary);
+            if (addressList!.Count == 0)
+                return retValue;
+
+            var revLookedUp = await ReverseLookup(addressList, cancellationToken);
+            //add the new found ones to the cache
+            if (revLookedUp != null)
+                foreach (var account in revLookedUp)
+                {
+                    if (account.id == null) continue;
+
+                    var domainNames = account.domains?.Select(item => item.name).
+                        OfType<string>() //skip null values
+                        .ToArray();
+
+                    AddDomains(account.id, domainNames, ENS.SourceType.ReverseLookup);
+                }
+            //add all to the list of the already looked up addresses and fill
+            //retValue from the cache so that it contains all source types,
+            //not just the ones just looked up
+            foreach (var address in addressList)
+            {
+                ensAlreadyLookedUp.Add(address);
+                if (ensEntries.TryGetValue(address, out DomainsDictionary? dd))
+                {
+                    if (retValue == null)
+                        retValue = new();
+                    retValue.TryAdd(address, dd);
+                }
+            }
+
+            return retValue;
+        }
+    }
 }
