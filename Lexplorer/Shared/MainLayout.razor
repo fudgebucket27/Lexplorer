@@ -1,9 +1,10 @@
 ﻿@inherits LayoutComponentBase
-@inject LoopringGraphQLService LoopringGraphQLService;
-@inject NavigationManager NavigationManager;
-@inject EthereumService EthereumService;
-@inject IJSRuntime JS;
+@inject LoopringGraphQLService LoopringGraphQLService
+@inject NavigationManager NavigationManager
+@inject EthereumService EthereumService
+@inject IJSRuntime JS
 @inject IDialogService DialogService
+@inject ENSCacheService ENSCacheService
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider />
@@ -111,6 +112,7 @@
                 StateHasChanged();
                 return;
             }
+            ENSCacheService.AddLookupAddress(searchTerm, hexAddress);
             _searchTerm = hexAddress; //carry on searching with the found address
         }
 
@@ -127,10 +129,10 @@
 
     async Task DialogSearch()
     {
-        DialogOptions maxWidth = new DialogOptions() 
-        { 
-            MaxWidth = MaxWidth.Medium, 
-            FullWidth = true, 
+        DialogOptions maxWidth = new DialogOptions()
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
             Position = DialogPosition.TopCenter,
             CloseButton = true
         };

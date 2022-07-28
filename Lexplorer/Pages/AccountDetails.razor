@@ -7,6 +7,9 @@
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService;
 @inject IAppCache AppCache;
+@inject ENSCacheService ENSCacheService;
+
+@using DomainsDictionary = Dictionary<string, Lexplorer.Models.ENS.SourceType>;
 
 <PageTitle>The Lexplorer - Account</PageTitle>
 <MudContainer Fixed="true" Class="px-0 extra-extra-extra-large">
@@ -38,6 +41,15 @@
                     <td>0x@((account as User)!.publicKey)</td>
                 </tr>
 
+            }
+            @if (ensDomains != null)
+            {
+                <tr>
+                    <td>ENS names</td>
+                    <td>
+                        <ENSList ensDomains="@ensDomains" />
+                    </td>
+                </tr>
             }
             @if (poolToken != null)
             {
@@ -166,6 +178,7 @@
 
     private Account? account { get; set; }
     private LoopringPoolToken? poolToken { get; set; }
+    private DomainsDictionary? ensDomains { get; set; }
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? accountNFTSlots { get; set; }
     private CancellationTokenSource? cts;
@@ -187,6 +200,7 @@
                 if (account != null && account.id != accountId)
                 {
                     account = null;
+                    ensDomains = null;
                     transactions = new List<Transaction>();
                     accountNFTSlots = null;
                     pageNumber = "1";
@@ -220,6 +234,10 @@
                                 balance.token = poolToken.token;
                         }
                     balancesLoading = false;
+                    StateHasChanged();
+
+                    ensDomains = await ENSCacheService.ReverseLookupAddress(account.address, localCTS.Token);
+                    localCTS.Token.ThrowIfCancellationRequested();
                     StateHasChanged();
                 }
                 if (string.IsNullOrEmpty(pageNumber))
@@ -258,7 +276,7 @@
                 Trace.WriteLine(e.StackTrace + "\n" + e.Message);
             }
             finally
-            { 
+            {
                 //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
                 //otherwise a new call has already replaced cts with it's own localCTS
                 Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);

@@ -17,6 +17,7 @@ builder.Services.AddSingleton<EthereumService>();
 builder.Services.AddSingleton<NftMetadataService>();
 builder.Services.AddSingleton<ILoopStatsService, LoopStatsService>();
 builder.Services.AddSingleton<LoopringPoolTokenCacheService>();
+builder.Services.AddSingleton<ENSCacheService>();
 builder.Services.AddLazyCache();
 
 //registration of CSV export formats, no automatic registration possible

@@ -8,6 +8,10 @@
 @inject LoopringGraphQLService LoopringGraphQLService;
 @inject LoopringPoolTokenCacheService poolTokenCacheService;
 @inject UniswapGraphQLService UniswapGraphQLService;
+@inject ENSCacheService ENSCacheService;
+
+@using DomainsDictionary = Dictionary<string, Lexplorer.Models.ENS.SourceType>;
+@using AddressDomainsDictionary = Dictionary<string, Dictionary<string, Lexplorer.Models.ENS.SourceType>>;
 
 <PageTitle>The Lexplorer - token @(token?.failSafeSymbol) </PageTitle>
 
@@ -57,12 +61,14 @@
     <HeaderContent>
         <MudTh>Account Id</MudTh>
         <MudTh>L1 address</MudTh>
+        <MudTh>ENS</MudTh>
         <MudTh>Type</MudTh>
         <MudTh Style="text-align:right">Balance</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Account Id">@LinkHelper.GetObjectLink(context?.account)</MudTd>
         <MudTd DataLabel="Address"><L1AccountLink address="@context?.account?.address" /></MudTd>
+        <MudTd DataLabel="ENS"><ENSList ensDomains="@GetENS(context?.account?.address)" /></MudTd>
         <MudTd DataLabel="Type">@context?.account?.typeName</MudTd>
         <MudTd Style="text-align:right" DataLabel="Balance">@TokenAmountConverter.ToStringWithExponent(context.balance, token?.decimals ?? 0, 1)</MudTd>
     </RowTemplate>
@@ -92,54 +98,99 @@
         }
     }
 
+    private DomainsDictionary? GetENS(string? address)
+    {
+        DomainsDictionary? retValue = null;
+        if (address != null)
+            ensDictionary?.TryGetValue(address, out retValue);
+        return retValue;
+    }
+
     private Token? token { get; set; }
     private LoopringPoolToken? poolToken { get; set; }
     private UniswapToken? uniswapToken { get; set; }
     private IList<AccountTokenBalance>? tokenHolders { get; set; } = new List<AccountTokenBalance>();
+    private AddressDomainsDictionary? ensDictionary { get; set; }
     public readonly int pageSize = 25;
     bool isLoading = true;
+    private CancellationTokenSource? cts = null;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (token?.id != tokenId)
+        //cancel any previous OnParametersSetAsync which might still be running
+        cts?.Cancel();
+
+        using (CancellationTokenSource localCTS = new CancellationTokenSource())
         {
-            isLoading = true;
-            poolToken = null;
-            uniswapToken = null;
-            tokenHolders = new List<AccountTokenBalance>();
-            string tokenCacheKey = $"token-{tokenId}";
-            token = await AppCache.GetOrAddAsyncNonNull(tokenCacheKey,
-                async () => await LoopringGraphQLService.GetToken(tokenId),
-                DateTimeOffset.UtcNow.AddHours(1));
-            if (token == null) return;
-            StateHasChanged();
-            poolToken = await poolTokenCacheService.GetPoolToken(token);
-            if (poolToken?.token == null)
+            //give future calls a chance to cancel us; it is now safe to replace
+            //any previous value of cts, since we already cancelled it above
+            Interlocked.Exchange<CancellationTokenSource?>(ref cts, localCTS);
+            try
             {
-                if (token.id != "0")  //we cannot get the ETH price that way, ETH has no token address
-                { 
-                    string uniswapTokenCacheKey = $"uniSwapTokenPrice-{token.address}";
-                    uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey,
-                        async () => await UniswapGraphQLService.GetTokenPrice(token.address!),
+                if (token?.id != tokenId)
+                {
+                    isLoading = true;
+                    poolToken = null;
+                    uniswapToken = null;
+                    tokenHolders = new List<AccountTokenBalance>();
+                    ensDictionary = null;
+                    string tokenCacheKey = $"token-{tokenId}";
+                    token = await AppCache.GetOrAddAsyncNonNull(tokenCacheKey,
+                        async () => await LoopringGraphQLService.GetToken(tokenId),
                         DateTimeOffset.UtcNow.AddHours(1));
+                    if (token == null) return;
+                    StateHasChanged();
+                    poolToken = await poolTokenCacheService.GetPoolToken(token);
+                    if (poolToken?.token == null)
+                    {
+                        if (token.id != "0")  //we cannot get the ETH price that way, ETH has no token address
+                        {
+                            string uniswapTokenCacheKey = $"uniSwapTokenPrice-{token.address}";
+                            uniswapToken = await AppCache.GetOrAddAsyncNonNull(uniswapTokenCacheKey,
+                                async () => await UniswapGraphQLService.GetTokenPrice(token.address!),
+                                DateTimeOffset.UtcNow.AddHours(1));
+                        }
+                    }
+                    else
+                    {
+                        //normally we would just replace the token with poolToken.token, but currently that would loose tradedVolume
+                        token.name = poolToken.token.name;
+                        token.symbol = poolToken.token.symbol;
+                        token.decimals = poolToken.token.decimals;
+                        StateHasChanged();
+                    }
+                }
+
+                isLoading = true;
+                string tokenHoldersCacheKey = $"tokenHolders-{tokenId}-{gotoPage}";
+                tokenHolders = await AppCache.GetOrAddAsyncNonNull(tokenHoldersCacheKey,
+                    async () => await LoopringGraphQLService.GetTokenHolders(token.id!, (gotoPage - 1) * pageSize, pageSize, cancellationToken: localCTS.Token),
+                    DateTimeOffset.UtcNow.AddHours(1));
+                localCTS.Token.ThrowIfCancellationRequested();
+
+                List<string>? addressList = tokenHolders?.Select(x => x?.account?.address).OfType<string>().ToList();
+
+                ensDictionary = ENSCacheService.GetCachedENS(ref addressList);
+                if ((addressList?.Count ?? 0) > 0)
+                {
+                    StateHasChanged();
+                    ensDictionary = await ENSCacheService.ReverseLookupAddressList(addressList, ensDictionary, localCTS.Token);
                 }
             }
-            else
+            catch (OperationCanceledException)
             {
-                //normally we would just replace the token with poolToken.token, but currently that would loose tradedVolume
-                token.name = poolToken.token.name;
-                token.symbol = poolToken.token.symbol;
-                token.decimals = poolToken.token.decimals;
-                StateHasChanged();
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+            }
+            finally
+            {
+                //now for cleanup, we must clear cts, but only if it is still our localCTS, which we're about to dispose
+                //otherwise a new call has already replaced cts with it's own localCTS
+                Interlocked.CompareExchange<CancellationTokenSource?>(ref cts, null, localCTS);
             }
         }
-
-        isLoading = true;
-        string tokenHoldersCacheKey = $"tokenHolders-{tokenId}-{gotoPage}";
-        tokenHolders = await AppCache.GetOrAddAsyncNonNull(tokenHoldersCacheKey,
-            async () => await LoopringGraphQLService.GetTokenHolders(token.id!, (gotoPage - 1) * pageSize, pageSize),
-            DateTimeOffset.UtcNow.AddHours(1));
         isLoading = false;
-        StateHasChanged();
     }
 }
