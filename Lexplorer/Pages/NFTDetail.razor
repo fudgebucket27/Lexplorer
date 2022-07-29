@@ -104,6 +104,14 @@
                 <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
+        @if (nftMetadata?.Error != null)
+        {
+            <tr>
+                <td colspan="2">
+                    <MudAlert Severity="Severity.Error"> @nftMetadata?.Error </MudAlert>
+                </td>
+            </tr>
+        }
         @if ((nft?.token ?? nftMetadata?.JSONContent) != null)
         {
             <tr>
@@ -292,8 +300,19 @@
                     if (!string.IsNullOrEmpty(nftMetadata?.animation_url))
                     {
                         string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
-                        nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
-                            async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        try
+                        {
+                            nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
+                                async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            nftMetadata!.Error = String.Join(System.Environment.NewLine, nftMetadata.Error, e.Message);
+                        }
                     }
                     StateHasChanged();
                 }
