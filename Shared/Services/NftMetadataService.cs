@@ -39,7 +39,9 @@ namespace Lexplorer.Services
         {
             if (link == null) return null;
 
-            var modLink = link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
+            var modLink =
+                link.StartsWith("ipfs://ipfs/") ? _ipfsBaseUrl + link.Remove(0, 12) : //handle ERC721 uri glitches with extra /ipfs prefix
+                    link.StartsWith("ipfs://") ? _ipfsBaseUrl + link.Remove(0, 7) : link; //remove the ipfs portion and add base
 
             //try to recover from mismints by escaping the filename part of the URL
             //unfortunately Uri() will not fix this as it's not considered part of the data string, so we have to explicitly
