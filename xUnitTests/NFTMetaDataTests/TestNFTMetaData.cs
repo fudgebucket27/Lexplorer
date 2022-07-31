@@ -61,7 +61,7 @@ namespace xUnitTests.NFTMetaDataTests
 		}
 
 		[Theory]
-		[InlineData("0x11b2e47f2c1d8cd2e22da989f2f0dde99a8d0a22a42381cfce9a5020fe7bd413", EthereumService.CF_NFTTokenAddress, 0)]
+		[InlineData("0x52ed914d080ee393a35b02cc9e57f27fa96cc9ab933ee754b05ab61d49539546", EthereumService.CF_NFTTokenAddress, 0)]
 		public async void TestGetMetadataAudioContentType(string nftID, string nftTokenAddress, int nftType)
 		{
 			var link = await fixture.EthS.GetMetadataLink(nftID, nftTokenAddress, nftType);
