@@ -25,18 +25,17 @@ namespace xUnitTests.LoopringGraphTests
         [Fact]
         public async void GetBlocks()
         {
-            Blocks? blocks = await service.GetBlocks(0, 10);
-            Assert.NotNull(blocks);
-            Assert.NotEmpty(blocks!.data!.blocks!);
-            Assert.Equal(10, blocks!.data!.blocks!.Count);
+            var blocksDTO = await service.GetBlocks(0, 10);
+            Assert.NotEmpty(blocksDTO!.blocks);
+            Assert.Equal(10, blocksDTO!.blocks!.Count);
         }
         [Fact]
         public async void GetBlockByDate()
         {
-            Blocks? blocks = await service.GetBlocks(0, 1, blockTimestamp: "1643909000", gte: false);
-            Assert.NotNull(blocks);
-            Assert.Single(blocks!.data!.blocks!);
-            Assert.Equal("16791", blocks!.data!.blocks![0].id);
+            var blocksDTO = await service.GetBlocks(0, 1, blockTimestamp: "1643909000", gte: false);
+            Assert.NotNull(blocksDTO);
+            Assert.Single(blocksDTO?.blocks!);
+            Assert.Equal("16791", blocksDTO!.blocks![0].id);
         }
         [Fact]
         public async void GetBlockDateRange()

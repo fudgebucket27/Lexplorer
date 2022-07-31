@@ -39,8 +39,8 @@
         {
             if (linkedObject is Account)
                 return new Tuple<string, string>($"account/{((Account)linkedObject).id}", ((Account)linkedObject).id ?? "");
-            else if (linkedObject is BlockDetail)
-                return new Tuple<string, string>($"blocks/{((BlockDetail)linkedObject).id}", ((BlockDetail)linkedObject).id ?? "");
+            else if (linkedObject is Block)
+                return new Tuple<string, string>($"blocks/{((Block)linkedObject).id}", ((Block)linkedObject).id ?? "");
             else if (linkedObject is Transaction)
                 return new Tuple<string, string>($"transactions/{((Transaction)linkedObject).id}", 
                     ((Transaction)linkedObject).id ?? "");
@@ -50,6 +50,9 @@
             else if (linkedObject is Pair pair)
                 return new Tuple<string, string>($"pairs/{pair.id}",
                     $"{pair.token0?.symbol} / {pair.token1?.symbol}");
+            else if (linkedObject is Token token)
+                return new Tuple<string, string>($"tokens/{token.id}",
+                    $"{token?.failSafeSymbol}");
             else
                 return null;
         }

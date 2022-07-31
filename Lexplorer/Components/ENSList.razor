@@ -1,0 +1,19 @@
+﻿@if (ensDomains != null)
+    @foreach (string domain in ensDomains.Keys)
+    {
+        @if (ensDomains[domain] == ENS.SourceType.Lookup)
+        {
+            <MudIcon Icon="@Icons.Filled.Search" Title="Lookup" Size="Size.Small" Style="vertical-align:middle" />
+        }
+        @if (ensDomains[domain] == ENS.SourceType.ReverseLookup)
+        {
+            <MudIcon Icon="@Icons.Filled.YoutubeSearchedFor" Title="Reverse Lookup" Size="Size.Small" Style="vertical-align:middle" />
+        }
+        @domain
+        <br />
+    }
+
+@code {
+    [Parameter]
+    public Dictionary<string, ENS.SourceType>? ensDomains { get; set; }
+}

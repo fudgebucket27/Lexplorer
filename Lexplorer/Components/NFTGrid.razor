@@ -25,7 +25,7 @@
                 <MudCard Style="height:100%;position:relative" Class="ma-1 border-solid">
                     <MudCardMedia Image="@NftMetadataService.MakeIPFSLink(metaData?.image)" Style="object-fit:contain" />
                     <MudCardContent>
-                        <MudText Typo="Typo.h6">@metaData?.name</MudText>
+                        <MudText Typo="Typo.h6" Style="word-break: break-all;">@metaData?.name</MudText>
                         @if (slot.balance > 0)
                         { 
                             <MudChip Label="true" Color="Color.Primary" Class="ml-0">x @slot.balance.ToString("#,##0")</MudChip>

@@ -6,6 +6,10 @@
 @inject EthereumService EthereumService;
 @inject NftMetadataService NftMetadataService;
 @inject IDialogService DialogService;
+@inject ENSCacheService ENSCacheService;
+
+@using DomainsDictionary = Dictionary<string, Lexplorer.Models.ENS.SourceType>;
+@using AddressDomainsDictionary = Dictionary<string, Dictionary<string, Lexplorer.Models.ENS.SourceType>>;
 
 <PageTitle>The Lexplorer - NFT @nft?.nftID </PageTitle>
 
@@ -104,6 +108,14 @@
                 <NFTContent nftMetadata="@nftMetadata" />
             </td>
         </tr>
+        @if (nftMetadata?.Error != null)
+        {
+            <tr>
+                <td colspan="2">
+                    <MudAlert Severity="Severity.Error"> @nftMetadata?.Error </MudAlert>
+                </td>
+            </tr>
+        }
         @if ((nft?.token ?? nftMetadata?.JSONContent) != null)
         {
             <tr>
@@ -125,54 +137,56 @@
 <br />
 <MudExpansionPanels MultiExpansion="true">
     <LexpansionPanel Text="Transactions">
-            <ChildContent>
-                <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
-                    <ToolBarContent>
-                        <MudSpacer />
-                        <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" />
-                        <MudSpacer />
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Tx Id</MudTh>
-                        <MudTh>Type</MudTh>
-                        <MudTh>From</MudTh>
-                        <MudTh>To</MudTh>
-                        <MudTh Style="text-align:right">Bought</MudTh>
-                        <MudTh Style="text-align:right">Sold</MudTh>
-                        <MudTh Style="text-align:right">Fee</MudTh>
-                        <MudTh>Verified At (UTC)</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
-                        <MudTd DataLabel="Type">@context.typeName</MudTd>
-                        <TransactionTableDetails TransactionData=@context />
-                        <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
-                    </RowTemplate>
-                </MudTable>
-                <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" IsOptionalBottomPager="true" />
-            </ChildContent>
+        <ChildContent>
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@transactions" Hover="true" Loading=@isLoading>
+                <ToolBarContent>
+                    <MudSpacer />
+                    <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" />
+                    <MudSpacer />
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Tx Id</MudTh>
+                    <MudTh>Type</MudTh>
+                    <MudTh>From</MudTh>
+                    <MudTh>To</MudTh>
+                    <MudTh Style="text-align:right">Bought</MudTh>
+                    <MudTh Style="text-align:right">Sold</MudTh>
+                    <MudTh Style="text-align:right">Fee</MudTh>
+                    <MudTh>Verified At (UTC)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Transaction Id">@LinkHelper.GetObjectLink(context)</MudTd>
+                    <MudTd DataLabel="Type">@context.typeName</MudTd>
+                    <TransactionTableDetails TransactionData=@context />
+                    <MudTd DataLabel="Timestamp">@context.verifiedAt</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <OpenEndedPager @bind-PageNumber="gotoPage" IsLastPage="@(transactions!.Count < pageSize)" IsOptionalBottomPager="true" />
+        </ChildContent>
     </LexpansionPanel>
     <LexpansionPanel Text="Holders">
-            <ChildContent>
-                <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
-                    <ToolBarContent>
-                        <MudSpacer />
-                        <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
-                        <MudSpacer />
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Account Id</MudTh>
-                        <MudTh>Address</MudTh>
-                        <MudTh>Balance</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Account Id">@context?.account?.id</MudTd>
-                        <MudTd DataLabel="Address">@LinkHelper.CreateUserLink(context?.account?.id, context?.account?.address, true)</MudTd>
-                        <MudTd DataLabel="Balance">@context?.balance</MudTd>
-                    </RowTemplate>
-                </MudTable>
-                <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" IsOptionalBottomPager="true" />
-            </ChildContent>
+        <ChildContent>
+            <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
+                <ToolBarContent>
+                    <MudSpacer />
+                    <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
+                    <MudSpacer />
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Account Id</MudTh>
+                    <MudTh>Address</MudTh>
+                    <MudTh>ENS</MudTh>
+                    <MudTh>Balance</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Account Id">@LinkHelper.GetObjectLink(context?.account)</MudTd>
+                    <MudTd DataLabel="L1 Address"><L1AccountLink address="@context?.account?.address" /></MudTd>
+                    <MudTd DataLabel="ENS"><ENSList ensDomains="@GetENS(context?.account?.address)" /></MudTd>
+                    <MudTd DataLabel="Balance">@context?.balance</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" IsOptionalBottomPager="true" />
+        </ChildContent>
     </LexpansionPanel>
 </MudExpansionPanels>
 
@@ -191,6 +205,7 @@
     private NonFungibleToken? nft;
     private IList<Transaction>? transactions { get; set; } = new List<Transaction>();
     private IList<AccountNFTSlot>? holders { get; set; } = new List<AccountNFTSlot>();
+    private AddressDomainsDictionary? ensDictionary { get; set; }
     public bool isLoading = true;
     public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
@@ -222,6 +237,14 @@
         }
     }
 
+    private DomainsDictionary? GetENS(string? address)
+    {
+        DomainsDictionary? retValue = null;
+        if (address != null)
+            ensDictionary?.TryGetValue(address, out retValue);
+        return retValue;
+    }
+
     private CancellationTokenSource? cts;
 
     protected override async Task OnParametersSetAsync()
@@ -242,6 +265,7 @@
                     nft = null;
                     transactions = new List<Transaction>();
                     holders = new List<AccountNFTSlot>();
+                    ensDictionary = null;
                     pageNumber = "1";
                     StateHasChanged();
                 }
@@ -274,9 +298,18 @@
                 holders = await AppCache.GetOrAddAsyncNonNull(nftHoldersCacheKey,
                     async () => await LoopringGraphQLService.GetNftHolders(nftId, (goToHolderPage - 1) * pageSize, pageSize, cancellationToken: localCTS.Token),
                     DateTimeOffset.UtcNow.AddMinutes(10));
+
+                List<string>? addressList = holders?.Select(x => x?.account?.address).OfType<string>().ToList();
+
+                ensDictionary = ENSCacheService.GetCachedENS(ref addressList);
+                if ((addressList?.Count ?? 0) > 0)
+                {
+                    StateHasChanged();
+                    ensDictionary = await ENSCacheService.ReverseLookupAddressList(addressList, ensDictionary, localCTS.Token);
+                }
+
                 isLoadingHolders = false;
                 StateHasChanged();
-
 
                 //load the NFT metadata last - it might actually take the longest and other services are queried etc.
                 if (nftMetadata == null)
@@ -292,8 +325,19 @@
                     if (!string.IsNullOrEmpty(nftMetadata?.animation_url))
                     {
                         string nftMetadataContentTypeCacheKey = $"nftMetadata-contentType-{nftMetadataLink}";
-                        nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
-                            async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        try
+                        {
+                            nftMetadata!.contentType = await AppCache.GetOrAddAsyncNonNull(nftMetadataContentTypeCacheKey,
+                                async () => await NftMetadataService.GetContentTypeFromURL(nftMetadata.animation_url!, localCTS.Token));
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            nftMetadata!.Error = String.Join(System.Environment.NewLine, nftMetadata.Error, e.Message);
+                        }
                     }
                     StateHasChanged();
                 }

@@ -2,7 +2,7 @@
 using Lexplorer.Services;
 using Xunit;
 
-namespace xUnitTests.NFTMetaDataTests
+namespace xUnitTests.EthereumServiceTests
 {
     //shared context for several xUnit test classes
     //https://xunit.net/docs/shared-context

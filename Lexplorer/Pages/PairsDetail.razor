@@ -28,8 +28,8 @@
         </tr>
         <tr>
             <td>Price</td>
-            <td>1 @pair?.token0?.symbol = @TokenAmountConverter.ToString(pair?.token0Price, pair?.token1?.decimals) @pair?.token1?.symbol </td>
-            <td>1 @pair?.token1?.symbol = @TokenAmountConverter.ToString(pair?.token1Price, pair?.token0?.decimals) @pair?.token0?.symbol </td>
+            <td>1 @LinkHelper.GetObjectLink(@pair?.token0) = @TokenAmountConverter.ToString(pair?.token0Price, pair?.token1?.decimals) @pair?.token1?.symbol </td>
+            <td>1 @LinkHelper.GetObjectLink(@pair?.token1) = @TokenAmountConverter.ToString(pair?.token1Price, pair?.token0?.decimals) @pair?.token0?.symbol </td>
         </tr>
         <tr>
             <td>Total volume</td>
@@ -51,7 +51,7 @@
             <tr>
                 <td>Pool</td>
                 <td>@LinkHelper.GetObjectLink(poolToken.pool) </td>
-                <td>@poolToken.token?.name </td>
+                <td>@LinkHelper.GetObjectLink(poolToken.token) </td>
             </tr>
         }
     </tbody>
@@ -152,6 +152,8 @@
                 async () => await LoopringGraphQLService.GetPair(pairId),
                 DateTimeOffset.UtcNow.AddHours(1));
             if (pair == null) return;
+            pair.token0 = await poolTokenCacheService.FetchTokenDetailsFromContract(pair.token0);
+            pair.token1 = await poolTokenCacheService.FetchTokenDetailsFromContract(pair.token1);
             StateHasChanged();
             poolToken = await poolTokenCacheService.GetPoolToken(pair);
             StateHasChanged();
