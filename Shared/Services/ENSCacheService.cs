@@ -57,7 +57,7 @@ namespace Lexplorer.Services
             if ((domainNames?.Length ?? 0) == 0) return;
 
             _ = ensEntries.AddOrUpdate(address,
-                domainNames!.ToDictionary(x => x, x => sourceType),
+                domainNames!.ToDictionary(x => x, x => sourceType, StringComparer.InvariantCultureIgnoreCase),
                 (key, oldvalue) =>
                 {
                     //do not overwrite sourceType if already there
