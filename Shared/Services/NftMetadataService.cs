@@ -35,6 +35,8 @@ namespace Lexplorer.Services
             GC.SuppressFinalize(this);
         }
 
+        public string IPFSBaseUrl { get { return _ipfsBaseUrl; } }
+
         public string? MakeIPFSLink(string? link)
         {
             if (link == null) return null;
