@@ -53,7 +53,7 @@ namespace Lexplorer.Services
             {
                 var fileNamePortion = modLink.Substring(idx + 1);
                 if (!Uri.IsWellFormedUriString(fileNamePortion, UriKind.Relative))
-                    fileNamePortion = Uri.EscapeDataString(fileNamePortion);
+                    fileNamePortion = Uri.EscapeDataString(Uri.UnescapeDataString(fileNamePortion));
                 modLink = modLink.Substring(0, idx + 1) + fileNamePortion;
             }
 
