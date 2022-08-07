@@ -122,6 +122,16 @@ namespace xUnitTests.NFTMetaDataTests
             Assert.Equal("Test", meta!.name);
             Assert.Equal("value", meta!.properties!["test"]);
         }
+
+        [Theory]
+        [InlineData("ipfs://QmPbU7P8DmsGAspVrc4hdPXF5Z6P3NTXZfZJ9Q8sBmax9s/AOJETFinal#1.glb", "QmPbU7P8DmsGAspVrc4hdPXF5Z6P3NTXZfZJ9Q8sBmax9s/AOJETFinal%231.glb")]
+        [InlineData("ipfs://ipfs/QmWLmY3Vif95cvMGNkkJDNJjyq7Z8YFLD8ngfuPs89SvWn", "QmWLmY3Vif95cvMGNkkJDNJjyq7Z8YFLD8ngfuPs89SvWn")]
+        [InlineData("ipfs://QmT4enyxCxNytCcby23K8vtBhwteJVy7EJ1KjJhYaEVvhZ/Jolly Roger %230865.mp4", "QmT4enyxCxNytCcby23K8vtBhwteJVy7EJ1KjJhYaEVvhZ/Jolly%20Roger%20%230865.mp4")]
+        public void MakeIPFSLink(string IPFSUrl, string realtivePinataURL)
+        {
+			var url = fixture.NMS.MakeIPFSLink(IPFSUrl);
+            Assert.Equal(fixture.NMS.IPFSBaseUrl + realtivePinataURL, url);
+        }
     }
 }
 

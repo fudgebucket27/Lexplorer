@@ -336,7 +336,8 @@
                         }
                         catch (Exception e)
                         {
-                            nftMetadata!.Error = String.Join(System.Environment.NewLine, nftMetadata.Error, e.Message);
+                            if ((nftMetadata!.Error == null) || (!nftMetadata!.Error!.EndsWith(e.Message)))
+                                nftMetadata!.Error = String.Join(System.Environment.NewLine, nftMetadata.Error, e.Message);
                         }
                     }
                     StateHasChanged();

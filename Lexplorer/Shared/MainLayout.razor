@@ -99,7 +99,7 @@
 
     private async void DoSearch()
     {
-        if (searchTerm == null) return;
+        if (string.IsNullOrEmpty(searchTerm)) return;
         searching = true;
         searchResults = null;
         StateHasChanged();
