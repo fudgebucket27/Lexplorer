@@ -88,8 +88,13 @@ namespace Lexplorer.Services
             //metadata.json needs to be referenced directly while others are in a folder in ipfs
             NftMetadata? nmd = await GetMetadataFromURL(link, cancellationToken);
             var trySubFolder = (nmd == null);
-            if (!trySubFolder)
-                trySubFolder = ((nmd?.Error != null) && (nmd.JSONContent?.Contains("metadata.json") ?? false));
+            if (nmd != null)
+                //if we got metadata with an error, check if the JSONContent is an HTML page of a
+                //root CID folder and it mentions a metadata.json file in it
+                trySubFolder = ((nmd?.Error != null) && (nmd.JSONContent?.Contains("metadata.json", StringComparison.InvariantCultureIgnoreCase) ?? false));
+            //never add metadata.json if the URL already has it, #248
+            if (link.Contains("metadata.json", StringComparison.InvariantCultureIgnoreCase))
+                trySubFolder = false;
             if (trySubFolder)
                 nmd = await GetMetadataFromURL(link + "/metadata.json", cancellationToken);
             return nmd;
