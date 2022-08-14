@@ -55,12 +55,34 @@
             <td Style="word-break:break-all;"><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
         <tr>
+            <td>MetaData URL</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.URL != null)
+                {
+                    <a Class="mud-theme-primary" href="@nftMetadata?.GatewayURL" target="_blank">@nftMetadata?.URL</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
+        </tr>
+        <tr>
             <td>Image URL</td>
-            <td Style="word-break:break-all;">@nftMetadata?.image</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.image != null)
+                {
+                    <a Class="mud-theme-primary" href="@NftMetadataService.MakeIPFSLink(nftMetadata?.image)" target="_blank">@nftMetadata?.image</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
         </tr>
         <tr>
             <td>Animation URL</td>
-            <td Style="word-break:break-all;">@nftMetadata?.animation_url</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.animation_url != null)
+                {
+                    <a Class="mud-theme-primary" href="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)" target="_blank">@nftMetadata?.animation_url</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
         </tr>
         @if ((nftMetadata?.attributes?.Count > 0) || (nftMetadata?.properties?.Count > 0))
         {
