@@ -82,21 +82,26 @@ namespace Lexplorer.Services
 
         public async Task<NftMetadata?> GetMetadata(string link, CancellationToken cancellationToken = default)
         {
-            link = MakeIPFSLink(link)!;
+            var modifiedLink = MakeIPFSLink(link)!;
             //there is a fallback for if the metadata fails on the first try because
             //loopring deployed two different contracts for the nfts so some
             //metadata.json needs to be referenced directly while others are in a folder in ipfs
-            NftMetadata? nmd = await GetMetadataFromURL(link, cancellationToken);
+            NftMetadata? nmd = await GetMetadataFromURL(modifiedLink, cancellationToken);
             var trySubFolder = (nmd == null);
             if (nmd != null)
                 //if we got metadata with an error, check if the JSONContent is an HTML page of a
                 //root CID folder and it mentions a metadata.json file in it
                 trySubFolder = ((nmd?.Error != null) && (nmd.JSONContent?.Contains("metadata.json", StringComparison.InvariantCultureIgnoreCase) ?? false));
             //never add metadata.json if the URL already has it, #248
-            if (link.Contains("metadata.json", StringComparison.InvariantCultureIgnoreCase))
+            if (modifiedLink.Contains("metadata.json", StringComparison.InvariantCultureIgnoreCase))
                 trySubFolder = false;
             if (trySubFolder)
-                nmd = await GetMetadataFromURL(link + "/metadata.json", cancellationToken);
+                nmd = await GetMetadataFromURL(modifiedLink + "/metadata.json", cancellationToken);
+            if (nmd != null)
+            {
+                nmd.URL = link;
+                nmd.GatewayURL = modifiedLink;
+            }
             return nmd;
         }
 
