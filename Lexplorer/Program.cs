@@ -24,7 +24,6 @@ builder.Services.AddLazyCache();
 //registration of CSV export formats, no automatic registration possible
 //out of the box and extra framework seems overkill
 TransactionExportService.RegisterExportService("Default", new TransactionExportDefaultCSVFormat());
-NFTHolderExportService.RegisterExportService("NFTHolders", new NFTHolderExportDefaultCSVFormat());
 TransactionExportService.RegisterExportService("Cointracking", new TransactionExportCointracking());
 
 var app = builder.Build();

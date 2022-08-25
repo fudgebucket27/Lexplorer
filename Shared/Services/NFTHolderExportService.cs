@@ -10,27 +10,8 @@ using System.Linq;
 
 namespace Lexplorer.Services
 {
-    public interface ICSVNFTHolderFormatService
-    {
-        public void SuggestFileName(ref string fileName);
-        public void WriteHeader(CSVWriteLine writeLine);
-        public void WriteHolder(string nftId, string address, double balance, CSVWriteLine writeLine);
-    }
-
     public class NFTHolderExportService
     {
-        private static readonly Dictionary<string, ICSVNFTHolderFormatService> registeredExportServices;
-
-        static NFTHolderExportService()
-        {
-            registeredExportServices = new Dictionary<string, ICSVNFTHolderFormatService>();
-        }
-
-        public static void RegisterExportService(string CSVFormatName, ICSVNFTHolderFormatService service)
-        {
-            registeredExportServices.Add(CSVFormatName, service);
-        }
-
         private readonly LoopringGraphQLService _graphqlService;
 
         public NFTHolderExportService(LoopringGraphQLService graphQLService)
@@ -38,23 +19,13 @@ namespace Lexplorer.Services
             _graphqlService = graphQLService;
         }
 
-        public ICSVNFTHolderFormatService getFormatService(string CSVFormat)
-        {
-            return registeredExportServices[CSVFormat];
-        }
-
-        public List<string> ExportFormats()
-        {
-            return registeredExportServices.Keys.ToList<string>();
-        }
-
-        public async Task<Stream> GenerateCSV(ICSVNFTHolderFormatService format, string nftId)
+        public async Task<Stream> GenerateCSV(string nftId)
         {
             var stream = new MemoryStream();
             using (var writer = new StreamWriter(stream, leaveOpen: true))
             {
                 CSVWriteLine writeLine = (string line) => writer.WriteLine(line);
-                format.WriteHeader(writeLine);
+                DoWriteLine(writeLine, "NftId", "Address", "Balance");
                 var processed = 0;
                 while (true)
                 {
@@ -68,7 +39,7 @@ namespace Lexplorer.Services
                     }
                     foreach (var holder in holders)
                     {
-                        format.WriteHolder(nftId, holder.account!.address!, holder.balance, writeLine);
+                        DoWriteLine(writeLine, nftId, holder.account!.address!, holder.balance.ToString());
                     }
                     if (holders.Count < chunkSize) break;
                     processed += chunkSize;
@@ -77,5 +48,15 @@ namespace Lexplorer.Services
             stream.Position = 0;
             return stream;
         }
+
+        private readonly StringBuilder sb = new StringBuilder();
+
+        private void DoWriteLine(CSVWriteLine writeLine, params string?[] columns)
+        {
+            sb.Clear();
+            sb.AppendJoin(Convert.ToChar(9), columns);
+            writeLine(sb.ToString());
+        }
+
     }
 }

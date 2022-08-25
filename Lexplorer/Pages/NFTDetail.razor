@@ -414,25 +414,18 @@
         errorMessage = null;
         try
         {
-
-            var format = NFTHolderExportService.getFormatService(CSVType!);
-
             var fileName = $"NftHolders_{nftId}_{DateTime.UtcNow}.txt";
-            format.SuggestFileName(ref fileName);
-
-            var fileStream = await NFTHolderExportService.GenerateCSV(format, nftId);
+            var fileStream = await NFTHolderExportService.GenerateCSV(nftId);
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);
 
             await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-
-            downloadProcessing = false;
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
-            downloadProcessing = false;
         }
+        downloadProcessing = false;
     }
 
 }
