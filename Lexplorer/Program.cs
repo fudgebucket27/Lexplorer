@@ -13,6 +13,7 @@ builder.Services.AddMudServices();
 builder.Services.AddSingleton<LoopringGraphQLService>();
 builder.Services.AddSingleton<UniswapGraphQLService>();
 builder.Services.AddSingleton<TransactionExportService>();
+builder.Services.AddSingleton<NFTHolderExportService>();
 builder.Services.AddSingleton<EthereumService>();
 builder.Services.AddSingleton<NftMetadataService>();
 builder.Services.AddSingleton<ILoopStatsService, LoopStatsService>();
@@ -23,6 +24,7 @@ builder.Services.AddLazyCache();
 //registration of CSV export formats, no automatic registration possible
 //out of the box and extra framework seems overkill
 TransactionExportService.RegisterExportService("Default", new TransactionExportDefaultCSVFormat());
+NFTHolderExportService.RegisterExportService("NFTHolders", new NFTHolderExportDefaultCSVFormat());
 TransactionExportService.RegisterExportService("Cointracking", new TransactionExportCointracking());
 
 var app = builder.Build();

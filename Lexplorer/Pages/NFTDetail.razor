@@ -7,6 +7,8 @@
 @inject NftMetadataService NftMetadataService;
 @inject IDialogService DialogService;
 @inject ENSCacheService ENSCacheService;
+@inject NFTHolderExportService NFTHolderExportService;
+@inject IJSRuntime JS;
 
 @using DomainsDictionary = Dictionary<string, Lexplorer.Models.ENS.SourceType>;
 @using AddressDomainsDictionary = Dictionary<string, Dictionary<string, Lexplorer.Models.ENS.SourceType>>;
@@ -188,11 +190,14 @@
     </LexpansionPanel>
     <LexpansionPanel Text="Holders">
         <ChildContent>
+            <p hidden="@(!downloadProcessing)">Downloading NFT Holders...<MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+            <p hidden="@(errorMessage==null)"><MudAlert Severity="Severity.Error">@errorMessage</MudAlert></p>
             <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
                 <ToolBarContent>
                     <MudSpacer />
                     <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
                     <MudSpacer />
+                    <MudIconButton Icon="@Icons.Filled.Download" OnClick="DownloadCSVHolders" Disabled="@downloadProcessing" />
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Account Id</MudTh>
@@ -232,6 +237,10 @@
     public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
     private NftMetadata? nftMetadata;
+
+    public string? CSVType = "NFTHolders";
+    public bool downloadProcessing = false;
+    public string? errorMessage = null;
 
     public int gotoPage
     {
@@ -397,6 +406,33 @@
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
 
         DialogService.Show<NFTMetadataDialog>("NFT metadata JSON", parameters, options);
+    }
+
+    public async Task DownloadCSVHolders()
+    {
+        downloadProcessing = true;
+        errorMessage = null;
+        try
+        {
+
+            var format = NFTHolderExportService.getFormatService(CSVType!);
+
+            var fileName = $"NftHolders_{nftId}_{DateTime.UtcNow}.txt";
+            format.SuggestFileName(ref fileName);
+
+            var fileStream = await NFTHolderExportService.GenerateCSV(format, nftId);
+
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+
+            downloadProcessing = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            downloadProcessing = false;
+        }
     }
 
 }
