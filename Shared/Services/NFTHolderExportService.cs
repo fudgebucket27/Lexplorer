@@ -26,14 +26,15 @@ namespace Lexplorer.Services
             {
                 CSVWriteLine writeLine = (string line) => writer.WriteLine(line);
                 DoWriteLine(writeLine, "NftId", "Address", "Balance");
-                var processed = 0;
+                string? lastSlotID = null;
                 while (true)
                 {
                     const int chunkSize = 10;
-                    IList<AccountNFTSlot>? holders = await _graphqlService.GetNftHolders(nftId,processed, chunkSize)!;
+                    IList<AccountNFTSlot>? holders = await _graphqlService.GetNftHolders(nftId, 0, chunkSize, "id", "asc",
+                        lastSlotID == null ? null : new { id_gt = lastSlotID })!;
                     if ((holders == null) || (holders.Count == 0))
                     {
-                        if (processed == 0)
+                        if (lastSlotID == null)
                             throw new Exception("No holders found!");
                         break;
                     }
@@ -42,7 +43,7 @@ namespace Lexplorer.Services
                         DoWriteLine(writeLine, nftId, holder.account!.address!, holder.balance.ToString());
                     }
                     if (holders.Count < chunkSize) break;
-                    processed += chunkSize;
+                    lastSlotID = holders.Last().id;
                 }
             }
             stream.Position = 0;
