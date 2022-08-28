@@ -36,7 +36,7 @@ namespace xUnitTests.LoopringGraphTests
 
             var blockIds = await service.GetBlockDateRange(startDate, endDate);
             var response = await service.GetAccountTransactionsResponse(0, 100, fixture.testAccountId,
-              blockIds!.Item1, blockIds!.Item2);
+              new { block_gte = blockIds!.Item1.ToString(), block_lte = blockIds!.Item2.ToString() });
             Assert.NotNull(response);
             JObject jresponse = JObject.Parse(response!);
             JToken token = jresponse["data"]!["account"]!["transactions"]!;
