@@ -598,6 +598,7 @@ namespace Lexplorer.Services
                     where: $where
                   ) {
                     id
+                    internalID
                     __typename
                     block {
                       timestamp
