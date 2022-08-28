@@ -413,8 +413,8 @@
         errorMessage = null;
         try
         {
-            var fileName = $"NftHolders_{nftId}_{DateTime.UtcNow}.txt";
-            var fileStream = await NFTHolderExportService.GenerateCSV(nftId);
+            var fileName = $"NftHolders_{nft!.nftID}_{DateTime.UtcNow:yyyyMMddTHHmmss}.txt";
+            var fileStream = await NFTHolderExportService.GenerateCSV(nftId, nft);
 
             using var streamRef = new DotNetStreamReference(stream: fileStream);
 

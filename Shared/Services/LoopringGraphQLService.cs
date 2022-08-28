@@ -1481,7 +1481,9 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25, string orderBy = "balance", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25,
+            string orderBy = "balance", string orderDirection = "desc", object? slotWhere = null,
+            CancellationToken cancellationToken = default)
         {
             var nftHolders = @"
             query nftHolders(
@@ -1490,6 +1492,7 @@ namespace Lexplorer.Services
                 $nftId: String
                 $orderBy: String
                 $orderDirection: String
+                $slotWhere: AccountNFTSlot_filter
             )
             {
                 nonFungibleToken(
@@ -1501,13 +1504,15 @@ namespace Lexplorer.Services
                         first: $first
                         orderBy: $orderBy
                         orderDirection: $orderDirection
+                        where: $slotWhere
                     ) 
                     {
+                        id
                         account {
                             id
                             address
                         }
-                    balance
+                        balance
                     }
                 }
              }";
@@ -1523,7 +1528,8 @@ namespace Lexplorer.Services
                     skip = skip,
                     nftId = nftId,
                     orderBy = orderBy,
-                    orderDirection = orderDirection
+                    orderDirection = orderDirection,
+                    slotWhere = slotWhere
                 }
             });
             request.AddStringBody(jObject.ToString(), ContentType.Json);

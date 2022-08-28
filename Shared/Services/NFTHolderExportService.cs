@@ -19,30 +19,42 @@ namespace Lexplorer.Services
             _graphqlService = graphQLService;
         }
 
-        public async Task<Stream> GenerateCSV(string nftId)
+        public async Task<Stream> GenerateCSV(string nftId, NonFungibleToken? nft)
         {
             var stream = new MemoryStream();
             using (var writer = new StreamWriter(stream, leaveOpen: true))
             {
                 CSVWriteLine writeLine = (string line) => writer.WriteLine(line);
-                DoWriteLine(writeLine, "NftId", "Address", "Balance");
-                var processed = 0;
+                //write header
+                if (nft != null)
+                {
+                    DoWriteLine(writeLine, "NftId", nft.nftID);
+                    DoWriteLine(writeLine, "NftType", nft.nftTypeName);
+                    DoWriteLine(writeLine, "Token", nft.token);
+                    DoWriteLine(writeLine, "Minter", nft.minter?.id);
+                    DoWriteLine(writeLine, "MintedAt", nft.mintedAtTransaction?.id);
+                    DoWriteLine(writeLine, "MintedAmount", nft.mintedAtTransaction?.amount.ToString());
+                    writeLine("");
+                }
+                DoWriteLine(writeLine, "Account", "Address", "Balance");
+                string? lastSlotID = null;
                 while (true)
                 {
-                    const int chunkSize = 10;
-                    IList<AccountNFTSlot>? holders = await _graphqlService.GetNftHolders(nftId,processed, chunkSize)!;
+                    const int chunkSize = 200;
+                    IList<AccountNFTSlot>? holders = await _graphqlService.GetNftHolders(nftId, 0, chunkSize, "id", "asc",
+                        lastSlotID == null ? null : new { id_gt = lastSlotID })!;
                     if ((holders == null) || (holders.Count == 0))
                     {
-                        if (processed == 0)
+                        if (lastSlotID == null)
                             throw new Exception("No holders found!");
                         break;
                     }
                     foreach (var holder in holders)
                     {
-                        DoWriteLine(writeLine, nftId, holder.account!.address!, holder.balance.ToString());
+                        DoWriteLine(writeLine, holder.account!.id, holder.account!.address!, holder.balance.ToString());
                     }
                     if (holders.Count < chunkSize) break;
-                    processed += chunkSize;
+                    lastSlotID = holders.Last().id;
                 }
             }
             stream.Position = 0;
