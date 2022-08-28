@@ -61,8 +61,8 @@ namespace Lexplorer.Services
                 while (true)
                 {
                     const int chunkSize = 10;
-                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize, 
-                        accountId, blockIds!.Item1, blockIds!.Item2)!;
+                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize,
+                        accountId, new { block_gte = blockIds!.Item1.ToString(), block_lte = blockIds!.Item2.ToString() })!;
                     if ((transactions == null) || (transactions.Count == 0))
                     {
                         if (processed == 0)
