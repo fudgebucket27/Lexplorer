@@ -167,6 +167,20 @@ namespace Lexplorer.Services
                 totalToken: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);
         }
 
+
+        private void WriteTradeNFT(TradeNFT tradeNFT, string accountIdPerspective, CSVWriteLine writeLine)
+        {
+            DoBuildLine(tradeNFT, tradeNFT.id, tradeNFT.verifiedAt, tradeNFT.typeName,
+                from: tradeNFT.accountSeller?.address,
+                to: tradeNFT.accountBuyer?.address,
+                added: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? tradeNFT.NFTAmountSold.ToString() : GetExportAmount(tradeNFT.realizedNFTPrice, tradeNFT.token),
+                addedToken: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? "NFT" : tradeNFT.token?.symbol,
+                fee: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? GetExportAmount(tradeNFT.feeBuyer, tradeNFT.token) : GetExportAmount(tradeNFT.feeSeller, tradeNFT.token),
+                feeToken: tradeNFT.token?.symbol,
+                total: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? GetExportAmount(tradeNFT.realizedNFTPrice, tradeNFT.token) : tradeNFT.NFTAmountSold.ToString(),
+                totalToken: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? tradeNFT.token?.symbol : "NFT");
+        }
+
         private static readonly List<string> transactionTypesToIgnore = new()
         {
             { "SignatureVerification" },
@@ -194,6 +208,8 @@ namespace Lexplorer.Services
                 WriteWithdrawalNFT(withdrawalNFT, accountIdPerspective, writeLine);
             else if (transaction is AccountUpdate accountUpdate)
                 WriteAccountUpdate(accountUpdate, accountIdPerspective, writeLine);
+            else if (transaction is TradeNFT tradeNFT)
+                WriteTradeNFT(tradeNFT, accountIdPerspective, writeLine);
             else if (transactionTypesToIgnore.Contains(transaction.typeName!))
                 return; //nothing to export
             else
