@@ -710,7 +710,7 @@ namespace Lexplorer.Services
                 {
                     skip = skip,
                     first = first,
-                    orderBy = "id",
+                    orderBy = "createdAt",
                     orderDirection = "desc",
                     where = new
                     {
