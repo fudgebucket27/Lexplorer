@@ -576,7 +576,7 @@ namespace Lexplorer.Services
         }
 
         public async Task<string?> GetAccountTransactionsResponse(int skip, int first, string accountId,
-            double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default)
+            object? where = null, CancellationToken cancellationToken = default)
         {
             var accountQuery = @"
             query accountTransactions(
@@ -598,6 +598,7 @@ namespace Lexplorer.Services
                     where: $where
                   ) {
                     id
+                    internalID
                     __typename
                     block {
                       timestamp
@@ -636,17 +637,9 @@ namespace Lexplorer.Services
                     accountId = int.Parse(accountId),
                     orderBy = "internalID",
                     orderDirection = "desc",
-                    where = new
-                    {
-                    },
+                    where = where
                 }
             });
-            if (firstBlockId.HasValue && lastBlockId.HasValue)
-            {
-                JObject where = (jObject["variables"]!["where"] as JObject)!;
-                where.Add(new JProperty("block_gte", firstBlockId.ToString()));
-                where.Add(new JProperty("block_lte", lastBlockId.ToString()));
-            }
             request.AddStringBody(jObject.ToString(), ContentType.Json);
             try
             {
@@ -661,11 +654,11 @@ namespace Lexplorer.Services
         }
 
         public async Task<IList<Transaction>?> GetAccountTransactions(int skip, int first, string accountId,
-            double? firstBlockId = null, double? lastBlockId = null, CancellationToken cancellationToken = default)
+            object? where = null, CancellationToken cancellationToken = default)
         {
             try
             {
-                string? response = await GetAccountTransactionsResponse(skip, first, accountId, firstBlockId, lastBlockId, cancellationToken);
+                string? response = await GetAccountTransactionsResponse(skip, first, accountId, where, cancellationToken);
                 JObject jresponse = JObject.Parse(response!);
                 JToken? token = jresponse["data"]!["account"]!["transactions"];
                 return token!.ToObject<IList<Transaction>>();
@@ -1481,7 +1474,9 @@ namespace Lexplorer.Services
             }
         }
 
-        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25, string orderBy = "balance", string orderDirection = "desc", CancellationToken cancellationToken = default)
+        public async Task<List<AccountNFTSlot>> GetNftHolders(string nftId, int skip = 0, int first = 25,
+            string orderBy = "balance", string orderDirection = "desc", object? slotWhere = null,
+            CancellationToken cancellationToken = default)
         {
             var nftHolders = @"
             query nftHolders(
@@ -1490,6 +1485,7 @@ namespace Lexplorer.Services
                 $nftId: String
                 $orderBy: String
                 $orderDirection: String
+                $slotWhere: AccountNFTSlot_filter
             )
             {
                 nonFungibleToken(
@@ -1501,13 +1497,15 @@ namespace Lexplorer.Services
                         first: $first
                         orderBy: $orderBy
                         orderDirection: $orderDirection
+                        where: $slotWhere
                     ) 
                     {
+                        id
                         account {
                             id
                             address
                         }
-                    balance
+                        balance
                     }
                 }
              }";
@@ -1523,7 +1521,8 @@ namespace Lexplorer.Services
                     skip = skip,
                     nftId = nftId,
                     orderBy = orderBy,
-                    orderDirection = orderDirection
+                    orderDirection = orderDirection,
+                    slotWhere = slotWhere
                 }
             });
             request.AddStringBody(jObject.ToString(), ContentType.Json);

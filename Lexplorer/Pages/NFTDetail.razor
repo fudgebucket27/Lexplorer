@@ -7,6 +7,8 @@
 @inject NftMetadataService NftMetadataService;
 @inject IDialogService DialogService;
 @inject ENSCacheService ENSCacheService;
+@inject NFTHolderExportService NFTHolderExportService;
+@inject IJSRuntime JS;
 
 @using DomainsDictionary = Dictionary<string, Lexplorer.Models.ENS.SourceType>;
 @using AddressDomainsDictionary = Dictionary<string, Dictionary<string, Lexplorer.Models.ENS.SourceType>>;
@@ -55,12 +57,34 @@
             <td Style="word-break:break-all;"><L1AccountLink address="@nft?.token" shortenAddress="false" /></td>
         </tr>
         <tr>
+            <td>MetaData URL</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.URL != null)
+                {
+                    <a Class="mud-theme-primary" href="@nftMetadata?.GatewayURL" target="_blank">@nftMetadata?.URL</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
+        </tr>
+        <tr>
             <td>Image URL</td>
-            <td Style="word-break:break-all;">@nftMetadata?.image</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.image != null)
+                {
+                    <a Class="mud-theme-primary" href="@NftMetadataService.MakeIPFSLink(nftMetadata?.image)" target="_blank">@nftMetadata?.image</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
         </tr>
         <tr>
             <td>Animation URL</td>
-            <td Style="word-break:break-all;">@nftMetadata?.animation_url</td>
+            <td Style="word-break:break-all;">
+                @if (@nftMetadata?.animation_url != null)
+                {
+                    <a Class="mud-theme-primary" href="@NftMetadataService.MakeIPFSLink(nftMetadata?.animation_url)" target="_blank">@nftMetadata?.animation_url</a>
+                    <MudIcon Icon="@Icons.Filled.Link" Color="Color.Primary" Title="Link to IPFS gateway" Size="Size.Small" />
+                }
+            </td>
         </tr>
         @if ((nftMetadata?.attributes?.Count > 0) || (nftMetadata?.properties?.Count > 0))
         {
@@ -166,11 +190,14 @@
     </LexpansionPanel>
     <LexpansionPanel Text="Holders">
         <ChildContent>
+            <p hidden="@(!downloadProcessing)">Downloading NFT Holders...<MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-7"/></p>
+            <p hidden="@(errorMessage==null)"><MudAlert Severity="Severity.Error">@errorMessage</MudAlert></p>
             <MudTable Dense="true" Striped="true" Bordered="true" Items="@holders" Hover="true" Loading=@isLoadingHolders>
                 <ToolBarContent>
                     <MudSpacer />
                     <OpenEndedPager @bind-PageNumber="goToHolderPage" IsLastPage="@(holders!.Count < pageSize)" />
                     <MudSpacer />
+                    <MudIconButton Icon="@Icons.Filled.Download" OnClick="DownloadCSVHolders" Disabled="@downloadProcessing" />
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh>Account Id</MudTh>
@@ -210,6 +237,9 @@
     public bool isLoadingHolders = true;
     public readonly int pageSize = 25;
     private NftMetadata? nftMetadata;
+
+    public bool downloadProcessing = false;
+    public string? errorMessage = null;
 
     public int gotoPage
     {
@@ -375,6 +405,26 @@
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
 
         DialogService.Show<NFTMetadataDialog>("NFT metadata JSON", parameters, options);
+    }
+
+    public async Task DownloadCSVHolders()
+    {
+        downloadProcessing = true;
+        errorMessage = null;
+        try
+        {
+            var fileName = $"NftHolders_{nft!.nftID}_{DateTime.UtcNow:yyyyMMddTHHmmss}.txt";
+            var fileStream = await NFTHolderExportService.GenerateCSV(nftId, nft);
+
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        downloadProcessing = false;
     }
 
 }

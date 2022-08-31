@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopringGraphQLService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LoopStatsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NftMetadataService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\NFTHolderExportService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\TransactionExportDefaultCSVFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\UniswapGraphQLService.cs" />

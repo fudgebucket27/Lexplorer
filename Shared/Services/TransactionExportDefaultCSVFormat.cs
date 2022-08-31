@@ -67,6 +67,7 @@ namespace Lexplorer.Services
                     );
             }
         }
+
         private void WriteSwap(Swap swap, string accountIdPerspective, CSVWriteLine writeLine)
         {
             if (swap.fillAmountBorSA)
@@ -89,6 +90,7 @@ namespace Lexplorer.Services
                     );
             }
         }
+
         private void WriteTransfer(Transfer transfer, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(transfer, transfer.id, transfer.verifiedAt, transfer.typeName,
@@ -101,6 +103,7 @@ namespace Lexplorer.Services
                 total: (transfer.fromAccount?.id == accountIdPerspective) ? GetExportAmount(transfer.amount, transfer.token) : null,
                 totalToken: (transfer.fromAccount?.id  == accountIdPerspective) ? transfer.token?.symbol : null);
         }
+
         private void WriteDeposit(Deposit deposit, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(deposit, deposit.id, deposit.verifiedAt, deposit.typeName,
@@ -108,6 +111,7 @@ namespace Lexplorer.Services
                 added: GetExportAmount(deposit.amount, deposit.token),
                 addedToken: deposit.token?.symbol);
         }
+
         private void WriteWithdrawal(Withdrawal withdrawal, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(withdrawal, withdrawal.id, withdrawal.verifiedAt, withdrawal.typeName,
@@ -115,6 +119,7 @@ namespace Lexplorer.Services
                 total: GetExportAmount(withdrawal.amount, withdrawal.token),
                 totalToken: withdrawal.token?.symbol);
         }
+
         private void WriteAccountUpdate(AccountUpdate accountUpdate, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(accountUpdate, accountUpdate.id, accountUpdate.verifiedAt, accountUpdate.typeName, 
@@ -122,6 +127,7 @@ namespace Lexplorer.Services
                 fee: GetExportAmount(accountUpdate.fee, accountUpdate.feeToken),
                 feeToken: accountUpdate.feeToken?.symbol);
         }
+
         private void WriteTransferNFT(TransferNFT transferNFT, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(transferNFT, transferNFT.id, transferNFT.verifiedAt, transferNFT.typeName,
@@ -134,6 +140,7 @@ namespace Lexplorer.Services
                 total: (transferNFT.fromAccount?.id == accountIdPerspective) ? transferNFT.amount.ToString() : null,
                 totalToken: (transferNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);
         }
+
         private void WriteMintNFT(MintNFT mintNFT, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(mintNFT, mintNFT.id, mintNFT.verifiedAt, mintNFT.typeName,
@@ -146,6 +153,7 @@ namespace Lexplorer.Services
                 total: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? mintNFT.amount.ToString() : null,
                 totalToken: (mintNFT.minter?.id == accountIdPerspective) && (mintNFT.minter?.id != mintNFT.receiver?.id) ? "NFT" : null);
         }
+
         private void WriteWithdrawalNFT(WithdrawalNFT withdrawalNFT, string accountIdPerspective, CSVWriteLine writeLine)
         {
             DoBuildLine(withdrawalNFT, withdrawalNFT.id, withdrawalNFT.verifiedAt, withdrawalNFT.typeName,
@@ -158,11 +166,27 @@ namespace Lexplorer.Services
                 total: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? withdrawalNFT.amount.ToString() : null,
                 totalToken: (withdrawalNFT.fromAccount?.id == accountIdPerspective) ? "NFT" : null);
         }
+
+
+        private void WriteTradeNFT(TradeNFT tradeNFT, string accountIdPerspective, CSVWriteLine writeLine)
+        {
+            DoBuildLine(tradeNFT, tradeNFT.id, tradeNFT.verifiedAt, tradeNFT.typeName,
+                from: tradeNFT.accountSeller?.address,
+                to: tradeNFT.accountBuyer?.address,
+                added: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? tradeNFT.NFTAmountSold.ToString() : GetExportAmount(tradeNFT.realizedNFTPrice, tradeNFT.token),
+                addedToken: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? "NFT" : tradeNFT.token?.symbol,
+                fee: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? GetExportAmount(tradeNFT.feeBuyer, tradeNFT.token) : GetExportAmount(tradeNFT.feeSeller, tradeNFT.token),
+                feeToken: tradeNFT.token?.symbol,
+                total: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? GetExportAmount(tradeNFT.realizedNFTPrice, tradeNFT.token) : tradeNFT.NFTAmountSold.ToString(),
+                totalToken: (tradeNFT.accountBuyer?.id == accountIdPerspective) ? tradeNFT.token?.symbol : "NFT");
+        }
+
         private static readonly List<string> transactionTypesToIgnore = new()
         {
             { "SignatureVerification" },
             { "AmmUpdate" }
         };
+
         public void WriteTransaction(Transaction transaction, string accountIdPerspective, CSVWriteLine writeLine)
         {
             sb.Clear();
@@ -184,10 +208,10 @@ namespace Lexplorer.Services
                 WriteWithdrawalNFT(withdrawalNFT, accountIdPerspective, writeLine);
             else if (transaction is AccountUpdate accountUpdate)
                 WriteAccountUpdate(accountUpdate, accountIdPerspective, writeLine);
+            else if (transaction is TradeNFT tradeNFT)
+                WriteTradeNFT(tradeNFT, accountIdPerspective, writeLine);
             else if (transactionTypesToIgnore.Contains(transaction.typeName!))
-#pragma warning disable CS0642 // Possible mistaken empty statement
-                ; //nothing to export
-#pragma warning restore CS0642 // Possible mistaken empty statement
+                return; //nothing to export
             else
                 sb.AppendJoin(Convert.ToChar(9), transaction.id, transaction.verifiedAt, transaction.typeName);
 

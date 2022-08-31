@@ -57,15 +57,18 @@ namespace Lexplorer.Services
                 CSVWriteLine writeLine = (string line) => writer.WriteLine(line);
                 format.WriteHeader(writeLine);
                 var blockIds = await _graphqlService.GetBlockDateRange(startDate, endDate);
-                var processed = 0;
+                string? lastId = null;
+                object? whereObject = null;
                 while (true)
                 {
-                    const int chunkSize = 10;
-                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(processed, chunkSize, 
-                        accountId, blockIds!.Item1, blockIds!.Item2)!;
+                    const int chunkSize = 1000;
+                    whereObject = (lastId == null) ?
+                        new { block_gte = blockIds!.Item1.ToString(), block_lte = blockIds!.Item2.ToString() } :
+                        new { block_gte = blockIds!.Item1.ToString(), block_lte = blockIds!.Item2.ToString(), internalID_lt = lastId };
+                    IList<Transaction>? transactions = await _graphqlService.GetAccountTransactions(0, chunkSize, accountId, whereObject)!;
                     if ((transactions == null) || (transactions.Count == 0))
                     {
-                        if (processed == 0)
+                        if (lastId == null)
                             throw new Exception("No transactions found in the given timespan");
                         break;
                     }
@@ -74,7 +77,7 @@ namespace Lexplorer.Services
                         format.WriteTransaction(transaction, accountId, writeLine);
                     }
                     if (transactions.Count < chunkSize) break;
-                    processed += chunkSize;
+                    lastId = transactions.Last().internalID;
                 }
             }
             stream.Position = 0;
