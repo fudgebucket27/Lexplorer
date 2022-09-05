@@ -495,5 +495,7 @@ namespace Lexplorer.Models
         public double weekStart { get; set; }
         public double weekEnd { get; set; }
         public double weekNumber { get; set; }
+
+        public DateTime weekStartDateTime => DateTimeOffset.FromUnixTimeSeconds(((int)weekStart)).UtcDateTime;
     }
 }
