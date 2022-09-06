@@ -57,52 +57,104 @@
     </tbody>
 </MudSimpleTable>
 
+<MudExpansionPanels MultiExpansion="true">
 @if (dailyData != null)
 {
-    <MudItem lg="12" Class="my-3">
-        <ApexChart @ref="dailyPriceChart"
-                   Height="400"
-                   TItem="PairDailyData"
-                   Title=@($"30 day price in {pair?.token1?.symbol}")
-                   Options="dailyPriceChartOptions"
-                   XAxisType="XAxisType.Datetime">
+    <LexpansionPanel Text="Daily charts">
+        <MudItem lg="12" Class="my-3">
+            <ApexChart @ref="dailyPriceChart"
+                       Height="400"
+                       TItem="PairDailyData"
+                       Title=@($"30 day price in {pair?.token1?.symbol}")
+                       Options="dailyPriceChartOptions"
+                       XAxisType="XAxisType.Datetime">
 
-            <ApexCandleSeries TItem="PairDailyData"
-                              Items="dailyData"
-                              Name="Apex Stock Price"
-                              XValue="@(d => d.dayDateTime)"
-                              Open="@(d => TokenAmountConverter.ToDecimal(d.token0PriceOpen, pair?.token1?.decimals ?? 0))"
-                              High="@(d => TokenAmountConverter.ToDecimal(d.token0PriceHigh, pair?.token1?.decimals ?? 0))"
-                              Low="@(d => TokenAmountConverter.ToDecimal(d.token0PriceLow, pair?.token1?.decimals ?? 0))"
-                              Close="@(d => TokenAmountConverter.ToDecimal(d.token0PriceClose, pair?.token1?.decimals ?? 0))"
-                              OrderBy="d => d.X" />
-        </ApexChart>
-    </MudItem>
-    <MudItem lg="12" Class="my-3">
-        <ApexChart @ref="dailyVolumeChart"
-                   Height="250"
-                   TItem="PairDailyData"
-                   Title=@($"30 day volume in {pair?.token1?.symbol}")
-                   Options="dailyVolumeChartOptions"
-                   XAxisType="XAxisType.Datetime">
+                <ApexCandleSeries TItem="PairDailyData"
+                                  Items="dailyData"
+                                  Name="Apex Stock Price"
+                                  XValue="@(d => d.dayDateTime)"
+                                  Open="@(d => TokenAmountConverter.ToDecimal(d.token0PriceOpen, pair?.token1?.decimals ?? 0))"
+                                  High="@(d => TokenAmountConverter.ToDecimal(d.token0PriceHigh, pair?.token1?.decimals ?? 0))"
+                                  Low="@(d => TokenAmountConverter.ToDecimal(d.token0PriceLow, pair?.token1?.decimals ?? 0))"
+                                  Close="@(d => TokenAmountConverter.ToDecimal(d.token0PriceClose, pair?.token1?.decimals ?? 0))"
+                                  OrderBy="d => d.X" />
+            </ApexChart>
+        </MudItem>
+        <MudItem lg="12" Class="my-3">
+            <ApexChart @ref="dailyVolumeChart"
+                       Height="250"
+                       TItem="PairDailyData"
+                       Title=@($"30 day volume in {pair?.token1?.symbol}")
+                       Options="dailyVolumeChartOptions"
+                       XAxisType="XAxisType.Datetime">
 
-            <ApexPointSeries TItem="PairDailyData"
-                             Items="dailyData"
-                             Name="Swap"
-                             XValue="@(d => d.dayDateTime)"
-                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Swap, pair?.token1?.decimals ?? 0))"
-                             SeriesType="SeriesType.Bar"
-                             OrderBy="d => d.X" />
-            <ApexPointSeries TItem="PairDailyData"
-                             Items="dailyData"
-                             Name="Orderbook"
-                             XValue="@(d => d.dayDateTime)"
-                             YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Orderbook, pair?.token1?.decimals ?? 0))"
-                             SeriesType="SeriesType.Bar"
-                             OrderBy="d => d.X" />
-        </ApexChart>
-    </MudItem>
+                <ApexPointSeries TItem="PairDailyData"
+                                 Items="dailyData"
+                                 Name="Swap"
+                                 XValue="@(d => d.dayDateTime)"
+                                 YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Swap, pair?.token1?.decimals ?? 0))"
+                                 SeriesType="SeriesType.Bar"
+                                 OrderBy="d => d.X" />
+                <ApexPointSeries TItem="PairDailyData"
+                                 Items="dailyData"
+                                 Name="Orderbook"
+                                 XValue="@(d => d.dayDateTime)"
+                                 YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Orderbook, pair?.token1?.decimals ?? 0))"
+                                 SeriesType="SeriesType.Bar"
+                                 OrderBy="d => d.X" />
+            </ApexChart>
+        </MudItem>
+    </LexpansionPanel>
 }
+@if (weeklyData != null)
+{
+    <LexpansionPanel Text="Weekly charts">
+        <MudItem lg="12" Class="my-3">
+            <ApexChart @ref="weeklyPriceChart"
+                       Height="400"
+                       TItem="PairWeeklyData"
+                       Title=@($"52 week price in {pair?.token1?.symbol}")
+                       Options="weeklyPriceChartOptions"
+                       XAxisType="XAxisType.Datetime">
+
+                <ApexCandleSeries TItem="PairWeeklyData"
+                                  Items="weeklyData"
+                                  Name="Apex Stock Price"
+                                  XValue="@(d => d.weekStartDateTime)"
+                                  Open="@(d => TokenAmountConverter.ToDecimal(d.token0PriceOpen, pair?.token1?.decimals ?? 0))"
+                                  High="@(d => TokenAmountConverter.ToDecimal(d.token0PriceHigh, pair?.token1?.decimals ?? 0))"
+                                  Low="@(d => TokenAmountConverter.ToDecimal(d.token0PriceLow, pair?.token1?.decimals ?? 0))"
+                                  Close="@(d => TokenAmountConverter.ToDecimal(d.token0PriceClose, pair?.token1?.decimals ?? 0))"
+                                  OrderBy="d => d.X" />
+            </ApexChart>
+        </MudItem>
+        <MudItem lg="12" Class="my-3">
+            <ApexChart @ref="weeklyVolumeChart"
+                       Height="250"
+                       TItem="PairWeeklyData"
+                       Title=@($"52 week volume in {pair?.token1?.symbol}")
+                       Options="weeklyVolumeChartOptions"
+                       XAxisType="XAxisType.Datetime">
+
+                <ApexPointSeries TItem="PairWeeklyData"
+                                 Items="weeklyData"
+                                 Name="Swap"
+                                 XValue="@(d => d.weekStartDateTime)"
+                                 YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Swap, pair?.token1?.decimals ?? 0))"
+                                 SeriesType="SeriesType.Bar"
+                                 OrderBy="d => d.X" />
+                <ApexPointSeries TItem="PairWeeklyData"
+                                 Items="weeklyData"
+                                 Name="Orderbook"
+                                 XValue="@(d => d.weekStartDateTime)"
+                                 YValue="@(d => TokenAmountConverter.ToDecimal(d.tradedVolumeToken1Orderbook, pair?.token1?.decimals ?? 0))"
+                                 SeriesType="SeriesType.Bar"
+                                 OrderBy="d => d.X" />
+            </ApexChart>
+        </MudItem>
+    </LexpansionPanel>
+}
+</MudExpansionPanels>
 
 @code {
     [Parameter]
@@ -111,11 +163,17 @@
     private Pair? pair { get; set; } = new Pair();
     private LoopringPoolToken? poolToken { get; set; }
     private IList<PairDailyData>? dailyData { get; set; } = null;
+    private IList<PairWeeklyData>? weeklyData { get; set; } = null;
 
     private ApexChart<PairDailyData>? dailyPriceChart;
     private ApexChartOptions<PairDailyData> dailyPriceChartOptions = new();
     private ApexChart<PairDailyData>? dailyVolumeChart;
     private ApexChartOptions<PairDailyData> dailyVolumeChartOptions = new();
+
+    private ApexChart<PairWeeklyData>? weeklyPriceChart;
+    private ApexChartOptions<PairWeeklyData> weeklyPriceChartOptions = new();
+    private ApexChart<PairWeeklyData>? weeklyVolumeChart;
+    private ApexChartOptions<PairWeeklyData> weeklyVolumeChartOptions = new();
 
     private bool __isDarkMode = false;
     [CascadingParameter(Name = "_isDarkMode")]
@@ -138,6 +196,17 @@
                 Mode = _isDarkMode ? Mode.Dark : Mode.Light
             };
             dailyPriceChart?.RenderAsync();
+
+            weeklyVolumeChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            weeklyVolumeChart?.RenderAsync();
+            weeklyPriceChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            weeklyPriceChart?.RenderAsync();
         }
     }
 
@@ -163,12 +232,12 @@
                 DateTimeOffset.UtcNow.AddHours(1)
                 );
 
-            const string chartGroup = "dailyCharts";
+            const string dailyChartGroup = "dailyCharts";
 
             dailyVolumeChartOptions = new ApexChartOptions<PairDailyData>();
             dailyVolumeChartOptions.Chart = new Chart
             {
-                Group = chartGroup,
+                Group = dailyChartGroup,
                 Stacked = true,
                 Toolbar = new Toolbar
                 {
@@ -195,7 +264,7 @@
             dailyPriceChartOptions = new ApexChartOptions<PairDailyData>();
             dailyPriceChartOptions.Chart = new Chart
             {
-                Group = chartGroup,
+                Group = dailyChartGroup,
                 Toolbar = new Toolbar
                 {
                     Show = false
@@ -207,6 +276,65 @@
             };
             dailyPriceChartOptions.Yaxis = new List<YAxis>();
             dailyPriceChartOptions.Yaxis.Add(new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
+                    //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
+                    Formatter = $"function (value) {{return Number(value).toLocaleString() + \" {pair?.token1?.symbol}\";}}",
+                    MinWidth = 80
+                }
+            });
+            StateHasChanged();
+            string weeklyDataCacheKey = $"pair-{pairId}-weeklyData";
+            weeklyData = await AppCache.GetOrAddAsyncNonNull(weeklyDataCacheKey,
+                async () => await LoopringGraphQLService.GetPairWeeklyEntities(pairId, 0, 52),
+                DateTimeOffset.UtcNow.AddHours(1)
+                );
+            const string weeklyChartGroup = "weeklyCharts";
+
+            weeklyVolumeChartOptions = new ApexChartOptions<PairWeeklyData>();
+            weeklyVolumeChartOptions.Chart = new Chart
+            {
+                Group = weeklyChartGroup,
+                Stacked = true,
+                Toolbar = new Toolbar
+                {
+                    Show = false
+                }
+            };
+                weeklyVolumeChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            weeklyVolumeChartOptions.Yaxis = new List<YAxis>();
+            weeklyVolumeChartOptions.Yaxis.Add(new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    //ideally implement something similar to TokenAmountConverter.ToStringWithExponent but in JS?
+                    //as we're server side and the chart is JS, we can't call DotNet, i.e. our code
+                    Formatter = @"function (value) {
+                    return Number(value).toLocaleString();}",
+                    MinWidth = 80
+                }
+            }
+            );
+            weeklyPriceChartOptions = new ApexChartOptions<PairWeeklyData>();
+            weeklyPriceChartOptions.Chart = new Chart
+            {
+                Group = weeklyChartGroup,
+                Toolbar = new Toolbar
+                {
+                    Show = false
+                }
+            };
+            weeklyPriceChartOptions.Theme = new Theme
+            {
+                Mode = _isDarkMode ? Mode.Dark : Mode.Light
+            };
+            weeklyPriceChartOptions.Yaxis = new List<YAxis>();
+            weeklyPriceChartOptions.Yaxis.Add(new YAxis
             {
                 Labels = new YAxisLabels
                 {

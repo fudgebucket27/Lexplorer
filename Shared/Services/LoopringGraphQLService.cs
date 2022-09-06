@@ -990,6 +990,79 @@ namespace Lexplorer.Services
             }
         }
 
+        public async Task<IList<PairWeeklyData>?> GetPairWeeklyEntities(string pairID, int skip, int first, string orderBy = "weekEnd", string orderDirection = "desc")
+        {
+            var pairDailyEntitiesQuery = @"
+             query pair(
+                $pairID: ID!
+                $skip: Int
+                $first: Int
+                $orderBy: PairWeeklyData_orderBy
+                $orderDirection: OrderDirection
+              ) {
+                pair(
+                  id: $pairID
+                ) {
+                  weeklyEntities(
+                    skip: $skip
+                    first: $first
+                    orderBy: $orderBy
+                    orderDirection: $orderDirection
+                  ) {
+                    id
+                    weekStart
+                    weekEnd
+                    weekNumber
+                    token0PriceLow
+                    token0PriceHigh
+                    token0PriceOpen
+                    token0PriceClose
+
+                    token1PriceLow
+                    token1PriceHigh
+                    token1PriceOpen
+                    token1PriceClose
+
+                    tradedVolumeToken0
+                    tradedVolumeToken0Swap
+                    tradedVolumeToken0Orderbook
+                    tradedVolumeToken1
+                    tradedVolumeToken1Swap
+                    tradedVolumeToken1Orderbook
+                  }
+                }
+              }
+            "
+              + GraphQLFragments.TokenFragment;
+
+            var request = new RestRequest();
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(new
+            {
+                query = pairDailyEntitiesQuery,
+                variables = new
+                {
+                    pairID,
+                    skip,
+                    first,
+                    orderBy,
+                    orderDirection
+                }
+            });
+            try
+            {
+                var response = await _client.PostAsync(request);
+                JObject jresponse = JObject.Parse(response.Content!);
+                JToken? token = jresponse["data"]!["pair"]!["weeklyEntities"];
+                return token!.ToObject<IList<PairWeeklyData>>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         private static readonly Dictionary<string, Type> resultCategories
             = new Dictionary<string, Type>
         {
