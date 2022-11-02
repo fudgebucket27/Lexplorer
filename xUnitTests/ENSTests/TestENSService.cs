@@ -30,9 +30,13 @@ namespace xUnitTests.ENSTests
         public async void TestReverseLookupAddress(string address, params string[] domains)
         {
             var ens = await fixture.ENS.ReverseLookupAddress(address);
-            Assert.Equal(domains.Length, ens?.Count ?? 0);
-            if (domains.Length > 0)
-                Assert.Equal(domains, ens?.Keys.ToArray());
+            var ensCount = (ens?.Count ?? 0);
+            Assert.True(ensCount >= domains.Length, $"Should at least return {domains.Length} domains, but only returned {ensCount}");
+            var ensArray = ens?.Keys.ToArray();
+            foreach (var domain in domains)
+            {
+                Assert.True(ensArray!.Contains(domain), $"Domain {domain} not found in returned ensArray {ensArray}");
+            }
         }
 
 	}
