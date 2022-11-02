@@ -1386,7 +1386,9 @@ namespace Lexplorer.Services
                 {
                     where = new 
                     {
-                        token_in = new List<string> { tokenAddress } //avoid invalid argument error with graph when using "token" string instead of "token_in"
+                        //avoid invalid argument error with graph when using "token" string instead of "token_in"
+                        //also: convert to lower case, otherwise graph just returns an empty list, see #263
+                        token_in = new List<string> { tokenAddress.ToLower() }
                     },
                     skip = skip,
                     first = first,
