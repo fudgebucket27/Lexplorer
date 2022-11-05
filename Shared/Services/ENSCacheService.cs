@@ -81,12 +81,11 @@ namespace Lexplorer.Services
             {
                 try
                 {
-                    var accounts = await ReverseLookup(new List<string>() { address }, cancellationToken);
+                    var domains = await ReverseLookup(new List<string>() { address }, cancellationToken);
                     if (!disableCaching)
                         _ = ensAlreadyLookedUp.Add(address);
 
-                    var domainList = accounts?.FirstOrDefault<ENS.Account>()?.domains;
-                    var domainNames = domainList?.Select(item => item.name).
+                    var domainNames = domains?.Select(item => item.name).
                         OfType<string>() //skip null values
                         .ToArray();
 
@@ -104,24 +103,21 @@ namespace Lexplorer.Services
             return retValue;
         }
 
-        public async Task<List<ENS.Account>?> ReverseLookup(IList<string> addresses, CancellationToken cancellationToken = default)
+        public async Task<List<ENS.Domain>?> ReverseLookup(IList<string> addresses, CancellationToken cancellationToken = default)
         {
             var revLookupQuery = @"
             query revLookup(
                 $addresses: [String]
             ){
-                accounts(
-                    where: {id_in: $addresses}
+                domains (
+                    where: {resolvedAddress_in: $addresses}
                 ) {
                     id
-                    domains {
+                    name
+                    labelName
+                    labelhash
+                    resolvedAddress {
                       id
-                      name
-                      labelName
-                      labelhash
-                      parent {
-                        id
-                      }
                     }
                 }
             }
@@ -139,8 +135,8 @@ namespace Lexplorer.Services
             });
             var response = await _client.PostAsync(request, cancellationToken);
             JObject jresponse = JObject.Parse(response.Content!);
-            JToken? jtoken = jresponse["data"]!["accounts"];
-            return jtoken!.ToObject<List<ENS.Account>>()!;
+            JToken? jtoken = jresponse["data"]!["domains"];
+            return jtoken!.ToObject<List<ENS.Domain>>()!;
         }
 
         public AddressDomainsDictionary? GetCachedENS(ref List<string>? addressList, AddressDomainsDictionary? existingENSDictionary = default)
@@ -179,15 +175,12 @@ namespace Lexplorer.Services
             var revLookedUp = await ReverseLookup(addressList, cancellationToken);
             //add the new found ones to the cache
             if (revLookedUp != null)
-                foreach (var account in revLookedUp)
+                foreach (var domain in revLookedUp)
                 {
-                    if (account.id == null) continue;
+                    if (domain?.resolvedAddress?.id == null) continue;
+                    if (string.IsNullOrEmpty(domain?.name)) continue;
 
-                    var domainNames = account.domains?.Select(item => item.name).
-                        OfType<string>() //skip null values
-                        .ToArray();
-
-                    AddDomains(account.id, domainNames, ENS.SourceType.ReverseLookup);
+                    AddDomains(domain.resolvedAddress.id, new string[] { domain.name }, ENS.SourceType.ReverseLookup);
                 }
             //add all to the list of the already looked up addresses and fill
             //retValue from the cache so that it contains all source types,

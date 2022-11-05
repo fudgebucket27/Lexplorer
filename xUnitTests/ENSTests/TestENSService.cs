@@ -19,9 +19,9 @@ namespace xUnitTests.ENSTests
         [InlineData("0x36cd6b3b9329c04df55d55d41c257a5fdd387acd", "0x99fdddfdc9277404db0379009274cc98d3688f8b")]
         public async void TestReverseLoopkup(params string[] addresses)
         {
-            var accounts = await fixture.ENS.ReverseLookup(addresses);
-            Assert.NotEmpty(accounts);
-            Assert.Equal(addresses.Length, accounts!.Count);
+            var domains = await fixture.ENS.ReverseLookup(addresses);
+            Assert.NotEmpty(domains);
+            Assert.Equal(addresses.Length, domains!.Count);
         }
 
         [Theory]
