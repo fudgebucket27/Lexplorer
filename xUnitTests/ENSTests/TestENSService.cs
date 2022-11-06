@@ -19,9 +19,9 @@ namespace xUnitTests.ENSTests
         [InlineData("0x36cd6b3b9329c04df55d55d41c257a5fdd387acd", "0x99fdddfdc9277404db0379009274cc98d3688f8b")]
         public async void TestReverseLoopkup(params string[] addresses)
         {
-            var accounts = await fixture.ENS.ReverseLookup(addresses);
-            Assert.NotEmpty(accounts);
-            Assert.Equal(addresses.Length, accounts!.Count);
+            var domains = await fixture.ENS.ReverseLookup(addresses);
+            Assert.NotEmpty(domains);
+            Assert.Equal(addresses.Length, domains!.Count);
         }
 
         [Theory]
@@ -30,9 +30,13 @@ namespace xUnitTests.ENSTests
         public async void TestReverseLookupAddress(string address, params string[] domains)
         {
             var ens = await fixture.ENS.ReverseLookupAddress(address);
-            Assert.Equal(domains.Length, ens?.Count ?? 0);
-            if (domains.Length > 0)
-                Assert.Equal(domains, ens?.Keys.ToArray());
+            var ensCount = (ens?.Count ?? 0);
+            Assert.True(ensCount >= domains.Length, $"Should at least return {domains.Length} domains, but only returned {ensCount}");
+            var ensArray = ens?.Keys.ToArray();
+            foreach (var domain in domains)
+            {
+                Assert.True(ensArray!.Contains(domain), $"Domain {domain} not found in returned ensArray {ensArray}");
+            }
         }
 
 	}

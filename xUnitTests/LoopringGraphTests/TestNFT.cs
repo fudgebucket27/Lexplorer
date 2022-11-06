@@ -64,6 +64,7 @@ namespace xUnitTests.LoopringGraphTests
 
         [Theory]
         [InlineData("0x9af1b4f94657c79c4cff77c3c35a746353518724")]
+        [InlineData("0x7F49fc64A8dA0735C68557f3aEd37E377CF8F6a5")]
         public async void GetCollectionNFTs(string tokenAddress)
         {
             var nfts = await service.GetCollectionNFTs(tokenAddress);
