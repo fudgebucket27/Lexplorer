@@ -27,6 +27,7 @@ namespace Lexplorer.Services
         {
             _client = new RestClient();
             _ipfsBaseUrl = ipfsBaseUrl;
+            _client.AddDefaultHeader("Accept", "Accept: text/plain");
         }
 
         public void Dispose()
@@ -156,7 +157,7 @@ namespace Lexplorer.Services
             }
             catch (Exception e)
             {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                Debug.WriteLine(e.StackTrace + "\n" + e.Message);
                 return null;
             }
         }
@@ -172,7 +173,7 @@ namespace Lexplorer.Services
             }
             catch (Exception e)
             {
-                Trace.WriteLine(e.StackTrace + "\n" + e.Message);
+                Debug.WriteLine(e.StackTrace + "\n" + e.Message);
                 return null;
             }
         }
