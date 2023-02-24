@@ -17,7 +17,7 @@ namespace xUnitTests.LoopringGraphTests
 
         public GraphQLTestsFixture()
         {
-            LGS = new LoopringGraphQLService("https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36");
+            LGS = new LoopringGraphQLService("https://api.thegraph.com/subgraphs/name/loopring/loopring");
         }
 
         public void Dispose()
