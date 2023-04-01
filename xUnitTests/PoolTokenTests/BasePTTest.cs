@@ -18,7 +18,7 @@ namespace xUnitTests.PoolTokenTests
 
         public PoolTokensTestsFixture()
         {
-            LGS = new LoopringGraphQLService("https://api.thegraph.com/subgraphs/name/juanmardefago/loopring36");
+            LGS = new LoopringGraphQLService("https://api.thegraph.com/subgraphs/name/loopring/loopring");
             ES = new EthereumService();
             LPTCS = new LoopringPoolTokenCacheService(LGS, ES);
             LPTCS.DisableCache();
